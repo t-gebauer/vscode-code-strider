@@ -2,6 +2,12 @@
 
 pkgs.mkShell {
   buildInputs = with pkgs; [
-    nodejs
+    python3
+    nodejs-12_x
+    nodePackages.node-gyp
+
+    # To generate wasm files
+    tree-sitter
+    emscripten
   ];
 }

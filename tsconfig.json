@@ -14,6 +14,13 @@
 		// "noFallthroughCasesInSwitch": true, /* Report errors for fallthrough cases in switch statement. */
 		// "noUnusedParameters": true,  /* Report errors on unused parameters. */
 	},
+	"files": [
+		"src/wasm/tree-sitter-javascript.wasm"
+	],
+	"include": [
+		"src/**/*",
+		"declarations/*", "test-it.js"
+	],
 	"exclude": [
 		"node_modules",
 		".vscode-test"
