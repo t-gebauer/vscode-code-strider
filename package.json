@@ -10,13 +10,13 @@
 		"Other"
 	],
 	"activationEvents": [
-		"onCommand:vscode-code-strider.helloWorld"
+		"onCommand:code-strider.helloWorld"
 	],
 	"main": "./out/extension.js",
 	"contributes": {
 		"commands": [
 			{
-				"command": "vscode-code-strider.helloWorld",
+				"command": "code-strider.helloWorld",
 				"title": "Hello World"
 			}
 		]
