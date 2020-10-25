@@ -1,5 +1,5 @@
 import { TextEditor } from "vscode";
-import { parseJS } from "./javascript";
+import { initEditor, parseJS } from "./javascript";
 
 export function handleEditorChange(textEditor: TextEditor | undefined) {
     console.log('Editor changed');
@@ -8,6 +8,7 @@ export function handleEditorChange(textEditor: TextEditor | undefined) {
     if (textEditor?.document.languageId === 'javascript') {
         console.log('its JS!');
 
+        initEditor(textEditor);
         parseJS(textEditor.document.getText());
     }
 }

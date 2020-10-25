@@ -19,6 +19,28 @@
 				"command": "code-strider.helloWorld",
 				"title": "Hello World"
 			}
+		],
+		"keybindings": [
+			{
+				"command": "code-strider.gotoParent",
+				"key": "n",
+				"when": "editorTextFocus"
+			},
+			{
+				"command": "code-strider.firstChild",
+				"key": "t",
+				"when": "editorTextFocus"
+			},
+			{
+				"command": "code-strider.nextSibling",
+				"key": "r",
+				"when": "editorTextFocus"
+			},
+			{
+				"command": "code-strider.previousSibling",
+				"key": "g",
+				"when": "editorTextFocus"
+			}
 		]
 	},
 	"scripts": {
