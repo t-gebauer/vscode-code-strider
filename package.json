@@ -14,30 +14,24 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"commands": [
-			{
-				"command": "code-strider.helloWorld",
-				"title": "Hello World"
-			}
-		],
 		"keybindings": [
 			{
-				"command": "code-strider.gotoParent",
+				"command": "code-strider.parent",
 				"key": "n",
 				"when": "editorTextFocus"
 			},
 			{
-				"command": "code-strider.firstChild",
+				"command": "code-strider.first-child",
 				"key": "t",
 				"when": "editorTextFocus"
 			},
 			{
-				"command": "code-strider.nextSibling",
+				"command": "code-strider.next-sibling",
 				"key": "r",
 				"when": "editorTextFocus"
 			},
 			{
-				"command": "code-strider.previousSibling",
+				"command": "code-strider.previous-sibling",
 				"key": "g",
 				"when": "editorTextFocus"
 			}
