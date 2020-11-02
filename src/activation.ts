@@ -2,6 +2,7 @@ import { TextDocument, TextEditor } from "vscode";
 import * as Parser from 'web-tree-sitter';
 import { SyntaxNode } from "web-tree-sitter";
 import { showAST } from "./ast-view";
+import { selectNode } from "./commands";
 
 interface State {
     currentNode: SyntaxNode;
@@ -49,18 +50,30 @@ export async function handleEditorChange(textEditor: TextEditor | undefined) {
         const fileName = textEditor.document.fileName;
         let state = stateMap.get(fileName);
         if (!state) {
-            const parser = new Parser();
-            parser.setLanguage(await loadTreeSitterLanguage(languageId));
-            const tree = parser.parse(textEditor.document.getText());
-            state = {
-                parser,
-                tree,
-                currentNode: tree.rootNode,
-                document: textEditor.document
-            };
-            stateMap.set(fileName, state);
+            state = await createNewState(textEditor);
         }
 
+        selectNode(textEditor, state.currentNode);
         showAST(textEditor.document.fileName);
     }
+}
+
+async function createNewState(editor: TextEditor) {
+    const languageId = editor.document.languageId;
+    const fileName = editor.document.fileName;
+
+    const parser = new Parser();
+    parser.setLanguage(await loadTreeSitterLanguage(languageId));
+    const tree = parser.parse(editor.document.getText());
+
+    const initialNode = tree.rootNode.firstNamedChild || tree.rootNode;
+
+    const state = {
+        parser,
+        tree,
+        currentNode: initialNode,
+        document: editor.document
+    };
+    stateMap.set(fileName, state);
+    return state;
 }

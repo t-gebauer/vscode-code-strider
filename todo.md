@@ -11,9 +11,10 @@ insert: normal text insertion
 status bar item
 
 
+## Html
 
-
-
+Don't select "empty" text nodes.
+Don't select start and end tags.
 
 # Feedback
 

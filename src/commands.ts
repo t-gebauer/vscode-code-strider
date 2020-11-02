@@ -44,7 +44,7 @@ function setOrResetDecorations(editor: TextEditor, decorationType: TextEditorDec
     }
 }
 
-function selectNode(editor: TextEditor, node: SyntaxNode): void {
+export function selectNode(editor: TextEditor, node: SyntaxNode): void {
     window.showInformationMessage(node.type);
     //setOrResetDecorations(editor, parentDecorationType, node.parent);
     //setOrResetDecorations(editor, nextDecorationType, node.nextNamedSibling);
