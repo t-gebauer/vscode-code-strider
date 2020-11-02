@@ -5,7 +5,7 @@ import { toRange } from './utilities';
 
 export function movementCommand(handler: (node: SyntaxNode) => SyntaxNode | null): (editor: TextEditor) => void {
     return (editor) => {
-        const state = getState(editor);
+        const state = getState(editor.document.fileName);
 
         const node = state.currentNode;
         if (!node) {
@@ -47,9 +47,9 @@ function setOrResetDecorations(editor: TextEditor, decorationType: TextEditorDec
 function selectNode(editor: TextEditor, node: SyntaxNode): void {
     window.showInformationMessage(node.type);
     //setOrResetDecorations(editor, parentDecorationType, node.parent);
-    setOrResetDecorations(editor, nextDecorationType, node.nextNamedSibling);
-    setOrResetDecorations(editor, previousDecorationType, node.previousNamedSibling);
-    setOrResetDecorations(editor, firstChildDecorationType, node.firstNamedChild);
+    //setOrResetDecorations(editor, nextDecorationType, node.nextNamedSibling);
+    //setOrResetDecorations(editor, previousDecorationType, node.previousNamedSibling);
+    //setOrResetDecorations(editor, firstChildDecorationType, node.firstNamedChild);
     //editor.selection = toSelection(node);
     editor.setDecorations(currentDecorationType, [toRange(node)]);
 }

@@ -1,5 +1,7 @@
 # Welcome to your VS Code Extension
 
+https://code.visualstudio.com/api
+
 ## What's in the folder
 
 * This folder contains all of the files necessary for your extension.
