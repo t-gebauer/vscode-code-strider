@@ -3,6 +3,7 @@ import * as Parser from 'web-tree-sitter';
 import { SyntaxNode } from "web-tree-sitter";
 import { showAST } from "./ast-view";
 import { selectNode } from "./commands";
+import { extensionContext } from "./extension";
 
 interface State {
     currentNode: SyntaxNode;
@@ -32,7 +33,7 @@ function loadTreeSitterLanguage(languageId: string) {
         case 'javascript':
         case 'html':
         default:
-            return Parser.Language.load(`./wasm/tree-sitter-${languageId}.wasm`);
+            return Parser.Language.load(extensionContext.asAbsolutePath(`./wasm/tree-sitter-${languageId}.wasm`));
     }
 }
 

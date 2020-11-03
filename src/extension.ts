@@ -2,9 +2,12 @@ import { commands, Disposable, ExtensionContext, TextEditor, window } from 'vsco
 import { handleEditorChange } from './activation';
 import { movementCommand } from './commands';
 
+export let extensionContext: ExtensionContext;
+
 // this method is called when your extension is activated
 export async function activate(context: ExtensionContext) {
 	console.log('Extension "code-strider" is now active!');
+	extensionContext = context;
 
 	const registerCommand = function(id: string, handlerFunction: (editor: TextEditor) => void): Disposable {
 		return commands.registerTextEditorCommand('code-strider.' + id, handlerFunction);
