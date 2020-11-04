@@ -1,18 +1,17 @@
 import { TextEditor, TextEditorDecorationType, window } from 'vscode';
 import { SyntaxNode } from 'web-tree-sitter';
-import { getState } from './activation';
+import { getState, isLanguageSupported } from './activation';
 import { toRange } from './utilities';
 
-export function movementCommand(handler: (node: SyntaxNode) => SyntaxNode | null): (editor: TextEditor) => void {
-    return (editor) => {
+export function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | null): (editor: TextEditor) => void {
+    return (editor: TextEditor) => {
+        if (!isLanguageSupported(editor.document.languageId)) { return; }
+
         const state = getState(editor.document.fileName);
-
         const node = state.currentNode;
-        if (!node) {
-            return;
-        }
+        if (!node) { return; }
 
-        const next = handler(node);
+        const next = selectNext(node);
         if (next) {
             state.currentNode = next;
             selectNode(editor, next);

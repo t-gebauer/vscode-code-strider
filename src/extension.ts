@@ -9,7 +9,7 @@ export async function activate(context: ExtensionContext) {
 	console.log('Extension "code-strider" is now active!');
 	extensionContext = context;
 
-	const registerCommand = function(id: string, handlerFunction: (editor: TextEditor) => void): Disposable {
+	function registerCommand(id: string, handlerFunction: (editor: TextEditor) => void): Disposable {
 		return commands.registerTextEditorCommand('code-strider.' + id, handlerFunction);
 	};
 	context.subscriptions.push(

@@ -1,3 +1,4 @@
+import * as fs from "fs";
 import { TextDocument, TextEditor } from "vscode";
 import * as Parser from 'web-tree-sitter';
 import { SyntaxNode } from "web-tree-sitter";
@@ -11,52 +12,48 @@ interface State {
     tree: Parser.Tree;
     document: TextDocument;
 }
+// State per open file (parse tree caching, incremental parsing)
 const stateMap = new Map<string, State>();
 
+// Will throw an error if the language is not supported!
 export function getState(fileName: string): State {
-    // TODO: handle this better?
-    // We can make this non-null assertion here, because we know that a parser has
-    // already been initialised for any editor on editor change.
     const state = stateMap.get(fileName);
     if (!state) {
-        console.error('State not initialized!');
+        // A state should have already been initialized for this file, on the editor-change event.
+        throw new Error(`No state initialized for file '${fileName}'`);
     }
-    return state!!;
+    return state;
 }
 
-function canHandleThisLanguage(languageId: string): boolean {
+export function isLanguageSupported(languageId: string): boolean {
     return languageId === 'javascript' || languageId === 'html';
 }
 
-function loadTreeSitterLanguage(languageId: string) {
-    switch (languageId) {
-        case 'javascript':
-        case 'html':
-        default:
-            return Parser.Language.load(extensionContext.asAbsolutePath(`./wasm/tree-sitter-${languageId}.wasm`));
+function loadTreeSitterLanguage(languageId: string): Promise<Parser.Language> {
+    const wasmFilePath = extensionContext.asAbsolutePath(`./wasm/tree-sitter-${languageId}.wasm`);
+    if (!fs.existsSync(wasmFilePath)) {
+        throw new Error(`Missing parser for language '${languageId}'. The file '${wasmFilePath}' does not exist.`);
     }
+    return Parser.Language.load(wasmFilePath);
 }
 
-export async function handleEditorChange(textEditor: TextEditor | undefined) {
-    if (!textEditor) {
+export async function handleEditorChange(editor: TextEditor | undefined) {
+    if (!editor) {
         return;
     }
 
-    console.log('Editor change: ' + textEditor?.document.languageId);
-    const languageId = textEditor.document.languageId;
-
-    if (canHandleThisLanguage(languageId)) {
-        await Parser.init();
-
-        const fileName = textEditor.document.fileName;
-        let state = stateMap.get(fileName);
-        if (!state) {
-            state = await createNewState(textEditor);
-        }
-
-        selectNode(textEditor, state.currentNode);
-        showAST(textEditor.document.fileName);
+    const languageId = editor.document.languageId;
+    console.log('Editor change: ' + languageId);
+    if (!isLanguageSupported(languageId)) {
+        return;
     }
+
+    await Parser.init();
+
+    const fileName = editor.document.fileName;
+    const state = stateMap.get(fileName) || await createNewState(editor);
+    selectNode(editor, state.currentNode);
+    showAST(editor.document.fileName);
 }
 
 async function createNewState(editor: TextEditor) {
