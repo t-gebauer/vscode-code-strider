@@ -1,13 +1,23 @@
 import { TextEditor, TextEditorDecorationType, window } from 'vscode';
 import { SyntaxNode } from 'web-tree-sitter';
-import { getState, isLanguageSupported } from './activation';
+import { getState, isLanguageSupported, State } from './activation';
+import { statusBar } from './status-bar';
 import { toRange } from './utilities';
 
-export function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | null): (editor: TextEditor) => void {
+// Common functionality for all commands
+function wrapCommand(actualCommand: (state: State, editor: TextEditor) => void): (editor: TextEditor) => void {
     return (editor: TextEditor) => {
         if (!isLanguageSupported(editor.document.languageId)) { return; }
 
         const state = getState(editor.document.fileName);
+        actualCommand(state, editor);
+
+        statusBar.updateNodeType(state.currentNode.type);
+    };
+}
+
+export function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | null): (editor: TextEditor) => void {
+    return wrapCommand((state: State, editor: TextEditor) => {
         const node = state.currentNode;
         if (!node) { return; }
 
@@ -16,9 +26,10 @@ export function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | n
             state.currentNode = next;
             selectNode(editor, next);
         }
-    };
+    });
 }
 
+// TODO: dispose the decoration type?
 const currentDecorationType = window.createTextEditorDecorationType({
     backgroundColor: "#555"
 });
@@ -44,7 +55,6 @@ function setOrResetDecorations(editor: TextEditor, decorationType: TextEditorDec
 }
 
 export function selectNode(editor: TextEditor, node: SyntaxNode): void {
-    window.showInformationMessage(node.type);
     //setOrResetDecorations(editor, parentDecorationType, node.parent);
     //setOrResetDecorations(editor, nextDecorationType, node.nextNamedSibling);
     //setOrResetDecorations(editor, previousDecorationType, node.previousNamedSibling);

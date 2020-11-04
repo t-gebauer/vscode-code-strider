@@ -6,7 +6,7 @@ import { showAST } from "./ast-view";
 import { selectNode } from "./commands";
 import { extensionContext } from "./extension";
 
-interface State {
+export interface State {
     currentNode: SyntaxNode;
     parser: Parser;
     tree: Parser.Tree;
