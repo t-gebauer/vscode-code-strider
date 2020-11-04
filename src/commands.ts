@@ -16,7 +16,7 @@ function wrapCommand(actualCommand: (state: State, editor: TextEditor) => void):
     };
 }
 
-export function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | null): (editor: TextEditor) => void {
+function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | null): (editor: TextEditor) => void {
     return wrapCommand((state: State, editor: TextEditor) => {
         const node = state.currentNode;
         if (!node) { return; }
@@ -28,6 +28,12 @@ export function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | n
         }
     });
 }
+
+const gotoParent = movementCommand((node) => node.parent);
+const gotoFirstChild = movementCommand((node) => node.firstNamedChild);
+const gotoNextSibling = movementCommand((node) => node.nextNamedSibling);
+const gotoPreviousSibling = movementCommand((node) => node.previousNamedSibling);
+export const commands = { gotoParent, gotoFirstChild, gotoNextSibling, gotoPreviousSibling };
 
 // TODO: dispose the decoration type?
 const currentDecorationType = window.createTextEditorDecorationType({

@@ -8,8 +8,6 @@ navigation vs change vs insert mode
 navigation: move around
 change: edit the selected structure in a predefined way
 insert: normal text insertion
-status bar item
-
 
 ## Html
 

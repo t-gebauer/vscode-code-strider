@@ -1,6 +1,6 @@
 import { commands, Disposable, ExtensionContext, TextEditor, window } from 'vscode';
 import { handleEditorChange } from './activation';
-import { movementCommand } from './commands';
+import { interceptTypeCommand } from './intercept-typing';
 
 export let extensionContext: ExtensionContext;
 
@@ -13,10 +13,7 @@ export async function activate(context: ExtensionContext) {
 		return commands.registerTextEditorCommand('code-strider.' + id, handlerFunction);
 	};
 	context.subscriptions.push(
-		registerCommand('first-child', movementCommand((node) => node.firstNamedChild)),
-		registerCommand('parent', movementCommand((node) => node.parent)),
-		registerCommand('next-sibling', movementCommand((node) => node.nextNamedSibling)),
-		registerCommand('previous-sibling', movementCommand((node) => node.previousNamedSibling)),
+		commands.registerTextEditorCommand('type', interceptTypeCommand)
 	);
 
 	window.onDidChangeActiveTextEditor(handleEditorChange);

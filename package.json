@@ -15,28 +15,6 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
-		"keybindings": [
-			{
-				"command": "code-strider.parent",
-				"key": "n",
-				"when": "editorTextFocus"
-			},
-			{
-				"command": "code-strider.first-child",
-				"key": "t",
-				"when": "editorTextFocus"
-			},
-			{
-				"command": "code-strider.next-sibling",
-				"key": "r",
-				"when": "editorTextFocus"
-			},
-			{
-				"command": "code-strider.previous-sibling",
-				"key": "g",
-				"when": "editorTextFocus"
-			}
-		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",
