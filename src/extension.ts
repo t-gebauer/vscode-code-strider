@@ -1,5 +1,5 @@
 import { commands, Disposable, ExtensionContext, TextEditor, window } from 'vscode';
-import { handleEditorChange } from './activation';
+import { initializeParser } from './activation';
 import { interceptTypeCommand } from './intercept-typing';
 
 export let extensionContext: ExtensionContext;
@@ -13,8 +13,7 @@ export async function activate(context: ExtensionContext) {
 		commands.registerTextEditorCommand('type', interceptTypeCommand)
 	);
 
-	window.onDidChangeActiveTextEditor(handleEditorChange);
-	handleEditorChange(window.activeTextEditor);
+	initializeParser();
 }
 
 export function deactivate() { }

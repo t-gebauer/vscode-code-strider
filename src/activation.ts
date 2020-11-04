@@ -1,10 +1,11 @@
 import * as fs from "fs";
-import { TextDocument, TextEditor } from "vscode";
+import { ExtensionContext, TextDocument, TextEditor, window } from "vscode";
 import * as Parser from 'web-tree-sitter';
 import { SyntaxNode } from "web-tree-sitter";
 import { showAST } from "./ast-view";
 import { selectNode } from "./commands";
 import { extensionContext } from "./extension";
+import { statusBar } from "./status-bar";
 
 export interface State {
     currentNode: SyntaxNode;
@@ -19,7 +20,7 @@ const stateMap = new Map<string, State>();
 export function getState(fileName: string): State {
     const state = stateMap.get(fileName);
     if (!state) {
-        // A state should have already been initialized for this file, on the editor-change event.
+        // A state should have already been initialized for this file at the editor-change event.
         throw new Error(`No state initialized for file '${fileName}'`);
     }
     return state;
@@ -32,23 +33,16 @@ export function isLanguageSupported(languageId: string): boolean {
 function loadTreeSitterLanguage(languageId: string): Promise<Parser.Language> {
     const wasmFilePath = extensionContext.asAbsolutePath(`./wasm/tree-sitter-${languageId}.wasm`);
     if (!fs.existsSync(wasmFilePath)) {
-        throw new Error(`Missing parser for language '${languageId}'. The file '${wasmFilePath}' does not exist.`);
+        throw new Error(`Missing language file: '${wasmFilePath}'`);
     }
     return Parser.Language.load(wasmFilePath);
 }
 
-export async function handleEditorChange(editor: TextEditor | undefined) {
-    if (!editor) {
-        return;
-    }
+async function handleEditorChange(editor: TextEditor | undefined) {
+    if (!editor) { return; }
 
     const languageId = editor.document.languageId;
-    console.log('Editor change: ' + languageId);
-    if (!isLanguageSupported(languageId)) {
-        return;
-    }
-
-    await Parser.init();
+    if (!isLanguageSupported(languageId)) { return; }
 
     const fileName = editor.document.fileName;
     const state = stateMap.get(fileName) || await createNewState(editor);
@@ -74,4 +68,15 @@ async function createNewState(editor: TextEditor) {
     };
     stateMap.set(fileName, state);
     return state;
+}
+
+
+export async function initializeParser() {
+    // This is so fast on my machine, that it is barely noticeable.
+    statusBar.updateNodeType('Initializing Parser...');
+    await Parser.init();
+    statusBar.updateNodeType('');
+
+    window.onDidChangeActiveTextEditor(handleEditorChange);
+	handleEditorChange(window.activeTextEditor);
 }
