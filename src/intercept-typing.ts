@@ -1,5 +1,5 @@
 import { TextEditor, TextEditorEdit } from "vscode";
-import { commands } from "./commands";
+import { CommandFunction, commands } from "./commands";
 import * as vscode from 'vscode';
 
 function shouldInsertText(): boolean {
@@ -15,7 +15,7 @@ export function interceptTypeCommand(editor: TextEditor, _: TextEditorEdit, args
 
     // With lack of external configuration options, let's just use a simple switch case statement here...
     // Neo2 mapping :/
-    const commandConfig: { [key: string]: (editor: TextEditor) => void } = {
+    const commandConfig: { [key: string]: CommandFunction } = {
         'h': commands.gotoParent,
         'f': commands.gotoFirstChild,
         'g': commands.gotoPreviousSibling,

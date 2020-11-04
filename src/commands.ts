@@ -4,8 +4,10 @@ import { getState, isLanguageSupported, State } from './activation';
 import { statusBar } from './status-bar';
 import { toRange } from './utilities';
 
+export type CommandFunction = (editor: TextEditor) => void;
+
 // Common functionality for all commands
-function wrapCommand(actualCommand: (state: State, editor: TextEditor) => void): (editor: TextEditor) => void {
+function wrapCommand(actualCommand: (state: State, editor: TextEditor) => void): CommandFunction {
     return (editor: TextEditor) => {
         if (!isLanguageSupported(editor.document.languageId)) { return; }
 
@@ -16,7 +18,7 @@ function wrapCommand(actualCommand: (state: State, editor: TextEditor) => void):
     };
 }
 
-function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | null): (editor: TextEditor) => void {
+function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | null): CommandFunction {
     return wrapCommand((state: State, editor: TextEditor) => {
         const node = state.currentNode;
         if (!node) { return; }
