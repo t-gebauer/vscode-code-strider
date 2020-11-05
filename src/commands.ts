@@ -1,7 +1,7 @@
 import { TextEditor, TextEditorDecorationType, window } from 'vscode';
 import { SyntaxNode } from 'web-tree-sitter';
 import { getState, isLanguageSupported, State } from './activation';
-import { LanguageDefinition } from './language-support';
+import { CommandName, Executor, getOverrideFor, LanguageDefinition, NodeAccessorFunction } from './language-support';
 import { statusBar } from './status-bar';
 import { toRange } from './utilities';
 
@@ -18,7 +18,7 @@ function wrapCommand(actualCommand: (state: State, editor: TextEditor) => void):
     };
 }
 
-function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | null | undefined): CommandFunction {
+function movementCommand(selectNext: NodeAccessorFunction): CommandFunction {
     return wrapCommand((state: State, editor: TextEditor) => {
         const node = state.currentNode;
         if (!node) { return; }
@@ -32,18 +32,20 @@ function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | null | u
 
 export function commandsForLanguage(languageDefinition: LanguageDefinition) {
 
-    const gotoParent = movementCommand((node) => node.parent);
-    const gotoFirstChild = movementCommand((node) => {
-        const nodeDef = languageDefinition.interactiveNodes[node.type];
-        if (!nodeDef || !nodeDef.firstChild) {
-            return node.firstNamedChild;
-        }
-        console.log(`executing  special child method for ${node.type}`);
-        
-        return nodeDef.firstChild(node);
-    });
-    const gotoNextSibling = movementCommand((node) => node.nextNamedSibling);
-    const gotoPreviousSibling = movementCommand((node) => node.previousNamedSibling);
+    function withOverride(commandName: CommandName, defaultFunction: NodeAccessorFunction): NodeAccessorFunction {
+        return node => {
+            const overrideFun = getOverrideFor(languageDefinition, commandName, node);
+            if (overrideFun) {
+                return overrideFun(node);
+            }
+            return defaultFunction(node);
+        };
+    }
+
+    const gotoParent = movementCommand(withOverride('gotoParent', node => node.parent));
+    const gotoFirstChild = movementCommand(withOverride('firstChild', node => node.firstNamedChild));
+    const gotoNextSibling = movementCommand(withOverride('nextSibling', node => node.nextNamedSibling));
+    const gotoPreviousSibling = movementCommand(withOverride('previousSibling', node => node.previousNamedSibling));
 
     return { gotoParent, gotoFirstChild, gotoNextSibling, gotoPreviousSibling };
 }
