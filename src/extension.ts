@@ -1,6 +1,7 @@
 import { commands, Disposable, ExtensionContext, TextEditor, window } from 'vscode';
 import { initializeParser } from './activation';
 import { interceptTypeCommand } from './intercept-typing';
+import { initializeLanguages } from './language-support';
 
 export let extensionContext: ExtensionContext;
 
@@ -13,6 +14,7 @@ export async function activate(context: ExtensionContext) {
 		commands.registerTextEditorCommand('type', interceptTypeCommand)
 	);
 
+	initializeLanguages();
 	initializeParser();
 }
 

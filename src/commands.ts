@@ -1,12 +1,12 @@
 import { TextEditor, TextEditorDecorationType, window } from 'vscode';
 import { SyntaxNode } from 'web-tree-sitter';
 import { getState, isLanguageSupported, State } from './activation';
+import { LanguageDefinition } from './language-support';
 import { statusBar } from './status-bar';
 import { toRange } from './utilities';
 
 export type CommandFunction = (editor: TextEditor) => void;
 
-// Common functionality for all commands
 function wrapCommand(actualCommand: (state: State, editor: TextEditor) => void): CommandFunction {
     return (editor: TextEditor) => {
         if (!isLanguageSupported(editor.document.languageId)) { return; }
@@ -18,11 +18,10 @@ function wrapCommand(actualCommand: (state: State, editor: TextEditor) => void):
     };
 }
 
-function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | null): CommandFunction {
+function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | null | undefined): CommandFunction {
     return wrapCommand((state: State, editor: TextEditor) => {
         const node = state.currentNode;
         if (!node) { return; }
-
         const next = selectNext(node);
         if (next) {
             state.currentNode = next;
@@ -31,11 +30,23 @@ function movementCommand(selectNext: (node: SyntaxNode) => SyntaxNode | null): C
     });
 }
 
-const gotoParent = movementCommand((node) => node.parent);
-const gotoFirstChild = movementCommand((node) => node.firstNamedChild);
-const gotoNextSibling = movementCommand((node) => node.nextNamedSibling);
-const gotoPreviousSibling = movementCommand((node) => node.previousNamedSibling);
-export const commands = { gotoParent, gotoFirstChild, gotoNextSibling, gotoPreviousSibling };
+export function commandsForLanguage(languageDefinition: LanguageDefinition) {
+
+    const gotoParent = movementCommand((node) => node.parent);
+    const gotoFirstChild = movementCommand((node) => {
+        const nodeDef = languageDefinition.interactiveNodes[node.type];
+        if (!nodeDef || !nodeDef.firstChild) {
+            return node.firstNamedChild;
+        }
+        console.log(`executing  special child method for ${node.type}`);
+        
+        return nodeDef.firstChild(node);
+    });
+    const gotoNextSibling = movementCommand((node) => node.nextNamedSibling);
+    const gotoPreviousSibling = movementCommand((node) => node.previousNamedSibling);
+
+    return { gotoParent, gotoFirstChild, gotoNextSibling, gotoPreviousSibling };
+}
 
 // TODO: dispose the decoration type?
 const currentDecorationType = window.createTextEditorDecorationType({
