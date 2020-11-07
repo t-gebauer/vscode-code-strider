@@ -1,21 +1,19 @@
 import { CancellationToken, Event, ProviderResult, TextDocumentContentProvider, Uri, ViewColumn, window, workspace } from "vscode";
-import { getState } from "./activation";
+import { EditorState } from "./editor-state";
 
-export async function showAST(fileName: string) {
+export async function showAST(state: EditorState) {
     const scheme = 'code-strider-ast';
     const suffix = '.ast';
     const contentProvider = new class implements TextDocumentContentProvider {
         onDidChange?: Event<Uri> | undefined;
-        provideTextDocumentContent(uri: Uri, token: CancellationToken): ProviderResult<string> {
-            const fileName = uri.path.substr(0, uri.path.length - suffix.length);
-            const state = getState(fileName);
-            return formatAST(state.tree.rootNode.toString());
+        provideTextDocumentContent(uri: Uri, _: CancellationToken): ProviderResult<string> {
+            return formatAST(state.parseTree.rootNode.toString());
         }
     };
     // TODO: Register once, and dispose correctly
     workspace.registerTextDocumentContentProvider(scheme, contentProvider);
 
-    const uri = Uri.parse(`${scheme}:${fileName}${suffix}`);
+    const uri = Uri.parse(`${scheme}:${state.editor.document.fileName}${suffix}`);
     const document = await workspace.openTextDocument(uri);
     await window.showTextDocument(document, {preserveFocus: true, viewColumn: ViewColumn.Beside, preview: true});
 }
