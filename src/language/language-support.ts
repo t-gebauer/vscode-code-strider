@@ -26,10 +26,9 @@ export function getLanguageDefinition(languageId: string): LanguageDefinition {
 
 export function getOverrideFor(languageDefinition: LanguageDefinition, command: keyof RuleExecutor, node: SyntaxNode): NodeAccessorFunction | undefined {
     const firstMatchingRule = languageDefinition.rules.find(([matcher, executor]) => {
-        // TODO: Don't match if `undefined === undefined` ...
-        return executor[command] !== undefined &&
-            (matcher.selected === node.type ||
-                matcher.parent === node.parent?.type);
+        return executor[command] &&
+            (!matcher.selected || (matcher.selected === node.type)) &&
+            (!matcher.parent || (matcher.parent === node.parent?.type));
     });
     if (firstMatchingRule) {
         const [_, executor] = firstMatchingRule;
