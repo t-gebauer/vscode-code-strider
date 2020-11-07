@@ -1,6 +1,5 @@
 import { Disposable, StatusBarAlignment, StatusBarItem, window } from "vscode";
 
-// TODO: extension should dispose this? Maybe move life cycle into main file extension.ts
 export const statusBar = new class implements Disposable {
 
     private statusBarItem: StatusBarItem;

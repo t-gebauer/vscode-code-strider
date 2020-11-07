@@ -15,6 +15,13 @@
 	],
 	"main": "./out/extension.js",
 	"contributes": {
+		"keybindings": [
+			{
+				"command": "code-strider:exit-insert-mode",
+				"key": "Escape",
+				"when": "editorTextFocus && !suggestWidgetVisible"
+			}
+		]
 	},
 	"scripts": {
 		"vscode:prepublish": "npm run compile",

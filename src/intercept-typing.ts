@@ -2,16 +2,17 @@ import { TextEditor, TextEditorEdit } from "vscode";
 import { CommandFunction, commandsForLanguage } from "./commands";
 import * as vscode from 'vscode';
 import { getLanguageDefinition, isLanguageSupported } from "./language/language-support";
+import { statusBar } from "./status-bar";
 
-function shouldInsertText(): boolean {
-    return false; // TODO implement
-}
+let inInsertMode = false;
 
 export function interceptTypeCommand(editor: TextEditor, _: TextEditorEdit, args: { text: string }) {
     const key = args.text;
 
     const languageId = editor.document.languageId;
-    if (!isLanguageSupported(languageId) || shouldInsertText()) {
+    if (!isLanguageSupported(languageId) || inInsertMode) {
+        console.log(key);
+        
         vscode.commands.executeCommand('default:type', args);
         return;
     }
@@ -26,10 +27,21 @@ export function interceptTypeCommand(editor: TextEditor, _: TextEditorEdit, args
         'f': commands.gotoFirstChild,
         'g': commands.gotoPreviousSibling,
         'r': commands.gotoNextSibling,
+        'i': enterInsertMode,
     };
 
     const command = commandConfig[key];
     if (command) {
         command(editor);
     }
+}
+
+function enterInsertMode() {
+    inInsertMode = true;
+    statusBar.updateMode('INSERT');
+}
+
+export function exitInsertMode() {
+    inInsertMode = false;
+    statusBar.updateMode('STRUCT');
 }
