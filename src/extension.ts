@@ -1,6 +1,7 @@
-import { commands, Disposable, ExtensionContext, TextEditor, window } from 'vscode';
-import { initializeParser } from './activation';
-import { exitInsertMode, interceptTypeCommand } from './intercept-typing';
+import { commands, ExtensionContext } from 'vscode';
+import { initializeParser, withState } from './activation';
+import { exitInsertMode } from './commands';
+import { interceptTypeCommand } from './intercept-typing';
 import { initializeLanguages } from './language/language-support';
 import { statusBar } from './status-bar';
 
@@ -14,7 +15,7 @@ export async function activate(context: ExtensionContext) {
 	context.subscriptions.push(
 		statusBar,
 		commands.registerTextEditorCommand('type', interceptTypeCommand),
-		commands.registerTextEditorCommand('code-strider:exit-insert-mode', exitInsertMode),
+		commands.registerTextEditorCommand('code-strider:exit-insert-mode', withState(exitInsertMode)),
 	);
 
 	initializeLanguages();

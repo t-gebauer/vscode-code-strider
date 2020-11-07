@@ -1,4 +1,4 @@
-import { TextEditor, TextEditorDecorationType, window } from "vscode";
+import { TextEditor, TextEditorCursorStyle, TextEditorDecorationType, window } from "vscode";
 import { SyntaxNode } from "web-tree-sitter";
 import { EditorState } from "./editor-state";
 import { toRange, toSelection } from "./utilities";
@@ -28,15 +28,23 @@ function setOrResetDecorations(editor: TextEditor, decorationType: TextEditorDec
     }
 }
 
-export function selectNode(editor: TextEditor, node: SyntaxNode): void {
+export function setDecorationsForNode(editor: TextEditor, node: SyntaxNode | null): void {
     //setOrResetDecorations(editor, parentDecorationType, node.parent);
     //setOrResetDecorations(editor, nextDecorationType, node.nextNamedSibling);
     //setOrResetDecorations(editor, previousDecorationType, node.previousNamedSibling);
     //setOrResetDecorations(editor, firstChildDecorationType, node.firstNamedChild);
-    editor.selection = toSelection(node);
-    editor.setDecorations(currentDecorationType, [toRange(node)]);
+    setOrResetDecorations(editor, currentDecorationType, node);
 }
 
 export function updateSelection(state: EditorState): void {
-    selectNode(state.editor, state.currentNode);
+    const { editor } = state;
+    if (state.insertMode) {
+        // Clear highlight when in insert mode
+        setDecorationsForNode(editor, null);
+        editor.options.cursorStyle = TextEditorCursorStyle.Line;       
+    } else {
+        setDecorationsForNode(editor, state.currentNode);
+        editor.selection = toSelection(state.currentNode);
+        editor.options.cursorStyle = TextEditorCursorStyle.Block;       
+    }
 }

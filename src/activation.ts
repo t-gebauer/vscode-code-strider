@@ -1,7 +1,7 @@
 import { TextDocument, TextEditor, window } from "vscode";
 import * as Parser from 'web-tree-sitter';
 import { showAST } from "./ast-view";
-import { selectNode } from "./decoration";
+import { setDecorationsForNode } from "./decoration";
 import { EditorState } from "./editor-state";
 import { isLanguageSupported } from "./language/language-support";
 import { statusBar, updateStatusBar } from "./status-bar";
@@ -36,7 +36,7 @@ async function initializeEditor(editor: TextEditor | undefined): Promise<EditorS
     if (!isLanguageSupported(languageId)) { return null; }
 
     const state = editorStates.get(editor) || await createNewEditorState(editor);
-    selectNode(editor, state.currentNode);
+    setDecorationsForNode(editor, state.currentNode);
     showAST(state);
     updateStatusBar(state);
 
@@ -68,3 +68,11 @@ async function parseDocument(document: TextDocument): Promise<Parser.Tree> {
     return tree;
 }
 
+
+export function withState(fun: (state: EditorState) => void): () => void {
+    return () => {
+        if (activeEditorState) {
+            fun (activeEditorState);
+        }
+    };
+}

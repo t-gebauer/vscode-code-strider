@@ -1,16 +1,20 @@
+import { Selection, TextEditorCursorStyle } from 'vscode';
+import { Edit } from 'web-tree-sitter';
+import { updateSelection } from './decoration';
 import { EditorState } from './editor-state';
 import { NodeAccessorFunction, LanguageDefinition, CommandName } from './language/language-definition';
 import { getOverrideFor } from './language/language-support';
+import { updateStatusBar } from './status-bar';
+import { toPosition } from './utilities';
 
 export type CommandFunction = (editor: EditorState) => void;
 
 function movementCommand(selectNext: NodeAccessorFunction): CommandFunction {
     return (state: EditorState) => {
-        const node = state.currentNode;
-        if (!node) { return; }
-        const next = selectNext(node);
+        const next = selectNext(state.currentNode);
         if (next) {
             state.currentNode = next;
+            updateSelection(state);
         }
     };
 }
@@ -33,4 +37,32 @@ export function commandsForLanguage(languageDefinition: LanguageDefinition) {
     const gotoPreviousSibling = movementCommand(withOverride('previousSibling', node => node.previousNamedSibling));
 
     return { gotoParent, gotoFirstChild, gotoNextSibling, gotoPreviousSibling };
+}
+
+export function selectToChange(state: EditorState) {
+    state.insertMode = true;
+    updateSelection(state);
+}
+
+export function insertBefore(state: EditorState) {
+    state.insertMode = true;
+    const {editor, currentNode} = state;
+    const beforeNode = toPosition(currentNode.startPosition);
+    editor.selection = new Selection(beforeNode, beforeNode);
+    updateSelection(state);
+}
+
+export function insertAfter(state: EditorState) {
+    state.insertMode = true;
+    const {editor, currentNode} = state;
+    const afterNode = toPosition(currentNode.endPosition);
+    editor.selection = new Selection(afterNode, afterNode);
+    updateSelection(state);
+}
+
+export function exitInsertMode(state: EditorState) {
+    state.insertMode = false;
+    // TODO: selected node at current position
+    updateStatusBar(state);
+    updateSelection(state);
 }

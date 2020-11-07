@@ -4,10 +4,15 @@ import Parser = require("web-tree-sitter");
 import { extensionContext } from "./extension";
 import * as fs from 'fs';
 
+export function toPosition(point: Parser.Point) {
+    return new Position(point.row, point.column);
+}
+
 export function toSelection(node: SyntaxNode): Selection {
     return new Selection(
-        new Position(node.startPosition.row, node.startPosition.column),
-        new Position(node.endPosition.row, node.endPosition.column));
+        toPosition(node.startPosition),
+        toPosition(node.endPosition)
+    );
 }
 
 export function toRange(node: SyntaxNode): Range {

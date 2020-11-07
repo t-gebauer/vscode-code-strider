@@ -1,11 +1,9 @@
 import { TextEditor, TextEditorEdit } from "vscode";
-import { CommandFunction, commandsForLanguage } from "./commands";
+import { CommandFunction, commandsForLanguage, insertAfter, insertBefore, selectToChange } from "./commands";
 import * as vscode from 'vscode';
 import { getLanguageDefinition, isLanguageSupported } from "./language/language-support";
 import { updateStatusBar } from "./status-bar";
-import { updateSelection } from "./decoration";
 import { activeEditorState } from "./activation";
-import { EditorState } from "./editor-state";
 
 export function interceptTypeCommand(editor: TextEditor, _: TextEditorEdit, args: { text: string }) {
     const key = args.text;
@@ -26,29 +24,28 @@ export function interceptTypeCommand(editor: TextEditor, _: TextEditorEdit, args
     // With lack of external configuration options, let's just use a simple switch case statement here...
     // Neo2 mapping :/
     const commandConfig: { [key: string]: CommandFunction } = {
+        // Movement
         'h': commands.gotoParent,
         'f': commands.gotoFirstChild,
         'g': commands.gotoPreviousSibling,
         'r': commands.gotoNextSibling,
-        'i': enterInsertMode,
+        'n': commands.gotoPreviousSibling,
+        't': commands.gotoNextSibling,
+        //'g': commands.moveUp,
+        //'r': commands.moveDown,
+        //'n': commands.moveLeft,
+        //'t': commands.moveRight,
+        // Edit
+        'i': insertBefore,
+        'e': insertAfter,
+        //'l': insertAbove,
+        //'a': insertBelow,
+        'c': selectToChange,
     };
 
     const command = commandConfig[key];
     if (command) {
         command(state);
-        updateSelection(state);
         updateStatusBar(state);
-    }
-}
-
-function enterInsertMode(state: EditorState) {
-    state.insertMode = true;
-    updateStatusBar(state);
-}
-
-export function exitInsertMode() {
-    if (activeEditorState) {
-        activeEditorState.insertMode = false;
-        updateStatusBar(activeEditorState);
     }
 }
