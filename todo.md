@@ -1,5 +1,18 @@
-AST preview pane
-- with marked selection
+# Prioritized
+
+- update node selection on text selection event
+- directional movement (nearyl the same as selection update?)
+- improve javascript outwards movement
+- add TypeScript
+- add Kotlin
+- add CSS
+- add Python
+- add YAML
+- add HTML rules
+- undo complete edits
+- AST preview pane - mark selection
+
+# Details
 
 directional movement
 key right-arrow -> select something which is right of the current selection

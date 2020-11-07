@@ -1,24 +1,19 @@
-import { TextDocument, TextEditor, window } from "vscode";
-import * as Parser from 'web-tree-sitter';
+import { Disposable, TextDocument, TextEditor, window } from "vscode";
+import Parser = require("web-tree-sitter");
 import { showAST } from "./ast-view";
 import { setDecorationsForNode } from "./decoration";
+import { parseDocument } from "./document-parser";
 import { EditorState } from "./editor-state";
 import { isLanguageSupported } from "./language/language-support";
-import { statusBar, updateStatusBar } from "./status-bar";
-import { loadTreeSitterLanguage } from "./utilities";
+import { updateStatusBar } from "./status-bar";
 
-export async function initializeParser() {
-    // This is so fast on my machine, that it is barely noticeable.
-    statusBar.setText('Initializing Parser...');
-    await Parser.init();
-    statusBar.setText('');
 
-    window.onDidChangeActiveTextEditor(handleEditorChange);
+export function registerEditorChangeEvent(): Disposable {
+    const disposable = window.onDidChangeActiveTextEditor(handleEditorChange);
     handleEditorChange(window.activeTextEditor);
+    return disposable;
 }
 
-// State per open file (parse tree caching, incremental parsing)
-const parseTrees = new Map<TextDocument, Parser.Tree>();
 // State per open editor (cursor position, node selection, decoration)
 const editorStates = new Map<TextEditor, EditorState>();
 
@@ -43,9 +38,8 @@ async function initializeEditor(editor: TextEditor | undefined): Promise<EditorS
     return state;
 }
 
-
 async function createNewEditorState(editor: TextEditor) {
-    const parseTree = parseTrees.get(editor.document) || await parseDocument(editor.document);
+    const parseTree = await parseDocument(editor.document);
     const initialNode = parseTree.rootNode.firstNamedChild || parseTree.rootNode;
 
     const state: EditorState = {
@@ -58,21 +52,19 @@ async function createNewEditorState(editor: TextEditor) {
     return state;
 }
 
-async function parseDocument(document: TextDocument): Promise<Parser.Tree> {
-    const languageId = document.languageId;
-
-    const parser = new Parser();
-    parser.setLanguage(await loadTreeSitterLanguage(languageId));
-    const tree = parser.parse(document.getText());
-    parseTrees.set(document, tree);
-    return tree;
-}
-
-
 export function withState(fun: (state: EditorState) => void): () => void {
     return () => {
         if (activeEditorState) {
-            fun (activeEditorState);
+            fun(activeEditorState);
         }
     };
+}
+
+export function invalidateEditorStates(document: TextDocument, newTree: Parser.Tree) {
+    editorStates.forEach(state => {
+        if (state.editor.document === document) {
+            state.parseTree = newTree;
+            state.currentNode = newTree.rootNode.firstNamedChild || newTree.rootNode; // TODO find by cursor position
+        }
+    });
 }

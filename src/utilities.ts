@@ -4,6 +4,10 @@ import Parser = require("web-tree-sitter");
 import { extensionContext } from "./extension";
 import * as fs from 'fs';
 
+export function toPoint(position: Position): Parser.Point {
+    return { row: position.line, column: position.character };
+}
+
 export function toPosition(point: Parser.Point) {
     return new Position(point.row, point.column);
 }
