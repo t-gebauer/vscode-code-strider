@@ -5,6 +5,7 @@ import { SyntaxNode } from "web-tree-sitter";
 import { showAST } from "./ast-view";
 import { selectNode } from "./commands";
 import { extensionContext } from "./extension";
+import { isLanguageSupported } from "./language/language-support";
 import { statusBar } from "./status-bar";
 
 export interface State {
@@ -24,10 +25,6 @@ export function getState(fileName: string): State {
         throw new Error(`No state initialized for file '${fileName}'`);
     }
     return state;
-}
-
-export function isLanguageSupported(languageId: string): boolean {
-    return languageId === 'javascript' || languageId === 'html';
 }
 
 function loadTreeSitterLanguage(languageId: string): Promise<Parser.Language> {

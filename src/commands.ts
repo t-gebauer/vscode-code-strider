@@ -1,7 +1,8 @@
 import { TextEditor, TextEditorDecorationType, window } from 'vscode';
 import { SyntaxNode } from 'web-tree-sitter';
-import { getState, isLanguageSupported, State } from './activation';
-import { CommandName, Executor, getOverrideFor, LanguageDefinition, NodeAccessorFunction } from './language-support';
+import { getState, State } from './activation';
+import { NodeAccessorFunction, LanguageDefinition, CommandName } from './language/language-definition';
+import { isLanguageSupported, getOverrideFor } from './language/language-support';
 import { statusBar } from './status-bar';
 import { toRange } from './utilities';
 

@@ -1,7 +1,7 @@
 import { TextEditor, TextEditorEdit } from "vscode";
 import { CommandFunction, commandsForLanguage } from "./commands";
 import * as vscode from 'vscode';
-import { getLanguageDefinition } from "./language-support";
+import { getLanguageDefinition, isLanguageSupported } from "./language/language-support";
 
 function shouldInsertText(): boolean {
     return false; // TODO implement
@@ -10,11 +10,13 @@ function shouldInsertText(): boolean {
 export function interceptTypeCommand(editor: TextEditor, _: TextEditorEdit, args: { text: string }) {
     const key = args.text;
 
-    if (shouldInsertText()) {
+    const languageId = editor.document.languageId;
+    if (!isLanguageSupported(languageId) || shouldInsertText()) {
         vscode.commands.executeCommand('default:type', args);
+        return;
     }
 
-    const languageDefinition = getLanguageDefinition(editor.document.languageId);
+    const languageDefinition = getLanguageDefinition(languageId);
     const commands = commandsForLanguage(languageDefinition);
 
     // With lack of external configuration options, let's just use a simple switch case statement here...

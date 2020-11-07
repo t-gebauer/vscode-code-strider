@@ -1,9 +1,9 @@
 /* eslint-disable @typescript-eslint/naming-convention */
-import { LanguageDefinition } from "./language-support";
 
-export const languageJavaScript: LanguageDefinition = {
-    languageId: 'javascript',
-    rules: [
+import { defineLanguage } from "../language-definition";
+
+export const javaScript = defineLanguage('javascript',
+    [
         [{ selected: 'variable_declaration' }, { firstChild: node => node.firstNamedChild?.childForFieldName('value') }],
         [{ selected: 'function' }, { firstChild: node => node.childForFieldName('body')?.firstNamedChild }],
         [{ selected: 'function_declaration' }, { firstChild: node => node.childForFieldName('body')?.firstNamedChild }],
@@ -26,4 +26,4 @@ export const languageJavaScript: LanguageDefinition = {
         }],
         [{ selected: 'call_expression' }, { firstChild: node => node.childForFieldName('arguments')?.firstNamedChild }],
     ]
-};
+);
