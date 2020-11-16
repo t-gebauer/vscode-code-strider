@@ -52,6 +52,7 @@ async function createNewEditorState(editor: TextEditor) {
     return state;
 }
 
+// TODO: with args?, so that we can use this everywhere where we need the state
 export function withState(fun: (state: EditorState) => void): () => void {
     return () => {
         if (activeEditorState) {

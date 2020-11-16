@@ -1,7 +1,7 @@
 # Prioritized
 
 - update node selection on text selection event
-- directional movement (nearyl the same as selection update?)
+- directional movement (nearly the same as selection update?)
 - improve javascript outwards movement
 - add TypeScript
 - add Kotlin
@@ -10,7 +10,6 @@
 - add YAML
 - add HTML rules
 - undo complete edits
-- AST preview pane - mark selection
 
 # Details
 
