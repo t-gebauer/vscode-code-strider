@@ -1,11 +1,11 @@
-import { Selection, TextEditorCursorStyle } from 'vscode';
-import { Edit } from 'web-tree-sitter';
+import { Selection } from 'vscode';
 import { updateSelection } from './decoration';
 import { EditorState } from './editor-state';
 import { NodeAccessorFunction, LanguageDefinition, CommandName } from './language/language-definition';
 import { getOverrideFor } from './language/language-support';
+import { findNodeAtSelection } from './tree-utilities';
 import { updateStatusBar } from './status-bar';
-import { toPosition } from './utilities';
+import { toPosition } from './conversion-utilities';
 
 export type CommandFunction = (editor: EditorState) => void;
 
@@ -62,7 +62,8 @@ export function insertAfter(state: EditorState) {
 
 export function exitInsertMode(state: EditorState) {
     state.insertMode = false;
-    // TODO: selected node at current position
+    // TODO: should handle multiple selections
+    state.currentNode = findNodeAtSelection(state.parseTree, state.editor.selection);
     updateStatusBar(state);
     updateSelection(state);
 }

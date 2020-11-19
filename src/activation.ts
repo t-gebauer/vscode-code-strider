@@ -1,17 +1,21 @@
-import { Disposable, TextDocument, TextEditor, window } from "vscode";
+import { Disposable, TextDocument, TextEditor, TextEditorSelectionChangeEvent, window, workspace } from "vscode";
 import Parser = require("web-tree-sitter");
 import { showAST } from "./ast-view";
 import { setDecorationsForNode } from "./decoration";
 import { parseDocument } from "./document-parser";
 import { EditorState } from "./editor-state";
 import { isLanguageSupported } from "./language/language-support";
+import { findNodeAtSelection } from "./tree-utilities";
 import { updateStatusBar } from "./status-bar";
+import { toSelection } from "./conversion-utilities";
 
 
 export function registerEditorChangeEvent(): Disposable {
-    const disposable = window.onDidChangeActiveTextEditor(handleEditorChange);
     handleEditorChange(window.activeTextEditor);
-    return disposable;
+    return Disposable.from(
+        window.onDidChangeActiveTextEditor(handleEditorChange),
+        window.onDidChangeTextEditorSelection(handleEditorSelectionChange),
+    );
 }
 
 // State per open editor (cursor position, node selection, decoration)
@@ -31,16 +35,25 @@ async function initializeEditor(editor: TextEditor | undefined): Promise<EditorS
     if (!isLanguageSupported(languageId)) { return null; }
 
     const state = editorStates.get(editor) || await createNewEditorState(editor);
-    setDecorationsForNode(editor, state.currentNode);
+    onSelectedNodeChange(state);
+    return state;
+}
+
+function onSelectedNodeChange(state: EditorState) {
+    setDecorationsForNode(state.editor, state.currentNode);
     showAST(state);
     updateStatusBar(state);
-
-    return state;
+    // Make sure that the complete node is selected
+    const targetNodeSelection = toSelection(state.currentNode);
+    const currentSelection = state.editor.selection;
+    if (!currentSelection.isEqual(targetNodeSelection)) {
+        state.editor.selection = targetNodeSelection;
+    }
 }
 
 async function createNewEditorState(editor: TextEditor) {
     const parseTree = await parseDocument(editor.document);
-    const initialNode = parseTree.rootNode.firstNamedChild || parseTree.rootNode;
+    const initialNode = findNodeAtSelection(parseTree, editor.selection);
 
     const state: EditorState = {
         editor,
@@ -68,4 +81,19 @@ export function invalidateEditorStates(document: TextDocument, newTree: Parser.T
             state.currentNode = newTree.rootNode.firstNamedChild || newTree.rootNode; // TODO find by cursor position
         }
     });
+}
+
+
+function handleEditorSelectionChange(event: TextEditorSelectionChangeEvent) {
+    // For simplity, let's assume that selection change always happens after editor change.
+    // Otherwise we would have to do the parser state initialization here as well.
+    // This seems to work for now.
+
+    const editor = event.textEditor;
+    // TODO: should handle multiple selections
+    const selection = event.selections[0];
+    const state = editorStates.get(event.textEditor);
+    if (!state || state.insertMode) { return; }
+    state.currentNode = findNodeAtSelection(state.parseTree, selection);
+    onSelectedNodeChange(state);
 }
