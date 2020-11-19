@@ -1,8 +1,8 @@
 import { ProgressLocation, TextDocument, TextDocumentChangeEvent, window } from "vscode";
 import Parser = require("web-tree-sitter");
 import { invalidateEditorStates } from "./activation";
-import { toPoint } from "./conversion-utilities";
-import { loadTreeSitterLanguage } from "./tree-sitter-utilities";
+import { toPoint } from "./utilities/conversion-utilities";
+import { loadTreeSitterLanguage } from "./utilities/tree-sitter-utilities";
 
 export async function initializeParser() {
     // This is so fast on my machine, that it is hardly noticeable.

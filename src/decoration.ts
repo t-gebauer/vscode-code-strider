@@ -1,7 +1,7 @@
 import { TextEditor, TextEditorCursorStyle, TextEditorDecorationType, window } from "vscode";
 import { SyntaxNode } from "web-tree-sitter";
 import { EditorState } from "./editor-state";
-import { toRange, toSelection } from "./conversion-utilities";
+import { toRange, toSelection } from "./utilities/conversion-utilities";
 
 // TODO: dispose the decoration type?
 const currentDecorationType = window.createTextEditorDecorationType({

@@ -3,9 +3,9 @@ import { updateSelection } from './decoration';
 import { EditorState } from './editor-state';
 import { NodeAccessorFunction, LanguageDefinition, CommandName } from './language/language-definition';
 import { getOverrideFor } from './language/language-support';
-import { findNodeAtSelection } from './tree-utilities';
+import { findNodeAtSelection } from './utilities/tree-utilities';
 import { updateStatusBar } from './status-bar';
-import { toPosition } from './conversion-utilities';
+import { toPosition } from './utilities/conversion-utilities';
 
 export type CommandFunction = (editor: EditorState) => void;
 

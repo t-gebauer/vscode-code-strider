@@ -1,5 +1,5 @@
 import Parser = require("web-tree-sitter");
-import { extensionContext } from "./extension";
+import { extensionContext } from "../extension";
 import * as fs from 'fs';
 
 

@@ -5,7 +5,7 @@ import { getLanguageDefinition, isLanguageSupported } from "./language/language-
 import { updateStatusBar } from "./status-bar";
 import { activeEditorState } from "./activation";
 import { showAST } from "./ast-view";
-import { toRange } from "./conversion-utilities";
+import { toRange } from "./utilities/conversion-utilities";
 
 export function interceptTypeCommand(editor: TextEditor, _: TextEditorEdit, args: { text: string }) {
     const key = args.text;

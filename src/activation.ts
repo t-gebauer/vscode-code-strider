@@ -5,9 +5,9 @@ import { setDecorationsForNode } from "./decoration";
 import { parseDocument } from "./document-parser";
 import { EditorState } from "./editor-state";
 import { isLanguageSupported } from "./language/language-support";
-import { findNodeAtSelection } from "./tree-utilities";
+import { findNodeAtSelection } from "./utilities/tree-utilities";
 import { updateStatusBar } from "./status-bar";
-import { toSelection } from "./conversion-utilities";
+import { toSelection } from "./utilities/conversion-utilities";
 
 
 export function registerEditorChangeEvent(): Disposable {
