@@ -4,7 +4,6 @@ import * as vscode from 'vscode';
 import { getLanguageDefinition, isLanguageSupported } from "./language/language-support";
 import { updateStatusBar } from "./status-bar";
 import { activeEditorState } from "./activation";
-import { showAST } from "./ast-view";
 import { toRange } from "./utilities/conversion-utilities";
 
 export function interceptTypeCommand(editor: TextEditor, _: TextEditorEdit, args: { text: string }) {
@@ -50,6 +49,6 @@ export function interceptTypeCommand(editor: TextEditor, _: TextEditorEdit, args
         command(state);
         state.editor.revealRange(toRange(state.currentNode), vscode.TextEditorRevealType.InCenterIfOutsideViewport);
         updateStatusBar(state);
-        showAST(state);
+        state.astView?.updateSelectedNode(state.currentNode);
     }
 }

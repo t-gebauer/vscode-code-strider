@@ -1,6 +1,5 @@
 # Prioritized
 
-- update node selection on text selection event
 - directional movement (nearly the same as selection update?)
 - improve javascript outwards movement
 - add TypeScript
@@ -10,6 +9,13 @@
 - add YAML
 - add HTML rules
 - undo complete edits
+
+# More
+
+- last child
+- slurping
+- barfing
+- move node around (a minor mode?)
 
 # Details
 
