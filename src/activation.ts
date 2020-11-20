@@ -1,4 +1,4 @@
-import { Disposable, EventEmitter, TextDocument, TextEditor, TextEditorSelectionChangeEvent, window, workspace } from "vscode";
+import { Disposable, TextDocument, TextEditor, TextEditorSelectionChangeEvent, window } from "vscode";
 import Parser = require("web-tree-sitter");
 import { setDecorationsForNode } from "./decoration";
 import { parseDocument } from "./document-parser";
@@ -10,7 +10,7 @@ import { toSelection } from "./utilities/conversion-utilities";
 import { showAstView } from "./ast-view";
 
 
-export function registerEditorChangeEvent(): Disposable {
+export function registerEditorChangeEvents(): Disposable {
     handleEditorChange(window.activeTextEditor);
     return Disposable.from(
         window.onDidChangeActiveTextEditor(handleEditorChange),
@@ -62,33 +62,32 @@ async function createNewEditorState(editor: TextEditor) {
         insertMode: false,
     };
     // TODO: if config.showAstView ...
-    state = {
-        ...state,
-        astView: await showAstView(state),
-    };
+    showAstView(state).then(newAstView => state.astView = newAstView);
     editorStates.set(editor, state);
     return state;
 }
 
-// TODO: with args?, so that we can use this everywhere where we need the state
-export function withState(fun: (state: EditorState) => void): () => void {
-    return () => {
+export function withState<T extends readonly unknown[], U>(fun: (state: EditorState, ...args: T) => U): (...args: T) => U | undefined {
+    return (...rest) => {
         if (activeEditorState) {
-            fun(activeEditorState);
+            return fun(activeEditorState, ...rest);
         }
     };
 }
 
-export function invalidateEditorStates(document: TextDocument, newTree: Parser.Tree) {
+// The parse tree has changed
+export function invalidateEditorStatesForDocument(document: TextDocument, newTree: Parser.Tree) {
     editorStates.forEach(state => {
         if (state.editor.document === document) {
             state.parseTree = newTree;
-            state.currentNode = newTree.rootNode.firstNamedChild || newTree.rootNode; // TODO find by cursor position
-            showAstView(state).then((newAstView) => state.astView = newAstView);
+            state.currentNode = findNodeAtSelection(newTree, state.editor.selection);
+            if (state.astView) {
+                // No need to wait on the new AST view to show
+                showAstView(state).then((newAstView) => state.astView = newAstView);
+            }
         }
     });
 }
-
 
 function handleEditorSelectionChange(event: TextEditorSelectionChangeEvent) {
     // For simplity, let's assume that selection change always happens after editor change.

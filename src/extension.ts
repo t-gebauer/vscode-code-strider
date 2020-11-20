@@ -1,5 +1,5 @@
 import { commands, ExtensionContext, workspace } from 'vscode';
-import { registerEditorChangeEvent, withState } from './activation';
+import { registerEditorChangeEvents, withState } from './activation';
 import { exitInsertMode } from './commands';
 import { handleDocumentChange, initializeParser } from './document-parser';
 import { interceptTypeCommand } from './intercept-typing';
@@ -20,7 +20,7 @@ export async function activate(context: ExtensionContext) {
 		statusBar,
 		commands.registerTextEditorCommand('type', interceptTypeCommand),
 		commands.registerTextEditorCommand('code-strider:exit-insert-mode', withState(exitInsertMode)),
-		registerEditorChangeEvent(),
+		registerEditorChangeEvents(),
 		workspace.onDidChangeTextDocument(handleDocumentChange),
 	);
 
