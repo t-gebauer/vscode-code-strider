@@ -7,7 +7,7 @@ export type RuleMatcher = {
     parent?: string,
 };
 
-export type CommandName = 'firstChild' | 'gotoParent' | 'nextSibling' | 'previousSibling';
+export type CommandName = 'firstChild' | 'lastChild' | 'gotoParent' | 'nextSibling' | 'previousSibling';
 
 export type RuleExecutor = Partial<{
     [commandName in CommandName]: NodeAccessorFunction;

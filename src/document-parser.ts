@@ -7,6 +7,7 @@ import { loadTreeSitterLanguage } from "./utilities/tree-sitter-utilities";
 export async function initializeParser() {
     // This is so fast on my machine, that it is hardly noticeable.
     await window.withProgress(
+        // Theoretically, displays a loading indicator in the status bar.
         { location: ProgressLocation.Window, title: 'Initializing Parser...' },
         () => Parser.init()
     );
@@ -37,9 +38,11 @@ export async function handleDocumentChange(event: TextDocumentChangeEvent) {
     const tree = parseTrees.get(document);
     if (!tree) { return; }
 
+    // TODO: Does the tree editing really work?
+    // Can we test the speed? Is this really faster than parsing from scratch?
     contentChanges.forEach(change => {
         const newLines = change.text.split('\n'); // TODO: different end-of-line sequences?
-        
+
         // TODO: test it
         const edit = {
             startIndex: change.rangeOffset,

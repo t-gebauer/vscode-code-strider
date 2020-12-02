@@ -28,6 +28,8 @@ export function interceptTypeCommand(editor: TextEditor, _: TextEditorEdit, args
         // Movement
         'h': commands.gotoParent,
         'f': commands.gotoFirstChild,
+        // eslint-disable-next-line @typescript-eslint/naming-convention
+        'F': commands.gotoLastChild,
         'g': commands.gotoPreviousSibling,
         'r': commands.gotoNextSibling,
         'n': commands.gotoPreviousSibling,

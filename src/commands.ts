@@ -31,12 +31,13 @@ export function commandsForLanguage(languageDefinition: LanguageDefinition) {
         };
     }
 
-    const gotoParent = movementCommand(withOverride('gotoParent', node => node.parent));
-    const gotoFirstChild = movementCommand(withOverride('firstChild', node => node.firstNamedChild));
-    const gotoNextSibling = movementCommand(withOverride('nextSibling', node => node.nextNamedSibling));
-    const gotoPreviousSibling = movementCommand(withOverride('previousSibling', node => node.previousNamedSibling));
-
-    return { gotoParent, gotoFirstChild, gotoNextSibling, gotoPreviousSibling };
+    return {
+        gotoParent: movementCommand(withOverride('gotoParent', node => node.parent)),
+        gotoFirstChild: movementCommand(withOverride('firstChild', node => node.firstNamedChild)),
+        gotoLastChild: movementCommand(withOverride('lastChild', node => node.lastNamedChild)),
+        gotoNextSibling: movementCommand(withOverride('nextSibling', node => node.nextNamedSibling)),
+        gotoPreviousSibling: movementCommand(withOverride('previousSibling', node => node.previousNamedSibling)),
+    };
 }
 
 export function selectToChange(state: EditorState) {
