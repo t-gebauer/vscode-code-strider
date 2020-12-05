@@ -11,7 +11,8 @@
 	],
 	"activationEvents": [
 		"onLanguage:javascript",
-		"onLanguage:html"
+		"onLanguage:html",
+		"onLanguage:clojure"
 	],
 	"main": "./out/extension.js",
 	"contributes": {

@@ -1,5 +1,3 @@
-/* eslint-disable @typescript-eslint/naming-convention */
-
 import { defineLanguage } from "../language-definition";
 
 // TODO: Lots of duplication between first and last child
