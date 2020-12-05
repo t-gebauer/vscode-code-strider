@@ -70,7 +70,7 @@ function renderTree(tree: Tree): [source: string, getRange: (node: SyntaxNode) =
             cursor.gotoParent();
             return content;
         }
-        content += '\n' + makeIndent(indentLevel) + '(' + cursor.nodeType;
+        content += '\n' + makeIndent(indentLevel) + printFieldName(cursor) + '(' + cursor.nodeType;
         if (cursor.gotoFirstChild()) {
             content += renderNode(cursor, indentLevel + 1, startRow + 1);
         }
@@ -99,4 +99,9 @@ function nodeIndex(node: { startIndex: number, endIndex: number }): string {
 
 function makeIndent(level: number): string {
     return '  '.repeat(level);
+}
+
+function printFieldName(cursor: TreeCursor): string {
+    const name = cursor.currentFieldName();
+    return name !== null ? `${name}: ` : '';
 }
