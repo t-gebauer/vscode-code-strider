@@ -14,6 +14,7 @@ export function initializeLanguages() {
         javaScript,
         defineLanguage('html'),
         defineLanguage('clojure'),
+        defineLanguage('python'),
     ];
     languageDefinitions.forEach(def => {
         languages.set(def.languageId, def);
