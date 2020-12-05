@@ -1,7 +1,7 @@
 # Prioritized
 - automatically skip nodes which take the same space
 - generally don't select empty nodes? (*looking at html*)
-- directional movement (nearly the same as selection update?)
+- directional movement (similar to find-node-at-selection, but instead of starting at the root node, we can start at the current-node: search forward, search backward?)
 - improve javascript outwards movement
 - add Python
 - add HTML rules
@@ -10,10 +10,10 @@
 - move node around (a minor mode?)
 
 # Bugs
-- Movement gets trapped inside nodes which take the same place? (Clojure)
 - AST view highlights wrong nodes, when multiple nodes take the same place. (eg. Clojure: (boolean (true)))
 - AST view will crash the extension if it does not load fast enough:
     > Uncaught RuntimeError: abort(Error: Could NOT open editor for "code-strider-ast:/home/maybe/projects/ba-private/test-files/core.clj.2729.ast" because another editor opened in the meantime.).
+    To reproduce: Make a few edits in very short succession: Undo does this pretty well
 - Slow editing performance for large files (core.clj 8000 lines)
 
 # More

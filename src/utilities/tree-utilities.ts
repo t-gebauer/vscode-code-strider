@@ -3,6 +3,7 @@ import { SyntaxNode, Tree } from "web-tree-sitter";
 import { toRange } from "./conversion-utilities";
 
 export function findNodeAtSelection(tree: Tree, selection: Selection): SyntaxNode {
+    // Start at the top. Walk down until the we find the last node which completely contains the selection.
     const cursor = tree.walk();
 
     // TODO: Improvement: If whitespace is selected between nodes:

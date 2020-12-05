@@ -91,13 +91,20 @@ export function invalidateEditorStatesForDocument(document: TextDocument, newTre
 
 function handleEditorSelectionChange(event: TextEditorSelectionChangeEvent) {
     // For simplity, let's assume that selection change always happens after editor change.
-    // Otherwise we would have to do the parser state initialization here as well.
-    // This seems to work for now.
+    // Otherwise we might have to initialize the parser state here. As far as I could observe, this assumption is correct.
+
+    const state = editorStates.get(event.textEditor);
+    if (!state || state.insertMode) { return; }
 
     // TODO: should handle multiple selections
     const selection = event.selections[0];
-    const state = editorStates.get(event.textEditor);
-    if (!state || state.insertMode) { return; }
+
+    if (selection.isEqual(toSelection(state.currentNode))) {
+        // Nothing to do, the current node already spans the selection.
+        // Also happens if we are changing the selection manually after a movement command.
+        return;
+    }
+
     state.currentNode = findNodeAtSelection(state.parseTree, selection);
     onSelectedNodeChange(state);
 }
