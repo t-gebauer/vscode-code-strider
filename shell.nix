@@ -9,5 +9,8 @@ pkgs.mkShell {
     # To generate wasm files
     tree-sitter
     emscripten
+
+    # Code formatting
+    nodePackages.prettier
   ];
 }
