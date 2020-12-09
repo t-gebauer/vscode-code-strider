@@ -1,3 +1,4 @@
+import { compileFunction } from "vm"
 import {
     Disposable,
     Event,
@@ -84,49 +85,47 @@ function renderTree(
     const ranges = new Map<string, Range>()
     const cursor = tree.walk()
 
-    function renderNode(cursor: TreeCursor, indentLevel: number, startRow: number): string {
-        let content = ""
-        // skip un-named nodes
-        if (!cursor.nodeIsNamed) {
-            if (cursor.gotoFirstChild()) {
-                content += renderNode(cursor, indentLevel, startRow)
-            }
-            if (cursor.gotoNextSibling()) {
-                content += renderNode(cursor, indentLevel, startRow)
-                return content
-            }
-            cursor.gotoParent()
-            return content
-        }
-        // add own description
-        content += "\n" + makeIndent(indentLevel) + printFieldName(cursor) + "(" + cursor.nodeType
-        // render all children
-        if (cursor.gotoFirstChild()) {
-            content += renderNode(cursor, indentLevel + 1, startRow + 1)
-        }
-        // finish this node
-        content += ")"
-        const lines = content.split("\n")
-        // save range information for this node
-        ranges.set(
-            nodeIndex(cursor),
-            new Range(
-                new Position(startRow + 1, makeIndent(indentLevel).length),
-                new Position(startRow + lines.length - 1, lines[lines.length - 1].length)
-            )
-        )
-        // go to next sibling
-        if (cursor.gotoNextSibling()) {
-            return content + renderNode(cursor, indentLevel, startRow + lines.length - 1)
+    const result = renderNode(cursor)
+
+    return [result.content, (node) => ranges.get(nodeIndex(node))]
+}
+
+type ReturnValue = { content: string; positions: Map<string, Range>; isNamed: boolean }
+const INDENT = "  "
+
+function renderNode(cursor: TreeCursor): ReturnValue {
+    const children: Array<ReturnValue> = []
+    if (cursor.gotoFirstChild()) {
+        children.push(renderNode(cursor))
+        while (cursor.gotoNextSibling()) {
+            children.push(renderNode(cursor))
         }
         cursor.gotoParent()
-        return content
+    }
+    const namedChildren = children.filter((it) => it.isNamed)
+    const combinedChildContent = namedChildren
+        .flatMap((it) => it.content.split("\n"))
+        .map((it) => INDENT + it)
+        .join("\n")
+
+    function ownNameAroundChildContent() {
+        return (
+            printFieldName(cursor) +
+            "(" +
+            cursor.nodeType +
+            (namedChildren.length > 0 ? "\n" + combinedChildContent : "") +
+            ")"
+        )
     }
 
-    const content = renderNode(cursor, 0, 0)
-
-    return [content, (node) => ranges.get(nodeIndex(node))]
+    return {
+        content: cursor.nodeIsNamed ? ownNameAroundChildContent() : combinedChildContent,
+        positions: new Map(),
+        isNamed: cursor.nodeIsNamed,
+    }
 }
+
+// utility function: visitTree ?
 
 /** Returns a unique string to uniquely identify a SyntaxNode in the parse tree. */
 function nodeIndex(node: SyntaxNode | TreeCursor): string {
@@ -145,4 +144,8 @@ function printFieldName(cursor: TreeCursor): string {
 
 function isSyntaxNode(node: SyntaxNode | TreeCursor): node is SyntaxNode {
     return (node as SyntaxNode).type !== undefined
+}
+
+function notNull<T>(element: T | null | undefined): element is T {
+    return element != null
 }
