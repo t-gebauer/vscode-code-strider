@@ -70,6 +70,14 @@ export async function showAstView(editorState: EditorState): Promise<AstView> {
     }
 }
 
+/**
+ * Render the given parse tree to a string.
+ *
+ * @returns a tuple of
+ *   1. the rendered string and
+ *   2. a function to query the position of the string representation of
+ *      a SyntaxNode in the rendered string.
+ */
 function renderTree(
     tree: Tree
 ): [source: string, getRange: (node: SyntaxNode) => Range | undefined] {
@@ -78,8 +86,8 @@ function renderTree(
 
     function renderNode(cursor: TreeCursor, indentLevel: number, startRow: number): string {
         let content = ""
+        // skip un-named nodes
         if (!cursor.nodeIsNamed) {
-            // ignore all un-named nodes
             if (cursor.gotoFirstChild()) {
                 content += renderNode(cursor, indentLevel, startRow)
             }
@@ -90,12 +98,16 @@ function renderTree(
             cursor.gotoParent()
             return content
         }
+        // add own description
         content += "\n" + makeIndent(indentLevel) + printFieldName(cursor) + "(" + cursor.nodeType
+        // render all children
         if (cursor.gotoFirstChild()) {
             content += renderNode(cursor, indentLevel + 1, startRow + 1)
         }
+        // finish this node
         content += ")"
         const lines = content.split("\n")
+        // save range information for this node
         ranges.set(
             nodeIndex(cursor),
             new Range(
@@ -103,6 +115,7 @@ function renderTree(
                 new Position(startRow + lines.length - 1, lines[lines.length - 1].length)
             )
         )
+        // go to next sibling
         if (cursor.gotoNextSibling()) {
             return content + renderNode(cursor, indentLevel, startRow + lines.length - 1)
         }
@@ -115,8 +128,10 @@ function renderTree(
     return [content, (node) => ranges.get(nodeIndex(node))]
 }
 
-function nodeIndex(node: { startIndex: number; endIndex: number }): string {
-    return `${node.startIndex},${node.endIndex}`
+/** Returns a unique string to uniquely identify a SyntaxNode in the parse tree. */
+function nodeIndex(node: SyntaxNode | TreeCursor): string {
+    const type = isSyntaxNode(node) ? node.type : node.nodeType
+    return `${type}:${node.startIndex}:${node.endIndex}`
 }
 
 function makeIndent(level: number): string {
@@ -126,4 +141,8 @@ function makeIndent(level: number): string {
 function printFieldName(cursor: TreeCursor): string {
     const name = cursor.currentFieldName()
     return name !== null ? `${name}: ` : ""
+}
+
+function isSyntaxNode(node: SyntaxNode | TreeCursor): node is SyntaxNode {
+    return (node as SyntaxNode).type !== undefined
 }
