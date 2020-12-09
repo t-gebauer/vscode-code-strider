@@ -82,19 +82,23 @@ export async function showAstView(editorState: EditorState): Promise<AstView> {
 function renderTree(
     tree: Tree
 ): [source: string, getRange: (node: SyntaxNode) => Range | undefined] {
-    const ranges = new Map<string, Range>()
     const cursor = tree.walk()
 
-    const result = renderNode(cursor)
+    const { content, positions } = renderNode(cursor)
+    const ranges = new Map<string, Range>(positions)
 
-    return [result.content, (node) => ranges.get(nodeIndex(node))]
+    return [content, (node) => ranges.get(nodeIndex(node))]
 }
 
-type ReturnValue = { content: string; positions: Map<string, Range>; isNamed: boolean }
-const INDENT = "  "
+type Index = string
+type ResultRanges = [Index, Range][]
+type ReturnValue = { content: string; positions: ResultRanges; isNamed: boolean }
+const INDENT_SIZE = 2
+const INDENT = " ".repeat(INDENT_SIZE)
 
 function renderNode(cursor: TreeCursor): ReturnValue {
     const children: Array<ReturnValue> = []
+    // TODO: utility function: visitTree ?
     if (cursor.gotoFirstChild()) {
         children.push(renderNode(cursor))
         while (cursor.gotoNextSibling()) {
@@ -108,29 +112,60 @@ function renderNode(cursor: TreeCursor): ReturnValue {
         .map((it) => INDENT + it)
         .join("\n")
 
-    function ownNameAroundChildContent() {
-        return (
-            printFieldName(cursor) +
-            "(" +
-            cursor.nodeType +
-            (namedChildren.length > 0 ? "\n" + combinedChildContent : "") +
-            ")"
-        )
+    const combinedChildPositions = namedChildren
+        .flatMap((it) => it.positions)
+    // TODO: this maps over all children, but we only want to adjust the offsets relative to
+    // other direct children
+        .map<[Index, Range]>(([index, range], i, arr) => {
+            // TODO: adjust positions by previous sibling offset
+            return [
+            index,
+            new Range(
+                new Position(range.start.line + 1, range.start.character + INDENT_SIZE),
+                new Position(range.end.line + 1, range.end.character + INDENT_SIZE)
+            ),
+        ]})
+
+    if (!cursor.nodeIsNamed) {
+        return {
+            content: combinedChildContent,
+            positions: combinedChildPositions,
+            isNamed: cursor.nodeIsNamed,
+        }
     }
 
+    const hasNamedChildren = namedChildren.length > 0
+    const ownNameAroundChildContent =
+        printFieldName(cursor) +
+        "(" +
+        cursor.nodeType +
+        (hasNamedChildren ? "\n" + combinedChildContent : "") +
+        ")"
+    let endPosition: Position
+    if (hasNamedChildren) {
+        const [_, lastChildPosition]: [Index, Range] = combinedChildPositions[
+            combinedChildPositions.length - 1
+        ]
+        endPosition = new Position(lastChildPosition.end.line, lastChildPosition.end.character + 1)
+    } else {
+        endPosition = new Position(0, ownNameAroundChildContent.length)
+    }
+    const ownPosition: [Index, Range] = [
+        nodeIndex(cursor),
+        new Range(new Position(0, 0), endPosition),
+    ]
+    combinedChildPositions.push(ownPosition)
     return {
-        content: cursor.nodeIsNamed ? ownNameAroundChildContent() : combinedChildContent,
-        positions: new Map(),
+        content: ownNameAroundChildContent,
+        positions: combinedChildPositions,
         isNamed: cursor.nodeIsNamed,
     }
 }
 
-// utility function: visitTree ?
-
-/** Returns a unique string to uniquely identify a SyntaxNode in the parse tree. */
-function nodeIndex(node: SyntaxNode | TreeCursor): string {
+/** A key to uniquely identify a SyntaxNode in the parse tree. */
+function nodeIndex(node: SyntaxNode | TreeCursor): Index {
     const type = isSyntaxNode(node) ? node.type : node.nodeType
-    return `${type}:${node.startIndex}:${node.endIndex}`
+    return `${type}, ${node.startIndex}, ${node.endIndex}`
 }
 
 function makeIndent(level: number): string {
