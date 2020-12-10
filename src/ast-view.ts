@@ -19,7 +19,10 @@ export interface AstView extends Disposable {
 }
 
 /**
- * Print the AST of the given editorState in a new editor window
+ * Print the AST of the given editorState in a new editor window.
+ *
+ * TODO: This blindly opens a new editor window to the right of the currently selected.
+ *       Reuse an existing AST View window instead.
  */
 export async function showAstView(editorState: EditorState): Promise<AstView> {
     const subscriptions: Disposable[] = []
@@ -40,9 +43,9 @@ export async function showAstView(editorState: EditorState): Promise<AstView> {
     })()
     subscriptions.push(workspace.registerTextDocumentContentProvider(scheme, contentProvider))
 
-    // The URI does not matter if we create a new content provider each time?
+    // TODO: The URI does not matter if we create a new content provider each time?
     // But we add some randomness to force VS Code to update the content.
-    // TODO: Use the `onDidChange` event for this?
+    // Use the `onDidChange` event for this?
     const uri = Uri.parse(
         `${scheme}:${editorState.editor.document.fileName}.${Math.floor(
             Math.random() * 100000

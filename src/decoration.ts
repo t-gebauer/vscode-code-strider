@@ -8,17 +8,17 @@ const currentDecorationType = window.createTextEditorDecorationType({
     backgroundColor: "#555",
 })
 
-const firstChildDecorationType = window.createTextEditorDecorationType({
-    backgroundColor: "#533",
-})
+// const firstChildDecorationType = window.createTextEditorDecorationType({
+//     backgroundColor: "#533",
+// })
 
-const nextDecorationType = window.createTextEditorDecorationType({
-    backgroundColor: "#338",
-})
+// const nextDecorationType = window.createTextEditorDecorationType({
+//     backgroundColor: "#338",
+// })
 
-const previousDecorationType = window.createTextEditorDecorationType({
-    backgroundColor: "#484",
-})
+// const previousDecorationType = window.createTextEditorDecorationType({
+//     backgroundColor: "#484",
+// })
 
 function setOrResetDecorations(
     editor: TextEditor,
