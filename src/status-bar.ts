@@ -1,27 +1,35 @@
 import { Disposable, StatusBarAlignment, StatusBarItem, window } from "vscode"
 import { EditorState } from "./editor-state"
+import { Extension, InteractionMode } from "./extension"
 
-export const statusBar = new (class implements Disposable {
-    private statusBarItem: StatusBarItem
+function modeText(mode: InteractionMode): string {
+    switch (mode) {
+        case InteractionMode.Insert:
+            return "INSERT"
+        case InteractionMode.Structural:
+            return "STRUCT"
+    }
+}
 
-    constructor() {
-        this.statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left)
-        this.statusBarItem.show()
+export function registerStatusBar(ext: Extension): Disposable {
+    const statusBarItem = window.createStatusBarItem(StatusBarAlignment.Left)
+    statusBarItem.show()
+
+    function update(mode: InteractionMode, currentNodeType: string) {
+        statusBarItem.text = `${modeText(mode)} : ${currentNodeType}`
     }
 
-    dispose() {
-        this.statusBarItem.dispose()
+    function eventHandler(state: EditorState) {
+        update(
+            state.insertMode ? InteractionMode.Insert : InteractionMode.Structural,
+            state.currentNode.type
+        )
     }
 
-    setText(text: string) {
-        this.statusBarItem.text = text
-    }
-})()
-
-export function updateStatusBar(state: EditorState) {
-    if (state.insertMode) {
-        statusBar.setText("INSERT")
-    } else {
-        statusBar.setText(`STRUCT : ${state.currentNode.type}`)
-    }
+    return Disposable.from(
+        ext.onActiveEditorChange(eventHandler),
+        ext.onActiveEditorModeChange(eventHandler),
+        ext.onActiveEditorNodeSelectionChange(eventHandler),
+        statusBarItem
+    )
 }
