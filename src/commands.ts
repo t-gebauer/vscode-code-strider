@@ -6,10 +6,10 @@ import {
     LanguageDefinition,
     CommandName,
 } from "./language/language-definition"
-import { getOverrideFor } from "./language/language-support"
 import { findNodeAtSelection } from "./utilities/tree-utilities"
 import { updateStatusBar } from "./status-bar"
 import { toPosition } from "./utilities/conversion-utilities"
+import {  Languages } from "./language/language-support"
 
 export type CommandFunction = (editor: EditorState) => void
 
@@ -29,7 +29,7 @@ export function commandsForLanguage(languageDefinition: LanguageDefinition) {
         defaultFunction: NodeAccessorFunction
     ): NodeAccessorFunction {
         return (node) => {
-            const overrideFun = getOverrideFor(languageDefinition, commandName, node)
+            const overrideFun = Languages.getOverrideFor(languageDefinition, commandName, node)
             if (overrideFun) {
                 return overrideFun(node)
             }

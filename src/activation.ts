@@ -9,11 +9,11 @@ import Parser = require("web-tree-sitter")
 import { setDecorationsForNode } from "./decoration"
 import { parseDocument } from "./document-parser"
 import { EditorState } from "./editor-state"
-import { isLanguageSupported } from "./language/language-support"
 import { findNodeAtSelection } from "./utilities/tree-utilities"
 import { updateStatusBar } from "./status-bar"
 import { toSelection } from "./utilities/conversion-utilities"
 import { showAstView } from "./ast-view"
+import { Languages } from "./language/language-support"
 
 export function registerEditorChangeEvents(): Disposable {
     handleEditorChange(window.activeTextEditor)
@@ -39,7 +39,7 @@ async function initializeEditor(editor: TextEditor | undefined): Promise<EditorS
     }
 
     const languageId = editor.document.languageId
-    if (!isLanguageSupported(languageId)) {
+    if (!Languages.isSupported(languageId)) {
         return null
     }
 
