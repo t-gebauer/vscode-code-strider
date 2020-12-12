@@ -1,10 +1,12 @@
 import {
     Disposable,
-    Event,
+    EventEmitter,
     Position,
     ProviderResult,
     Range,
+    TextDocument,
     TextDocumentContentProvider,
+    TextEditor,
     TextEditorRevealType,
     Uri,
     ViewColumn,
@@ -13,63 +15,107 @@ import {
 } from "vscode"
 import { SyntaxNode, Tree, TreeCursor } from "web-tree-sitter"
 import { EditorState } from "./editor-state"
+import { Extension, logger } from "./extension"
 
-export interface AstView extends Disposable {
-    updateSelectedNode: (node: SyntaxNode) => void
+const URI_SCHEME = "code-strider-ast"
+const AST_FILE_SUFFIX = ".ast"
+
+function createUri(document: TextDocument): Uri {
+    return Uri.parse(`${URI_SCHEME}:${document.fileName}${AST_FILE_SUFFIX}`)
 }
 
-/**
- * Print the AST of the given editorState in a new editor window.
- *
- * TODO: This blindly opens a new editor window to the right of the currently selected.
- *       Reuse an existing AST View window instead.
- */
-export async function showAstView(editorState: EditorState): Promise<AstView> {
-    const subscriptions: Disposable[] = []
-    const nodeDecoration = window.createTextEditorDecorationType({ backgroundColor: "#333" })
-    subscriptions.push(nodeDecoration)
+export class AstViewer implements Disposable {
+    static async create(ext: Extension, state: EditorState): Promise<AstViewer> {
+        const astView = new AstViewer()
+        ext.onActiveEditorStateChange((newState: EditorState | undefined) => {
+            astView.setOrUpdateState(newState)
+        })
+        astView.setOrUpdateState(state)
+        await astView.show(state)
+        return astView
+    }
 
-    const [content, getRangeForNode] = renderTree(editorState.parseTree)
+    private parseTree?: Tree
+    private editorState?: EditorState
+    private rangeFinder?: (node: SyntaxNode) => Range | undefined
+    private editorWindow?: TextEditor
 
-    // Register content provider
-    // There can only be one provider per scheme, so we effectively unregister the previous one.
-    const scheme = "code-strider-ast"
-    const suffix = ".ast"
-    const contentProvider = new (class implements TextDocumentContentProvider {
-        onDidChange?: Event<Uri> | undefined
+    private readonly subscriptions: Disposable[] = []
+    private nodeDecoration = window.createTextEditorDecorationType({ backgroundColor: "#333" })
+
+    contentProvider = new (class implements TextDocumentContentProvider {
+        contentChangeEmitter = new EventEmitter<Uri>()
+        onDidChange = this.contentChangeEmitter.event
+        content = ""
         provideTextDocumentContent(): ProviderResult<string> {
-            return content
+            logger.debugContext("Providing TextDocument content")
+            logger.debug("Returning content: " + this.content)
+            return this.content
         }
     })()
-    subscriptions.push(workspace.registerTextDocumentContentProvider(scheme, contentProvider))
 
-    // TODO: The URI does not matter if we create a new content provider each time?
-    // But we add some randomness to force VS Code to update the content.
-    // Use the `onDidChange` event for this?
-    const uri = Uri.parse(
-        `${scheme}:${editorState.editor.document.fileName}.${Math.floor(
-            Math.random() * 100000
-        )}${suffix}`
-    )
-    const document = await workspace.openTextDocument(uri)
-    const editor = await window.showTextDocument(document, {
-        preserveFocus: true,
-        viewColumn: ViewColumn.Beside,
-        preview: true,
-    })
+    constructor() {
+        this.subscriptions.push(
+            workspace.registerTextDocumentContentProvider(URI_SCHEME, this.contentProvider)
+        )
+    }
 
-    function updateSelectedNode(node: SyntaxNode) {
-        const currentRange = getRangeForNode(node)
+    setOrUpdateState(editorState: EditorState | undefined) {
+        this.editorState = editorState;
+        if (editorState === undefined) {
+            // remove decorations
+            this.editorWindow?.setDecorations(this.nodeDecoration, []);
+                return;
+        }
+        if (editorState.parseTree !== this.parseTree) {
+            logger.debug("Parse tree change detected")
+            this.parseTree = editorState.parseTree
+            this.editorState = editorState
+            // DO this when the parse tree has changed, e.g. the content changed
+            const [content, rangeFinder] = renderTree(editorState.parseTree)
+            this.contentProvider.content = content
+            this.rangeFinder = rangeFinder
+            this.contentProvider.contentChangeEmitter.fire(createUri(editorState.editor.document))
+            return
+        }
+        this.updateDecorations()
+    }
+
+    private updateDecorations() {
+        // TODO: do we need these checks? Can we change the flow slightly, so that
+        // it becomes impossible to call this too early
+        if (!this.editorState || !this.rangeFinder || !this.editorWindow) {
+            return
+        }
+
+        const node = this.editorState.currentNode
+        const currentRange = this.rangeFinder(node)
         if (currentRange) {
-            editor.setDecorations(nodeDecoration, [currentRange])
-            editor.revealRange(currentRange, TextEditorRevealType.InCenterIfOutsideViewport)
+            this.editorWindow.setDecorations(this.nodeDecoration, [currentRange])
+            this.editorWindow.revealRange(
+                currentRange,
+                TextEditorRevealType.InCenterIfOutsideViewport
+            )
         }
     }
-    updateSelectedNode(editorState.currentNode)
 
-    return {
-        updateSelectedNode,
-        dispose: () => subscriptions.forEach((it) => it.dispose()),
+    async show(editorState: EditorState) {
+        const document = await workspace.openTextDocument(createUri(editorState.editor.document))
+        this.editorWindow = await window.showTextDocument(document, {
+            preserveFocus: true,
+            viewColumn: ViewColumn.Beside,
+            preview: true,
+        })
+    }
+
+    dispose() {
+        // We could hide the AST view window here?
+        // But `TextEditor.hide()` is deprecated.
+        Disposable.from(
+            ...this.subscriptions,
+            this.nodeDecoration,
+            this.contentProvider.contentChangeEmitter
+        ).dispose()
     }
 }
 
