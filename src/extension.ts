@@ -6,6 +6,7 @@ import {
     EventEmitter,
     ExtensionContext,
     TextDocument,
+    TextDocumentChangeEvent,
     TextEditor,
     TextEditorSelectionChangeEvent,
     window,
@@ -13,16 +14,17 @@ import {
 } from "vscode"
 import { AstViewer } from "./ast-view"
 import { exitInsertMode } from "./commands"
-import { handleDocumentChange, initializeParser, parseDocument } from "./document-parser"
 import { EditorState } from "./editor-state"
 import { interceptTypeCommand } from "./intercept-typing"
 import { Languages } from "./language/language-support"
 import { registerStatusBar } from "./status-bar"
-import { toRange, toSelection } from "./utilities/conversion-utilities"
+import { toPoint, toRange, toSelection } from "./utilities/conversion-utilities"
 import { findNodeAtSelection } from "./utilities/tree-utilities"
 import Parser = require("web-tree-sitter")
 import { registerDecorationHandler } from "./decoration"
 import { Logger } from "./logger"
+import { Tree } from "web-tree-sitter"
+import { initializeParser, loadTreeSitterLanguage } from "./utilities/tree-sitter-utilities"
 
 export let extensionContext: ExtensionContext
 export let logger: Logger
@@ -47,7 +49,6 @@ export async function activate(context: ExtensionContext) {
             "code-strider:exit-insert-mode",
             ext.withState(exitInsertMode)
         ),
-        workspace.onDidChangeTextDocument(handleDocumentChange),
         ext
     )
 }
@@ -80,7 +81,8 @@ export class Extension implements Disposable {
         await this.handleChangeActiveTextEditor(window.activeTextEditor)
         this.subscriptions.push(
             window.onDidChangeActiveTextEditor(this.handleChangeActiveTextEditor.bind(this)),
-            window.onDidChangeTextEditorSelection(this.handleChangeTextEditorSelection.bind(this))
+            window.onDidChangeTextEditorSelection(this.handleChangeTextEditorSelection.bind(this)),
+            workspace.onDidChangeTextDocument(this.handleTextDocumentChange.bind(this))
         )
     }
 
@@ -110,9 +112,10 @@ export class Extension implements Disposable {
     }
 
     private async createNewEditorState(editor: TextEditor): Promise<EditorState> {
+        const { document, selection } = editor
         logger.debug("initializing new editor state")
-        const parseTree = await parseDocument(editor.document)
-        const initialNode = findNodeAtSelection(parseTree, editor.selection)
+        const parseTree = this.parseTrees.get(document) ?? (await this.parseTextDocument(document))
+        const initialNode = findNodeAtSelection(parseTree, selection)
 
         let state: EditorState = {
             editor,
@@ -166,17 +169,6 @@ export class Extension implements Disposable {
         }
     }
 
-    // The parse tree has changed
-    invalidateEditorStatesForDocument(document: TextDocument, newTree: Parser.Tree) {
-        this.editorStates.forEach((state) => {
-            if (state.editor.document === document) {
-                state.parseTree = newTree
-                state.currentNode = findNodeAtSelection(newTree, state.editor.selection)
-            }
-        })
-        this.activeEditorStateChange.fire(this.activeEditorState)
-    }
-
     private async getOrInitializeEditorState(
         editor: TextEditor | undefined
     ): Promise<EditorState | undefined> {
@@ -214,5 +206,62 @@ export class Extension implements Disposable {
         logger.debug("finding new node for selection")
         state.currentNode = findNodeAtSelection(state.parseTree, selection)
         this.onSelectedNodeChange(state)
+    }
+
+    // State per open file (parse tree caching, incremental parsing)
+    private readonly parseTrees = new Map<TextDocument, Parser.Tree>()
+
+    // TODO move parsing specific code into `tree-sitter-utilities`, but keep state and plumbing here
+    private async parseTextDocument(document: TextDocument, previousTree?: Tree): Promise<Tree> {
+        // TODO: should we reuse the Parser for better performance?
+        const parser = new Parser()
+        parser.setLanguage(await loadTreeSitterLanguage(document.languageId))
+        const newTree = parser.parse(document.getText(), previousTree)
+
+        this.parseTrees.set(document, newTree)
+        this.invalidateEditorStatesForDocument(document, newTree)
+
+        return newTree
+    }
+
+    private async handleTextDocumentChange(event: TextDocumentChangeEvent) {
+        const { document, contentChanges } = event
+        // Nothing has changed?
+        if (contentChanges.length === 0) return
+        const tree = this.parseTrees.get(document)
+        if (!tree) return
+        // TODO: Does the tree editing really work?
+        // Can we test the speed? Is this really faster than parsing from scratch?
+        // Do we have to use the same Parser that generated the old tree for this to work?
+        contentChanges.forEach((change) => {
+            const newLines = change.text.split("\n") // TODO: different end-of-line sequences?
+            // TODO: test it
+            const edit = {
+                startIndex: change.rangeOffset,
+                oldEndIndex: change.rangeOffset + change.rangeLength,
+                newEndIndex: change.rangeOffset + change.text.length,
+                startPosition: toPoint(change.range.start),
+                oldEndPosition: toPoint(change.range.end),
+                newEndPosition: {
+                    row: change.range.start.line + newLines.length - 1,
+                    column:
+                        newLines.length > 1
+                            ? newLines[newLines.length - 1].length
+                            : change.range.start.character + change.text.length,
+                },
+            }
+            tree.edit(edit)
+        })
+        return this.parseTextDocument(document, tree)
+    }
+
+    private invalidateEditorStatesForDocument(document: TextDocument, newTree: Parser.Tree) {
+        this.editorStates.forEach((state) => {
+            if (state.editor.document === document) {
+                state.parseTree = newTree
+                state.currentNode = findNodeAtSelection(newTree, state.editor.selection)
+            }
+        })
+        this.activeEditorStateChange.fire(this.activeEditorState)
     }
 }

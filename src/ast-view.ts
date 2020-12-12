@@ -49,7 +49,6 @@ export class AstViewer implements Disposable {
         content = ""
         provideTextDocumentContent(): ProviderResult<string> {
             logger.debugContext("Providing TextDocument content")
-            logger.debug("Returning content: " + this.content)
             return this.content
         }
     })()
