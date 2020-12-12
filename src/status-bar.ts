@@ -24,5 +24,5 @@ export function registerStatusBar(ext: Extension): Disposable {
         }
     }
 
-    return Disposable.from(ext.onActiveEditorChange(eventHandler), statusBarItem)
+    return Disposable.from(ext.onActiveEditorStateChange(eventHandler), statusBarItem)
 }

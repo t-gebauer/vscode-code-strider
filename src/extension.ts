@@ -1,3 +1,4 @@
+import * as vscode from "vscode"
 import {
     commands,
     Disposable,
@@ -8,13 +9,10 @@ import {
     TextEditor,
     TextEditorSelectionChangeEvent,
     window,
-    workspace,
+    workspace
 } from "vscode"
-import * as vscode from "vscode"
-import Parser = require("web-tree-sitter")
 import { showAstView } from "./ast-view"
 import { exitInsertMode } from "./commands"
-import { setDecorationsForNode, updateSelection } from "./decoration"
 import { handleDocumentChange, initializeParser, parseDocument } from "./document-parser"
 import { EditorState } from "./editor-state"
 import { interceptTypeCommand } from "./intercept-typing"
@@ -22,6 +20,8 @@ import { Languages } from "./language/language-support"
 import { registerStatusBar } from "./status-bar"
 import { toRange, toSelection } from "./utilities/conversion-utilities"
 import { findNodeAtSelection } from "./utilities/tree-utilities"
+import Parser = require("web-tree-sitter")
+import { registerDecorationHandler } from "./decoration"
 
 export let extensionContext: ExtensionContext
 
@@ -37,6 +37,7 @@ export async function activate(context: ExtensionContext) {
 
     context.subscriptions.push(
         registerStatusBar(ext),
+        registerDecorationHandler(ext),
         commands.registerTextEditorCommand("type", ext.withState(interceptTypeCommand)),
         commands.registerTextEditorCommand(
             "code-strider:exit-insert-mode",
@@ -59,18 +60,16 @@ export enum InteractionMode {
 export type EditorStateChange = Partial<EditorState>
 
 export class Extension implements Disposable {
-    /* Dont use events for simple things... this will just add detached code, just call functions */
-    private activeEditorChange = new EventEmitter<EditorState | undefined>()
-
-    onActiveEditorChange: Event<EditorState | undefined> = this.activeEditorChange.event
-
     // State per open editor (cursor position, node selection, decoration)
-    editorStates = new Map<TextEditor, EditorState>()
-    activeEditorState?: EditorState
+    private readonly editorStates = new Map<TextEditor, EditorState>()
 
-    readonly subscriptions: { dispose(): unknown }[] = []
+    private activeEditorStateChange = new EventEmitter<EditorState | undefined>()
+    readonly onActiveEditorStateChange: Event<EditorState | undefined> = this.activeEditorStateChange.event
+    private activeEditorState?: EditorState
 
-    debugOutputChannel = window.createOutputChannel("code-strider debug")
+    private readonly subscriptions: { dispose(): unknown }[] = []
+
+    private debugOutputChannel = window.createOutputChannel("code-strider debug")
 
     private debugText(message: string) {
         this.debugOutputChannel.appendLine(message)
@@ -96,7 +95,7 @@ export class Extension implements Disposable {
     dispose() {
         Disposable.from(
             ...this.subscriptions,
-            this.activeEditorChange,
+            this.activeEditorStateChange,
             this.debugOutputChannel
         ).dispose()
     }
@@ -104,16 +103,15 @@ export class Extension implements Disposable {
     private async handleChangeActiveTextEditor(editor: TextEditor | undefined) {
         this.debugContext("Event: changed ActiveTextEditor")
         this.activeEditorState = editor ? await this.getOrInitializeEditorState(editor) : undefined
-        this.activeEditorChange.fire(this.activeEditorState)
+        this.activeEditorStateChange.fire(this.activeEditorState)
     }
 
     onSelectedNodeChange(state: EditorState) {
         this.debug("onSelectedNodeChange")
         // TODO: rework to inverse event handling
-        setDecorationsForNode(state.editor, state.currentNode)
         state.astView?.updateSelectedNode(state.currentNode)
         // TODO: really always fire event here?
-        this.activeEditorChange.fire(this.activeEditorState)
+        this.activeEditorStateChange.fire(this.activeEditorState)
 
         // Make sure that the complete node is selected
         const targetNodeSelection = toSelection(state.currentNode)
@@ -162,9 +160,9 @@ export class Extension implements Disposable {
                     vscode.TextEditorRevealType.InCenterIfOutsideViewport
                 )
             }
-            updateSelection(activeState)
+            // TODO listen to event
             activeState.astView?.updateSelectedNode(activeState.currentNode)
-            this.activeEditorChange.fire(activeState)
+            this.activeEditorStateChange.fire(activeState)
         }
     }
 
@@ -226,7 +224,7 @@ export class Extension implements Disposable {
         if (selection.isEqual(toSelection(state.currentNode))) {
             // Nothing to do, the current node already spans the selection.
             // Also happens if we are changing the selection manually after a movement command.
-            this.debug("selection matchens current node, nothing to do")
+            this.debug("Selection already matches current node, nothing to do")
             return
         }
 
