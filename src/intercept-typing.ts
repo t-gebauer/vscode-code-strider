@@ -7,26 +7,22 @@ import {
     selectToChange,
 } from "./commands"
 import * as vscode from "vscode"
-import { updateStatusBar } from "./status-bar"
-import { activeEditorState } from "./activation"
-import { toRange } from "./utilities/conversion-utilities"
 import { Languages } from "./language/language-support"
+import { EditorStateChange } from "./extension"
+import { EditorState } from "./editor-state"
 
 export function interceptTypeCommand(
+    activeState: EditorState,
     editor: TextEditor,
     _: TextEditorEdit,
     args: { text: string }
-) {
+): EditorStateChange | undefined {
     const key = args.text
 
     const languageId = editor.document.languageId
-    const state = activeEditorState
-    if (!Languages.isSupported(languageId) || (state && state.insertMode)) {
+    if (!Languages.isSupported(languageId) || (activeState.insertMode)) {
         vscode.commands.executeCommand("default:type", args)
         return
-    }
-    if (!state) {
-        throw new Error("Unexpected: No editor state for this editor.")
     }
 
     const languageDefinition = Languages.getDefinition(languageId)
@@ -58,12 +54,7 @@ export function interceptTypeCommand(
 
     const command = commandConfig[key]
     if (command) {
-        command(state)
-        state.editor.revealRange(
-            toRange(state.currentNode),
-            vscode.TextEditorRevealType.InCenterIfOutsideViewport
-        )
-        updateStatusBar(state)
-        state.astView?.updateSelectedNode(state.currentNode)
+        const change = command(activeState)
+        return change
     }
 }

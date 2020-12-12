@@ -1,6 +1,5 @@
 import { ProgressLocation, TextDocument, TextDocumentChangeEvent, window } from "vscode"
 import Parser = require("web-tree-sitter")
-import { invalidateEditorStatesForDocument } from "./activation"
 import { toPoint } from "./utilities/conversion-utilities"
 import { loadTreeSitterLanguage } from "./utilities/tree-sitter-utilities"
 
@@ -72,5 +71,5 @@ export async function handleDocumentChange(event: TextDocumentChangeEvent) {
     const newTree = parser.parse(document.getText(), tree)
 
     parseTrees.set(document, newTree)
-    invalidateEditorStatesForDocument(document, newTree)
+//TODO    invalidateEditorStatesForDocument(document, newTree)
 }

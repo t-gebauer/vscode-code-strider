@@ -50,3 +50,16 @@ It's hard enough to build a solution that works for one language. Yes, sure, tre
 # Open questions
 
 How to navigate efficiently over lots of one line statements? We do not want to navigate line-by-line.
+
+
+Show ast in tree-view sidebar?
+
+# v1.49
+- Only format modified text
+
+# v1.52
+
+- Open Keyboard Shortcuts editor with query filter
+vscode.commands.executeCommand('workbench.action.openGlobalKeybindings', 'query');
+
+- Status bar entry background color API (proposed?)

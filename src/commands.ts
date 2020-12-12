@@ -1,5 +1,4 @@
 import { Selection } from "vscode"
-import { updateSelection } from "./decoration"
 import { EditorState } from "./editor-state"
 import {
     NodeAccessorFunction,
@@ -7,18 +6,17 @@ import {
     CommandName,
 } from "./language/language-definition"
 import { findNodeAtSelection } from "./utilities/tree-utilities"
-import { updateStatusBar } from "./status-bar"
 import { toPosition } from "./utilities/conversion-utilities"
-import {  Languages } from "./language/language-support"
+import { Languages } from "./language/language-support"
+import { EditorStateChange } from "./extension"
 
-export type CommandFunction = (editor: EditorState) => void
+export type CommandFunction = (editor: Readonly<EditorState>) => EditorStateChange | undefined
 
 function movementCommand(selectNext: NodeAccessorFunction): CommandFunction {
-    return (state: EditorState) => {
+    return (state: Readonly<EditorState>): EditorStateChange | undefined => {
         const next = selectNext(state.currentNode)
         if (next) {
-            state.currentNode = next
-            updateSelection(state)
+            return { currentNode: next }
         }
     }
 }
@@ -50,31 +48,34 @@ export function commandsForLanguage(languageDefinition: LanguageDefinition) {
     }
 }
 
-export function selectToChange(state: EditorState) {
-    state.insertMode = true
-    updateSelection(state)
+export function selectToChange(_: Readonly<EditorState>): EditorStateChange {
+    return {
+        insertMode: true,
+    }
 }
 
-export function insertBefore(state: EditorState) {
-    state.insertMode = true
+export function insertBefore(state: Readonly<EditorState>) {
     const { editor, currentNode } = state
     const beforeNode = toPosition(currentNode.startPosition)
     editor.selection = new Selection(beforeNode, beforeNode)
-    updateSelection(state)
+    return {
+        insertMode: true,
+    }
 }
 
-export function insertAfter(state: EditorState) {
-    state.insertMode = true
+export function insertAfter(state: Readonly<EditorState>): EditorStateChange {
     const { editor, currentNode } = state
     const afterNode = toPosition(currentNode.endPosition)
     editor.selection = new Selection(afterNode, afterNode)
-    updateSelection(state)
+    return {
+        insertMode: true,
+    }
 }
 
-export function exitInsertMode(state: EditorState) {
-    state.insertMode = false
+export function exitInsertMode(state: Readonly<EditorState>): EditorStateChange {
     // TODO: should handle multiple selections
-    state.currentNode = findNodeAtSelection(state.parseTree, state.editor.selection)
-    updateStatusBar(state)
-    updateSelection(state)
+    return {
+        insertMode: false,
+        currentNode: findNodeAtSelection(state.parseTree, state.editor.selection),
+    }
 }

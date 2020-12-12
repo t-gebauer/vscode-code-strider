@@ -10,16 +10,17 @@ import {
     window,
     workspace,
 } from "vscode"
+import * as vscode from "vscode"
 import Parser = require("web-tree-sitter")
 import { showAstView } from "./ast-view"
 import { exitInsertMode } from "./commands"
-import { setDecorationsForNode } from "./decoration"
+import { setDecorationsForNode, updateSelection } from "./decoration"
 import { handleDocumentChange, initializeParser, parseDocument } from "./document-parser"
 import { EditorState } from "./editor-state"
 import { interceptTypeCommand } from "./intercept-typing"
 import { Languages } from "./language/language-support"
 import { registerStatusBar } from "./status-bar"
-import { toSelection } from "./utilities/conversion-utilities"
+import { toRange, toSelection } from "./utilities/conversion-utilities"
 import { findNodeAtSelection } from "./utilities/tree-utilities"
 
 export let extensionContext: ExtensionContext
@@ -32,10 +33,11 @@ export async function activate(context: ExtensionContext) {
     await initializeParser()
 
     const ext = new Extension()
+    await ext.registerEventHandlers()
 
     context.subscriptions.push(
         registerStatusBar(ext),
-        commands.registerTextEditorCommand("type", interceptTypeCommand),
+        commands.registerTextEditorCommand("type", ext.withState(interceptTypeCommand)),
         commands.registerTextEditorCommand(
             "code-strider:exit-insert-mode",
             ext.withState(exitInsertMode)
@@ -54,71 +56,76 @@ export enum InteractionMode {
     Insert,
 }
 
-export class Extension implements Disposable {
-    private activeEditorChange = new EventEmitter<EditorState>()
-    private activeEditorModeChange = new EventEmitter<EditorState>()
-    private activeEditorNodeSelectionChange = new EventEmitter<EditorState>()
+export type EditorStateChange = Partial<EditorState>
 
-    onActiveEditorChange: Event<EditorState> = this.activeEditorChange.event
-    onActiveEditorModeChange: Event<EditorState> = this.activeEditorModeChange.event
-    onActiveEditorNodeSelectionChange: Event<EditorState> = this.activeEditorNodeSelectionChange
-        .event
+export class Extension implements Disposable {
+    /* Dont use events for simple things... this will just add detached code, just call functions */
+    private activeEditorChange = new EventEmitter<EditorState | undefined>()
+
+    onActiveEditorChange: Event<EditorState | undefined> = this.activeEditorChange.event
 
     // State per open editor (cursor position, node selection, decoration)
     editorStates = new Map<TextEditor, EditorState>()
-    activeEditorState: EditorState | null = null
+    activeEditorState?: EditorState
 
     readonly subscriptions: { dispose(): unknown }[] = []
 
-    constructor() {
-        this.handleEditorChange(window.activeTextEditor)
-        window.onDidChangeActiveTextEditor(this.handleEditorChange),
-            window.onDidChangeTextEditorSelection(this.handleEditorSelectionChange)
+    debugOutputChannel = window.createOutputChannel("code-strider debug")
+
+    private debugText(message: string) {
+        this.debugOutputChannel.appendLine(message)
+    }
+
+    private debugContext(name: string) {
+        this.debugText(`[${Date.now()}] ${name}`)
+    }
+
+    debug(message: string) {
+        this.debugText(`  ${message}`)
+    }
+
+    async registerEventHandlers() {
+        this.debugOutputChannel.show()
+        await this.handleChangeActiveTextEditor(window.activeTextEditor)
+        this.subscriptions.push(
+            window.onDidChangeActiveTextEditor(this.handleChangeActiveTextEditor.bind(this)),
+            window.onDidChangeTextEditorSelection(this.handleChangeTextEditorSelection.bind(this))
+        )
     }
 
     dispose() {
         Disposable.from(
+            ...this.subscriptions,
             this.activeEditorChange,
-            this.activeEditorModeChange,
-            this.activeEditorNodeSelectionChange
+            this.debugOutputChannel
         ).dispose()
     }
 
-    async handleEditorChange(editor: TextEditor | undefined) {
-        const newState = await this.initializeEditor(editor)
-        this.activeEditorState = newState
-    }
-
-    async initializeEditor(editor: TextEditor | undefined): Promise<EditorState | null> {
-        if (!editor) {
-            return null
-        }
-
-        const languageId = editor.document.languageId
-        if (!Languages.isSupported(languageId)) {
-            return null
-        }
-
-        const state = this.editorStates.get(editor) || (await this.createNewEditorState(editor))
-        this.onSelectedNodeChange(state)
-        return state
+    private async handleChangeActiveTextEditor(editor: TextEditor | undefined) {
+        this.debugContext("Event: changed ActiveTextEditor")
+        this.activeEditorState = editor ? await this.getOrInitializeEditorState(editor) : undefined
+        this.activeEditorChange.fire(this.activeEditorState)
     }
 
     onSelectedNodeChange(state: EditorState) {
+        this.debug("onSelectedNodeChange")
         // TODO: rework to inverse event handling
         setDecorationsForNode(state.editor, state.currentNode)
         state.astView?.updateSelectedNode(state.currentNode)
-        this.activeEditorNodeSelectionChange.fire(state)
+        // TODO: really always fire event here?
+        this.activeEditorChange.fire(this.activeEditorState)
 
         // Make sure that the complete node is selected
         const targetNodeSelection = toSelection(state.currentNode)
         const currentSelection = state.editor.selection
         if (!currentSelection.isEqual(targetNodeSelection)) {
+            this.debug("correcting editor selection")
             state.editor.selection = targetNodeSelection
         }
     }
 
-    async createNewEditorState(editor: TextEditor) {
+    private async createNewEditorState(editor: TextEditor): Promise<EditorState> {
+        this.debug("initializing new editor state")
         const parseTree = await parseDocument(editor.document)
         const initialNode = findNodeAtSelection(parseTree, editor.selection)
 
@@ -134,12 +141,43 @@ export class Extension implements Disposable {
         return state
     }
 
-    withState<T extends readonly unknown[], U>(
-        fun: (state: EditorState, ...args: T) => U
-    ): (...args: T) => U | undefined {
+    private updateActiveEditorState(change: EditorStateChange) {
+        const activeState = this.activeEditorState
+        if (!activeState) {
+            window.showErrorMessage("Invalid state: no compatible editor active")
+            return
+        }
+
+        let didChange = false
+        // Is there really no sane way to iterate over a known type?
+        for (const [k, v] of Object.entries(change)) {
+            ;(activeState as any)[k] = v
+            didChange = true
+        }
+
+        if (didChange) {
+            if (change.currentNode !== undefined) {
+                activeState.editor.revealRange(
+                    toRange(change.currentNode),
+                    vscode.TextEditorRevealType.InCenterIfOutsideViewport
+                )
+            }
+            updateSelection(activeState)
+            activeState.astView?.updateSelectedNode(activeState.currentNode)
+            this.activeEditorChange.fire(activeState)
+        }
+    }
+
+    withState<T extends readonly unknown[], U extends EditorStateChange>(
+        fun: (state: Readonly<EditorState>, ...args: T) => U | undefined
+    ): (...args: T) => void {
         return (...rest) => {
             if (this.activeEditorState) {
-                return fun(this.activeEditorState, ...rest)
+                const readonlyState = Object.freeze({ ...this.activeEditorState })
+                const change = fun(readonlyState, ...rest)
+                if (change != undefined) {
+                    this.updateActiveEditorState(change)
+                }
             }
         }
     }
@@ -158,14 +196,29 @@ export class Extension implements Disposable {
         })
     }
 
-    handleEditorSelectionChange(event: TextEditorSelectionChangeEvent) {
-        // For simplicity, let's assume that selection change always happens after editor change.
-        // Otherwise we might have to initialize the parser state here. As far as I could observe, this assumption is correct.
+    private async getOrInitializeEditorState(
+        editor: TextEditor | undefined
+    ): Promise<EditorState | undefined> {
+        if (!editor) {
+            return
+        }
+        const existingState = this.editorStates.get(editor)
+        if (existingState) {
+            return existingState
+        }
+        const languageId = editor.document.languageId
+        if (!Languages.isSupported(languageId)) {
+            return
+        }
+        return this.createNewEditorState(editor)
+    }
 
+    private async handleChangeTextEditorSelection(event: TextEditorSelectionChangeEvent) {
         const state = this.editorStates.get(event.textEditor)
         if (!state || state.insertMode) {
             return
         }
+        this.debugContext("Event: changed TextEditorSelection")
 
         // TODO: should handle multiple selections
         const selection = event.selections[0]
@@ -173,9 +226,11 @@ export class Extension implements Disposable {
         if (selection.isEqual(toSelection(state.currentNode))) {
             // Nothing to do, the current node already spans the selection.
             // Also happens if we are changing the selection manually after a movement command.
+            this.debug("selection matchens current node, nothing to do")
             return
         }
 
+        this.debug("finding new node for selection")
         state.currentNode = findNodeAtSelection(state.parseTree, selection)
         this.onSelectedNodeChange(state)
     }
