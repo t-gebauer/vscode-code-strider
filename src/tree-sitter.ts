@@ -1,4 +1,4 @@
-import { logger } from "../extension"
+import { logger } from "./extension"
 import * as fs from "fs"
 import Parser = require("web-tree-sitter")
 import { Tree } from "web-tree-sitter"

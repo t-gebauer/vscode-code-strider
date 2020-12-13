@@ -24,7 +24,7 @@ import Parser = require("web-tree-sitter")
 import { registerDecorationHandler } from "./decoration"
 import { Logger } from "./logger"
 import { Tree } from "web-tree-sitter"
-import { TreeSitter } from "./utilities/tree-sitter-utilities"
+import { TreeSitter } from "./tree-sitter"
 
 export let logger: Logger
 
