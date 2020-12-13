@@ -10,10 +10,6 @@
 - move node around (a minor mode?)
 
 # Bugs
-- AST view will crash the extension if it does not load fast enough:
-    > Uncaught RuntimeError: abort(Error: Could NOT open editor for "code-strider-ast:/home/maybe/projects/ba-private/test-files/core.clj.2729.ast" because another editor opened in the meantime.).
-    To reproduce: Make a few edits in very short succession: Undo does this pretty well
-- Slow editing performance for large files (core.clj 8000 lines)
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true)))
 
 # More

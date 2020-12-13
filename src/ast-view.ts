@@ -66,8 +66,8 @@ export class AstViewer implements Disposable {
             this.editorWindow?.setDecorations(this.nodeDecoration, []);
                 return;
         }
-        if (editorState.parseTree !== this.parseTree) {
-            logger.debug("Parse tree change detected")
+        if (!editorState.insertMode && editorState.parseTree !== this.parseTree) {
+            logger.debug("AST view: Parse tree change detected")
             this.parseTree = editorState.parseTree
             this.editorState = editorState
             // DO this when the parse tree has changed, e.g. the content changed
