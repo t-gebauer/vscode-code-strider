@@ -4,6 +4,7 @@ import {
     Position,
     ProviderResult,
     Range,
+    Selection,
     TextDocument,
     TextDocumentContentProvider,
     TextEditor,
@@ -14,6 +15,7 @@ import {
     workspace,
 } from "vscode"
 import { SyntaxNode, Tree, TreeCursor } from "web-tree-sitter"
+import { Colors } from "./colors"
 import { EditorState } from "./editor-state"
 import { Extension, logger } from "./extension"
 
@@ -41,7 +43,10 @@ export class AstViewer implements Disposable {
     private editorWindow?: TextEditor
 
     private readonly subscriptions: Disposable[] = []
-    private nodeDecoration = window.createTextEditorDecorationType({ backgroundColor: "#333" })
+    private nodeDecoration = window.createTextEditorDecorationType({
+        isWholeLine: true,
+        backgroundColor: Colors.inactiveSelectionBackground,
+    })
 
     contentProvider = new (class implements TextDocumentContentProvider {
         contentChangeEmitter = new EventEmitter<Uri>()
@@ -60,11 +65,11 @@ export class AstViewer implements Disposable {
     }
 
     setOrUpdateState(editorState: EditorState | undefined) {
-        this.editorState = editorState;
+        this.editorState = editorState
         if (editorState === undefined) {
             // remove decorations
-            this.editorWindow?.setDecorations(this.nodeDecoration, []);
-                return;
+            this.editorWindow?.setDecorations(this.nodeDecoration, [])
+            return
         }
         if (!editorState.insertMode && editorState.parseTree !== this.parseTree) {
             logger.debug("AST view: Parse tree change detected")
@@ -88,6 +93,8 @@ export class AstViewer implements Disposable {
         const node = this.editorState.currentNode
         const currentRange = this.rangeFinder(node)
         if (currentRange) {
+            // move the cursor out of the way to prevent automatic "similarity highlighting", and to hide the cursor
+            this.editorWindow.selection = new Selection(new Position(0, 0), new Position(0, 0))
             this.editorWindow.setDecorations(this.nodeDecoration, [currentRange])
             this.editorWindow.revealRange(
                 currentRange,
@@ -103,7 +110,7 @@ export class AstViewer implements Disposable {
             viewColumn: ViewColumn.Beside,
             preview: true,
         })
-        this.updateDecorations();
+        this.updateDecorations()
     }
 
     dispose() {

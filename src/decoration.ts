@@ -6,6 +6,7 @@ import {
     window,
 } from "vscode"
 import { SyntaxNode } from "web-tree-sitter"
+import { Colors } from "./colors"
 import { EditorState } from "./editor-state"
 import { Extension } from "./extension"
 import { toRange, toSelection } from "./utilities/conversion-utilities"
@@ -25,26 +26,10 @@ function setOrResetDecorations(
 
 export function registerDecorationHandler(ext: Extension): Disposable {
     const currentDecorationType = window.createTextEditorDecorationType({
-        backgroundColor: "#555",
+        backgroundColor: Colors.inactiveSelectionBackground,
     })
 
-// const firstChildDecorationType = window.createTextEditorDecorationType({
-//     backgroundColor: "#533",
-// })
-
-// const nextDecorationType = window.createTextEditorDecorationType({
-//     backgroundColor: "#338",
-// })
-
-// const previousDecorationType = window.createTextEditorDecorationType({
-//     backgroundColor: "#484",
-// })
-
     function setDecorationsForNode(editor: TextEditor, node: SyntaxNode | null): void {
-        //setOrResetDecorations(editor, parentDecorationType, node.parent);
-        //setOrResetDecorations(editor, nextDecorationType, node.nextNamedSibling);
-        //setOrResetDecorations(editor, previousDecorationType, node.previousNamedSibling);
-        //setOrResetDecorations(editor, firstChildDecorationType, node.firstNamedChild);
         setOrResetDecorations(editor, currentDecorationType, node)
     }
 
