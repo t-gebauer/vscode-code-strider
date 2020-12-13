@@ -48,7 +48,7 @@ export class AstViewer implements Disposable {
         onDidChange = this.contentChangeEmitter.event
         content = ""
         provideTextDocumentContent(): ProviderResult<string> {
-            logger.debugContext("Providing TextDocument content")
+            logger.debug("AST view: Providing TextDocument content")
             return this.content
         }
     })()
@@ -75,14 +75,12 @@ export class AstViewer implements Disposable {
             this.contentProvider.content = content
             this.rangeFinder = rangeFinder
             this.contentProvider.contentChangeEmitter.fire(createUri(editorState.editor.document))
-            return
         }
+        // TODO: Do we need to wait for the new content to be displayed before updating the decorations?
         this.updateDecorations()
     }
 
     private updateDecorations() {
-        // TODO: do we need these checks? Can we change the flow slightly, so that
-        // it becomes impossible to call this too early
         if (!this.editorState || !this.rangeFinder || !this.editorWindow) {
             return
         }
@@ -105,6 +103,7 @@ export class AstViewer implements Disposable {
             viewColumn: ViewColumn.Beside,
             preview: true,
         })
+        this.updateDecorations();
     }
 
     dispose() {

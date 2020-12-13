@@ -24,7 +24,7 @@ import Parser = require("web-tree-sitter")
 import { registerDecorationHandler } from "./decoration"
 import { Logger } from "./logger"
 import { Tree } from "web-tree-sitter"
-import { initializeParser, loadTreeSitterLanguage } from "./utilities/tree-sitter-utilities"
+import { initializeParser, TreeSitter } from "./utilities/tree-sitter-utilities"
 
 export let extensionContext: ExtensionContext
 export let logger: Logger
@@ -211,13 +211,12 @@ export class Extension implements Disposable {
     // State per open file (parse tree caching, incremental parsing)
     private readonly parseTrees = new Map<TextDocument, Parser.Tree>()
 
-    // TODO move parsing specific code into `tree-sitter-utilities`, but keep state and plumbing here
     private async parseTextDocument(document: TextDocument, previousTree?: Tree): Promise<Tree> {
-        // TODO: should we reuse the Parser for better performance?
-        const parser = new Parser()
-        parser.setLanguage(await loadTreeSitterLanguage(document.languageId))
-        const newTree = parser.parse(document.getText(), previousTree)
-
+        const newTree = await TreeSitter.parseText(
+            document.getText(),
+            document.languageId,
+            previousTree
+        )
         this.parseTrees.set(document, newTree)
         this.invalidateEditorStatesForDocument(document, newTree)
 
@@ -226,16 +225,15 @@ export class Extension implements Disposable {
 
     private async handleTextDocumentChange(event: TextDocumentChangeEvent) {
         const { document, contentChanges } = event
-        // Nothing has changed?
+        // Did the content change? The event is also fired when other properties of the document change.
         if (contentChanges.length === 0) return
         const tree = this.parseTrees.get(document)
         if (!tree) return
-        // TODO: Does the tree editing really work?
-        // Can we test the speed? Is this really faster than parsing from scratch?
-        // Do we have to use the same Parser that generated the old tree for this to work?
+
+        logger.debugContext("Event: TextDocument content changed")
         contentChanges.forEach((change) => {
             const newLines = change.text.split("\n") // TODO: different end-of-line sequences?
-            // TODO: test it
+            // TODO: write a test for this?
             const edit = {
                 startIndex: change.rangeOffset,
                 oldEndIndex: change.rangeOffset + change.rangeLength,
@@ -252,7 +250,7 @@ export class Extension implements Disposable {
             }
             tree.edit(edit)
         })
-        return this.parseTextDocument(document, tree)
+        await this.parseTextDocument(document, tree)
     }
 
     private invalidateEditorStatesForDocument(document: TextDocument, newTree: Parser.Tree) {
