@@ -24,20 +24,20 @@ import Parser = require("web-tree-sitter")
 import { registerDecorationHandler } from "./decoration"
 import { Logger } from "./logger"
 import { Tree } from "web-tree-sitter"
-import { initializeParser, TreeSitter } from "./utilities/tree-sitter-utilities"
+import { TreeSitter } from "./utilities/tree-sitter-utilities"
 
-export let extensionContext: ExtensionContext
 export let logger: Logger
 
-// this method is called when your extension is activated
+// Main entry point. This method is called when the extension is activated. Configured in package.json.
 export async function activate(context: ExtensionContext) {
     console.log('Extension "code-strider" is now active!')
-    extensionContext = context
     logger = new Logger("code-strider debug")
+    logger.debugContext('Activation')
 
-    await initializeParser()
+    const treeSitter = new TreeSitter(context.asAbsolutePath("./wasm/"))
+    await treeSitter.initialize();
 
-    const ext = new Extension()
+    const ext = new Extension(treeSitter)
     await ext.registerEventHandlers()
 
     context.subscriptions.push(
@@ -53,9 +53,11 @@ export async function activate(context: ExtensionContext) {
     )
 }
 
-export function deactivate() {}
-
-// ---
+// Called by VS Code. But, nothing to do here for now, everything should have been added to
+// the context.subscriptions already.
+export function deactivate() {
+    logger.debugContext('Deactivation')
+}
 
 export enum InteractionMode {
     Structural,
@@ -76,6 +78,8 @@ export class Extension implements Disposable {
     private astViewer?: AstViewer
 
     private readonly subscriptions: { dispose(): unknown }[] = []
+
+    constructor(private readonly treeSitter: TreeSitter) {}
 
     async registerEventHandlers() {
         await this.handleChangeActiveTextEditor(window.activeTextEditor)
@@ -212,7 +216,7 @@ export class Extension implements Disposable {
     private readonly parseTrees = new Map<TextDocument, Parser.Tree>()
 
     private async parseTextDocument(document: TextDocument, previousTree?: Tree): Promise<Tree> {
-        const newTree = await TreeSitter.parseText(
+        const newTree = await this.treeSitter.parseText(
             document.getText(),
             document.languageId,
             previousTree
