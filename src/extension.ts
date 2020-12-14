@@ -32,10 +32,10 @@ export let logger: Logger
 export async function activate(context: ExtensionContext) {
     console.log('Extension "code-strider" is now active!')
     logger = new Logger("code-strider debug")
-    logger.debugContext('Activation')
+    logger.debugContext("Activation")
 
     const treeSitter = new TreeSitter(context.asAbsolutePath("./wasm/"))
-    await treeSitter.initialize();
+    await treeSitter.initialize()
 
     const ext = new Extension(treeSitter)
     await ext.registerEventHandlers()
@@ -56,7 +56,7 @@ export async function activate(context: ExtensionContext) {
 // Called by VS Code. But, nothing to do here for now, everything should have been added to
 // the context.subscriptions already.
 export function deactivate() {
-    logger.debugContext('Deactivation')
+    logger.debugContext("Deactivation")
 }
 
 export enum InteractionMode {

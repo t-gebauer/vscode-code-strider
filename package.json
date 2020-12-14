@@ -6,14 +6,13 @@
     "engines": {
         "vscode": "^1.50.0"
     },
-    "categories": [
-        "Other"
-    ],
+    "categories": ["Other"],
     "activationEvents": [
         "onLanguage:javascript",
         "onLanguage:html",
         "onLanguage:clojure",
-        "onLanguage:python"
+        "onLanguage:python",
+        "onLanguage:fennel"
     ],
     "main": "./out/extension.js",
     "contributes": {
@@ -22,6 +21,13 @@
                 "command": "code-strider:exit-insert-mode",
                 "key": "Escape",
                 "when": "editorTextFocus && !suggestWidgetVisible"
+            }
+        ],
+        "languages": [
+            {
+                "id": "fennel",
+                "extensions": [".fnl"],
+                "aliases": ["Fennel", "fnl"]
             }
         ]
     },
