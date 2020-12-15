@@ -2,6 +2,7 @@
     "name": "code-strider",
     "displayName": "Code Strider",
     "description": "Structured code navigation and editing",
+    "publisher": "ttt",
     "version": "0.0.1",
     "engines": {
         "vscode": "^1.50.0"

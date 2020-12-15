@@ -16,6 +16,11 @@ async function main() {
         // The executable to use. Would automatically download `version` when no path is provided
         const vscodeExecutablePath = `${process.env.CODIUM_PATH}/lib/vscode/codium`
 
+        // TODO: we are not using the download facilities of vscode-test, so we could just call codium directly with the path args:
+        // codium \
+        // --extensionDevelopmentPath=<EXTENSION-ROOT-PATH> \
+        // --extensionTestsPath=<TEST-RUNNER-SCRIPT-PATH>
+
         // Run the integration test
         await runTests({  extensionDevelopmentPath, extensionTestsPath, vscodeExecutablePath })
     } catch (err) {
