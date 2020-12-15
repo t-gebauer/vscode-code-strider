@@ -59,3 +59,22 @@ Show ast in tree-view sidebar?
 vscode.commands.executeCommand('workbench.action.openGlobalKeybindings', 'query');
 
 - Status bar entry background color API (proposed?)
+
+
+# Alternative implementations
+
+Could use a `CustomEditorProvider` for either the main editor and/or the AST viewer. No idea whether that would simply be more complicated, or also improve, maybe even simplify interactions.
+
+The AST view could also be rendered as `WebviewPanel` or `TreeView`.
+
+
+# Limitations of VS Code
+
+- It is not possible to change the cursor color. For example to hide the cursor. The only thing we can do, is move the cursor out of sight (beginning or end of document). But that also moves the selection, which can create other problems.
+
+- It is currently not possible to intercept mouse events. We can only listen to selection change events.
+This makes it impossible to bind different actions to different mouse buttons.
+
+As an alternative, we could create modal states for different selections, to differentiate between mouse selection "select thing at cursor" (atom, variable, string) and "select containing thing" (block, body, function, class).
+
+https://github.com/microsoft/vscode/issues/3130

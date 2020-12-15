@@ -27,6 +27,10 @@ This extension contributes the following settings:
 * `myExtension.enable`: enable/disable this extension
 * `myExtension.thing`: set to `blah` to do something
 
+## Contributions
+
+This extension contributes the language `Fennel`, but that only means, that files ending in `.fnl` are recognized with the languageId `fennel`. While this would not be strictly necessary to recognized such files, this makes it consistent with how all other languages are handled, which are all recognized by VS Code by default.
+
 ## Known Issues
 
 Calling out known issues can help limit users opening duplicate issues against your extension.

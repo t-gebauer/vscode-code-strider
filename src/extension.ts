@@ -97,22 +97,30 @@ export class Extension implements Disposable {
 
     private async handleChangeActiveTextEditor(editor: TextEditor | undefined) {
         logger.debugContext("Event: changed ActiveTextEditor")
-        this.activeEditorState = editor ? await this.getOrInitializeEditorState(editor) : undefined
-        this.activeEditorStateChange.fire(this.activeEditorState)
+        const state = editor ? await this.getOrInitializeEditorState(editor) : undefined
+        this.activeEditorState = state
+        if (state) {
+            this.handleSelectedNodeChanged(state) // will also fire the state changed event
+        } else {
+            this.activeEditorStateChange.fire(this.activeEditorState)
+        }
     }
 
-    onSelectedNodeChange(state: EditorState) {
-        logger.debug("onSelectedNodeChange")
-        // TODO: really always fire event here?
-        this.activeEditorStateChange.fire(this.activeEditorState)
-
-        // Make sure that the complete node is selected
+    handleSelectedNodeChanged(state: EditorState) {
+        logger.debug("handle selectedNode change")
+        // Ensure that the complete node is selected
         const targetNodeSelection = toSelection(state.currentNode)
         const currentSelection = state.editor.selection
         if (!currentSelection.isEqual(targetNodeSelection)) {
             logger.debug("correcting editor selection")
             state.editor.selection = targetNodeSelection
         }
+        state.editor.revealRange(
+            toRange(state.currentNode),
+            vscode.TextEditorRevealType.InCenterIfOutsideViewport
+        )
+        // TODO: really always fire event here? Consider sending a second smaller "selected node change event"
+        this.activeEditorStateChange.fire(this.activeEditorState)
     }
 
     private async createNewEditorState(editor: TextEditor): Promise<EditorState> {
@@ -128,8 +136,7 @@ export class Extension implements Disposable {
             insertMode: false,
         }
         this.editorStates.set(editor, state)
-        // TODO: if config.showAstView ...
-        // TODO: might create
+        // TODO: add a config option to decide whether to show the AST viewer by default
         AstViewer.create(this, state).then((astViewer) => (this.astViewer = astViewer))
         return state
     }
@@ -142,7 +149,7 @@ export class Extension implements Disposable {
         }
 
         let didChange = false
-        // Is there really no sane way to iterate over a known type?
+        // Is there really no type-safe way to iterate over the known properties of a type?
         for (const [k, v] of Object.entries(change)) {
             ;(activeState as any)[k] = v
             didChange = true
@@ -150,12 +157,10 @@ export class Extension implements Disposable {
 
         if (didChange) {
             if (change.currentNode !== undefined) {
-                activeState.editor.revealRange(
-                    toRange(change.currentNode),
-                    vscode.TextEditorRevealType.InCenterIfOutsideViewport
-                )
+                this.handleSelectedNodeChanged(activeState) // will also fire the state change event
+            } else {
+                this.activeEditorStateChange.fire(activeState)
             }
-            this.activeEditorStateChange.fire(activeState)
         }
     }
 
@@ -195,7 +200,7 @@ export class Extension implements Disposable {
         if (!state || state.insertMode) {
             return
         }
-        logger.debugContext("Event: changed TextEditorSelection")
+        logger.debugContext(`Event: changed TextEditorSelection (${event.kind})`)
 
         // TODO: should handle multiple selections
         const selection = event.selections[0]
@@ -203,13 +208,14 @@ export class Extension implements Disposable {
         if (selection.isEqual(toSelection(state.currentNode))) {
             // Nothing to do, the current node already spans the selection.
             // Also happens if we are changing the selection manually after a movement command.
-            logger.debug("Selection already matches current node, nothing to do")
+            logger.debug("selection already matches current node, nothing to do")
             return
         }
 
-        logger.debug("finding new node for selection")
+        const timeBefore = Date.now()
         state.currentNode = findNodeAtSelection(state.parseTree, selection)
-        this.onSelectedNodeChange(state)
+        logger.debug(`finding matching node at selection (took ${Date.now() - timeBefore} ms)`)
+        this.handleSelectedNodeChanged(state)
     }
 
     // State per open file (parse tree caching, incremental parsing)

@@ -9,13 +9,12 @@ import { SyntaxNode } from "web-tree-sitter"
 import { Colors } from "./colors"
 import { EditorState } from "./editor-state"
 import { Extension } from "./extension"
-import { toRange, toSelection } from "./utilities/conversion-utilities"
-
+import { toRange } from "./utilities/conversion-utilities"
 
 function setOrResetDecorations(
     editor: TextEditor,
     decorationType: TextEditorDecorationType,
-    node: SyntaxNode | null
+    node?: SyntaxNode
 ) {
     if (node) {
         editor.setDecorations(decorationType, [toRange(node)])
@@ -29,21 +28,19 @@ export function registerDecorationHandler(ext: Extension): Disposable {
         backgroundColor: Colors.inactiveSelectionBackground,
     })
 
-    function setDecorationsForNode(editor: TextEditor, node: SyntaxNode | null): void {
+    function setDecorationsForNode(editor: TextEditor, node?: SyntaxNode): void {
         setOrResetDecorations(editor, currentDecorationType, node)
     }
 
     function updateSelection(state?: EditorState): void {
         if (!state) return
-        const { editor } = state
         if (state.insertMode) {
             // Clear highlight when in insert mode
-            setDecorationsForNode(editor, null)
-            editor.options.cursorStyle = TextEditorCursorStyle.Line
+            setDecorationsForNode(state.editor, undefined)
+            state.editor.options.cursorStyle = TextEditorCursorStyle.Line
         } else {
-            setDecorationsForNode(editor, state.currentNode)
-            editor.selection = toSelection(state.currentNode)
-            editor.options.cursorStyle = TextEditorCursorStyle.Block
+            setDecorationsForNode(state.editor, state.currentNode)
+            state.editor.options.cursorStyle = TextEditorCursorStyle.BlockOutline
         }
     }
 
