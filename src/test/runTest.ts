@@ -1,4 +1,5 @@
 import * as path from "path"
+import * as process from "process"
 
 import { runTests } from "vscode-test"
 
@@ -12,9 +13,13 @@ async function main() {
         // Passed to --extensionTestsPath
         const extensionTestsPath = path.resolve(__dirname, "./suite/index")
 
-        // Download VS Code, unzip it and run the integration test
-        await runTests({ extensionDevelopmentPath, extensionTestsPath })
+        // The executable to use. Would automatically download `version` when no path is provided
+        const vscodeExecutablePath = `${process.env.CODIUM_PATH}/lib/vscode/codium`
+
+        // Run the integration test
+        await runTests({  extensionDevelopmentPath, extensionTestsPath, vscodeExecutablePath })
     } catch (err) {
+        console.error(err)
         console.error("Failed to run tests")
         process.exit(1)
     }

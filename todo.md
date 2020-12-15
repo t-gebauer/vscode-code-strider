@@ -78,3 +78,5 @@ This makes it impossible to bind different actions to different mouse buttons.
 As an alternative, we could create modal states for different selections, to differentiate between mouse selection "select thing at cursor" (atom, variable, string) and "select containing thing" (block, body, function, class).
 
 https://github.com/microsoft/vscode/issues/3130
+
+Or we could do something really hacky, like registering a hover provider for the sole purpose of tracking the mouse position. Then we could bind the commands "select at cursor" "and select containing node" to hotkeys.

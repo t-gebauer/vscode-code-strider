@@ -171,7 +171,7 @@ export class Extension implements Disposable {
             if (this.activeEditorState) {
                 const readonlyState = Object.freeze({ ...this.activeEditorState })
                 const change = fun(readonlyState, ...rest)
-                if (change != undefined) {
+                if (change !== undefined) {
                     this.updateActiveEditorState(change)
                 }
             }

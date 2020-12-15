@@ -13,4 +13,8 @@ pkgs.mkShell {
     # Code formatting
     nodePackages.prettier
   ];
+
+  shellHook = ''
+    export CODIUM_PATH=${pkgs.vscodium}
+    '';
 }
