@@ -1,14 +1,9 @@
 import * as vscode from "vscode"
-import * as treeUtils from "../../utilities/tree-utilities"
 import { Position, Selection } from "vscode"
-import { SyntaxNode, Tree } from "web-tree-sitter"
-import Parser = require("web-tree-sitter")
+import { Tree } from "web-tree-sitter"
 import { TreeSitter } from "../../tree-sitter"
-import { expect } from "chai"
-import { proxy, flush } from "@alfonso-presa/soft-assert"
-
-const softExpect = proxy(expect)
-afterEach(flush) // assert all soft assertions
+import * as treeUtils from "../../utilities/tree-utilities"
+import { softExpect } from "../soft-expect"
 
 describe("Tree Utils", () => {
     let treeSitter: TreeSitter
@@ -71,9 +66,9 @@ function bar(arg = false) {
         it("boolean in inside", () => {
             const booleanNode = treeUtils.findNodeAtSelection(tree, selection(4, 12))
             softExpect(booleanNode.type).to.equal("true")
-            softExpect(booleanNode.parent?.type).to.equal( "arguments")
-            softExpect(booleanNode.startPosition).to.deep.equal( { row: 4, column: 10 })
-            softExpect(booleanNode.endPosition).to.deep.equal( { row: 4, column: 14 })
+            softExpect(booleanNode.parent?.type).to.equal("arguments")
+            softExpect(booleanNode.startPosition).to.deep.equal({ row: 4, column: 10 })
+            softExpect(booleanNode.endPosition).to.deep.equal({ row: 4, column: 14 })
         })
 
         it("whitespace selection", () => {
