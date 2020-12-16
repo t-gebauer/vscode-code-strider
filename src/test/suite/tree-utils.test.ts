@@ -8,12 +8,12 @@ import { expect } from "chai"
 import { proxy, flush } from "@alfonso-presa/soft-assert"
 
 const softExpect = proxy(expect)
-teardown(flush) // assert all soft assertions
+afterEach(flush) // assert all soft assertions
 
-suite("Tree Utils", () => {
+describe("Tree Utils", () => {
     let treeSitter: TreeSitter
 
-    suiteSetup(async () => {
+    before(async () => {
         const extension: vscode.Extension<unknown> | undefined = vscode.extensions.getExtension(
             "ttt.code-strider"
         )
@@ -21,7 +21,7 @@ suite("Tree Utils", () => {
         await treeSitter.initialize()
     })
 
-    suite("Find node in selection", async () => {
+    context("Find node in selection", async () => {
         const source = `
 const foo = require("foo")
 
@@ -42,11 +42,11 @@ function bar(arg = false) {
         const sourceLines = source.split("\n")
         let tree: Tree
 
-        suiteSetup(async () => {
+        before(async () => {
             tree = await treeSitter.parseText(source, "javascript")
         })
 
-        test("node at start", () => {
+        it("node at start", () => {
             const node = treeUtils.findNodeAtSelection(tree, selection(1, 0))
             softExpect(node.type).to.equal("lexical_declaration")
             softExpect(node.parent?.type).to.equal("program")
@@ -54,7 +54,7 @@ function bar(arg = false) {
             softExpect(node.endPosition).to.deep.equal({ row: 1, column: sourceLines[1].length })
         })
 
-        test("node at end", () => {
+        it("node at end", () => {
             const node = treeUtils.findNodeAtSelection(
                 tree,
                 selection(sourceLines.length - 2, sourceLines[sourceLines.length - 2].length)
@@ -68,7 +68,7 @@ function bar(arg = false) {
             })
         })
 
-        test("boolean in inside", () => {
+        it("boolean in inside", () => {
             const booleanNode = treeUtils.findNodeAtSelection(tree, selection(4, 12))
             softExpect(booleanNode.type).to.equal("true")
             softExpect(booleanNode.parent?.type).to.equal( "arguments")
@@ -76,7 +76,7 @@ function bar(arg = false) {
             softExpect(booleanNode.endPosition).to.deep.equal( { row: 4, column: 14 })
         })
 
-        test("whitespace selection", () => {
+        it("whitespace selection", () => {
             const node = treeUtils.findNodeAtSelection(tree, selection(7, 0))
             // TODO not implemented yet
             // softExpect(node.type).to.equal( "variable_declaration")
