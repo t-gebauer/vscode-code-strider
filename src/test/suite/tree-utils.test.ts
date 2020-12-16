@@ -19,22 +19,35 @@ suite("Tree Utils", () => {
     })
 
     suite("Find node in selection", async () => {
-        const source = `(defn nothing [do-nothing]
-  (do-nothing true))
+        const source = `
+const foo = require("foo")
 
-(def a-keyword :foo)`
+const x = {
+  ... bar(true),
+  z: '100'
+}
+
+function bar(arg = false) {
+  console.log(arg || "default");
+
+  if (typeof arg === "string") {
+    return arg ? arg && "something" : "nothing"
+  }
+  return { a: 0, b: 1}
+}
+`
         const sourceLines = source.split("\n")
         let tree: Tree
 
         suiteSetup(async () => {
-            tree = await treeSitter.parseText(source, "clojure")
+            tree = await treeSitter.parseText(source, "javascript")
         })
 
         test("node at start", () => {
-            const nodeAtStart = treeUtils.findNodeAtSelection(tree, selection(0, 0))
-            assert.strictEqual(nodeAtStart.type, "list_lit")
-            assert.strictEqual(nodeAtStart.parent?.type, "source")
-            assert.deepStrictEqual(nodeAtStart.startPosition, { row: 0, column: 0 })
+            const nodeAtStart = treeUtils.findNodeAtSelection(tree, selection(1, 0))
+            assert.strictEqual(nodeAtStart.type, "lexical_declaration")
+            assert.strictEqual(nodeAtStart.parent?.type, "program")
+            assert.deepStrictEqual(nodeAtStart.startPosition, { row: 1, column: 0 })
             assert.deepStrictEqual(nodeAtStart.endPosition, {
                 row: 1,
                 column: sourceLines[1].length,
@@ -44,20 +57,31 @@ suite("Tree Utils", () => {
         test("node at end", () => {
             const nodeAtEnd = treeUtils.findNodeAtSelection(
                 tree,
-                selection(3, sourceLines[3].length)
+                selection(sourceLines.length - 2, sourceLines[sourceLines.length - 2].length)
             )
-            assert.strictEqual(nodeAtEnd.type, "list_lit")
-            assert.strictEqual(nodeAtEnd.parent?.type, "source")
-            assert.deepStrictEqual(nodeAtEnd.startPosition, { row: 3, column: 0 })
-            assert.deepStrictEqual(nodeAtEnd.endPosition, { row: 3, column: sourceLines[3].length })
+            assert.strictEqual(nodeAtEnd.type, "statement_block")
+            assert.strictEqual(nodeAtEnd.parent?.type, "function_declaration")
+            assert.deepStrictEqual(nodeAtEnd.startPosition, { row: 8, column: 26 })
+            assert.deepStrictEqual(nodeAtEnd.endPosition, {
+                row: sourceLines.length - 2,
+                column: sourceLines[sourceLines.length - 2].length,
+            })
         })
 
         test("boolean in inside", () => {
-            const booleanNode = treeUtils.findNodeAtSelection(tree, selection(1, 16))
-            assert.strictEqual(booleanNode.type, "bool_lit")
-            assert.strictEqual(booleanNode.parent?.type, "list_lit")
-            assert.deepStrictEqual(booleanNode.startPosition, { row: 1, column: 14 })
-            assert.deepStrictEqual(booleanNode.endPosition, { row: 1, column: 18 })
+            const booleanNode = treeUtils.findNodeAtSelection(tree, selection(4, 12))
+            assert.strictEqual(booleanNode.type, "true")
+            assert.strictEqual(booleanNode.parent?.type, "arguments")
+            assert.deepStrictEqual(booleanNode.startPosition, { row: 4, column: 10 })
+            assert.deepStrictEqual(booleanNode.endPosition, { row: 4, column: 14 })
+        })
+
+        test("whitespace selection", () => {
+            const node = treeUtils.findNodeAtSelection(tree, selection(7, 0))
+            // TODO not implemented yet
+            // assert.strictEqual(node.type, "variable_declaration")
+            // assert.deepStrictEqual(node.startPosition, { row: 1, column: 14 })
+            // assert.deepStrictEqual(node.endPosition, { row: 1, column: 18 })
         })
     })
 })
