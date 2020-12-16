@@ -1,28 +1,28 @@
-import { logger } from "./extension"
 import * as fs from "fs"
 import Parser = require("web-tree-sitter")
 import { Tree } from "web-tree-sitter"
+import { Logger } from "./logger"
 
 export class TreeSitter {
-    constructor(private readonly wasmDirPath: string) {
-        logger.debug("WASM location: " + wasmDirPath)
+    constructor(private readonly wasmDirPath: string, private readonly logger?: Logger) {
+        this.logger?.log("WASM location: " + wasmDirPath)
     }
 
     async initialize() {
-        logger.debug('Initializing Tree-sitter...')
+        this.logger?.log("Initializing Tree-sitter...")
         await Parser.init()
     }
 
     async parseText(text: string, languageId: string, previousTree?: Tree): Promise<Tree> {
         // TODO: should we reuse the Parser for better performance?
         // There seems to be a small fixed effort necessary for loading (or setting) the language?
-        logger.debug("1 initializing parser instance ...")
+        this.logger?.log("1 initializing parser instance ...")
         const parser = new Parser()
-        logger.debug("2 setting language ...")
+        this.logger?.log("2 setting language ...")
         parser.setLanguage(await this.loadTreeSitterLanguage(languageId))
-        logger.debug("3 parsing text ...")
+        this.logger?.log("3 parsing text ...")
         const result = parser.parse(text, previousTree)
-        logger.debug("4 done.")
+        this.logger?.log("4 done.")
         return result
     }
 

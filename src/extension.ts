@@ -22,7 +22,7 @@ import { toPoint, toRange, toSelection } from "./utilities/conversion-utilities"
 import { findNodeAtSelection } from "./utilities/tree-utilities"
 import Parser = require("web-tree-sitter")
 import { registerDecorationHandler } from "./decoration"
-import { Logger } from "./logger"
+import { Logger, OutputChannelLogger } from "./logger"
 import { Tree } from "web-tree-sitter"
 import { TreeSitter } from "./tree-sitter"
 
@@ -31,17 +31,17 @@ export let logger: Logger
 // Main entry point. This method is called when the extension is activated. Configured in package.json.
 export async function activate(context: ExtensionContext) {
     console.log('Extension "code-strider" is now active!')
-    logger = new Logger("code-strider debug")
-    logger.debugContext("Activation")
+    const outputChannelLogger = new OutputChannelLogger("code-strider debug")
+    logger = outputChannelLogger
+    logger.context("Activation")
 
-    const treeSitter = new TreeSitter(context.asAbsolutePath("./wasm/"))
+    const treeSitter = new TreeSitter(context.asAbsolutePath("./wasm/"), logger)
     await treeSitter.initialize()
 
     const ext = new Extension(treeSitter)
     await ext.registerEventHandlers()
 
     context.subscriptions.push(
-        logger,
         registerStatusBar(ext),
         registerDecorationHandler(ext),
         commands.registerTextEditorCommand("type", ext.withState(interceptTypeCommand)),
@@ -49,14 +49,15 @@ export async function activate(context: ExtensionContext) {
             "code-strider:exit-insert-mode",
             ext.withState(exitInsertMode)
         ),
-        ext
+        ext,
+        outputChannelLogger
     )
 }
 
 // Called by VS Code. But, nothing to do here for now, everything should have been added to
 // the context.subscriptions already.
 export function deactivate() {
-    logger.debugContext("Deactivation")
+    logger.context("Deactivation")
 }
 
 export enum InteractionMode {
@@ -96,7 +97,7 @@ export class Extension implements Disposable {
     }
 
     private async handleChangeActiveTextEditor(editor: TextEditor | undefined) {
-        logger.debugContext("Event: changed ActiveTextEditor")
+        logger.context("Event: changed ActiveTextEditor")
         const state = editor ? await this.getOrInitializeEditorState(editor) : undefined
         this.activeEditorState = state
         if (state) {
@@ -107,12 +108,12 @@ export class Extension implements Disposable {
     }
 
     handleSelectedNodeChanged(state: EditorState) {
-        logger.debug("handle selectedNode change")
+        logger.log("handle selectedNode change")
         // Ensure that the complete node is selected
         const targetNodeSelection = toSelection(state.currentNode)
         const currentSelection = state.editor.selection
         if (!currentSelection.isEqual(targetNodeSelection)) {
-            logger.debug("correcting editor selection")
+            logger.log("correcting editor selection")
             state.editor.selection = targetNodeSelection
         }
         state.editor.revealRange(
@@ -125,7 +126,7 @@ export class Extension implements Disposable {
 
     private async createNewEditorState(editor: TextEditor): Promise<EditorState> {
         const { document, selection } = editor
-        logger.debug("initializing new editor state")
+        logger.log("initializing new editor state")
         const parseTree = this.parseTrees.get(document) ?? (await this.parseTextDocument(document))
         const initialNode = findNodeAtSelection(parseTree, selection)
 
@@ -200,7 +201,7 @@ export class Extension implements Disposable {
         if (!state || state.insertMode) {
             return
         }
-        logger.debugContext(`Event: changed TextEditorSelection (${event.kind})`)
+        logger.context(`Event: changed TextEditorSelection (${event.kind})`)
 
         // TODO: should handle multiple selections
         const selection = event.selections[0]
@@ -208,13 +209,13 @@ export class Extension implements Disposable {
         if (selection.isEqual(toSelection(state.currentNode))) {
             // Nothing to do, the current node already spans the selection.
             // Also happens if we are changing the selection manually after a movement command.
-            logger.debug("selection already matches current node, nothing to do")
+            logger.log("selection already matches current node, nothing to do")
             return
         }
 
         const timeBefore = Date.now()
         state.currentNode = findNodeAtSelection(state.parseTree, selection)
-        logger.debug(`finding matching node at selection (took ${Date.now() - timeBefore} ms)`)
+        logger.log(`finding matching node at selection (took ${Date.now() - timeBefore} ms)`)
         this.handleSelectedNodeChanged(state)
     }
 
@@ -240,7 +241,7 @@ export class Extension implements Disposable {
         const tree = this.parseTrees.get(document)
         if (!tree) return
 
-        logger.debugContext("Event: TextDocument content changed")
+        logger.context("Event: TextDocument content changed")
         contentChanges.forEach((change) => {
             const newLines = change.text.split("\n") // TODO: different end-of-line sequences?
             // TODO: write a test for this?

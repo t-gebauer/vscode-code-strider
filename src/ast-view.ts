@@ -53,7 +53,7 @@ export class AstViewer implements Disposable {
         onDidChange = this.contentChangeEmitter.event
         content = ""
         provideTextDocumentContent(): ProviderResult<string> {
-            logger.debug("AST view: Providing TextDocument content")
+            logger.log("AST view: Providing TextDocument content")
             return this.content
         }
     })()
@@ -72,7 +72,7 @@ export class AstViewer implements Disposable {
             return
         }
         if (!editorState.insertMode && editorState.parseTree !== this.parseTree) {
-            logger.debug("AST view: Parse tree change detected")
+            logger.log("AST view: Parse tree change detected")
             this.parseTree = editorState.parseTree
             this.editorState = editorState
             // DO this when the parse tree has changed, e.g. the content changed
