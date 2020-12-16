@@ -1,11 +1,14 @@
-import * as assert from "assert"
 import * as vscode from "vscode"
 import * as treeUtils from "../../utilities/tree-utilities"
 import { Position, Selection } from "vscode"
 import { SyntaxNode, Tree } from "web-tree-sitter"
 import Parser = require("web-tree-sitter")
 import { TreeSitter } from "../../tree-sitter"
-import { ConsoleOutLogger, Logger } from "../../logger"
+import { expect } from "chai"
+import { proxy, flush } from "@alfonso-presa/soft-assert"
+
+const softExpect = proxy(expect)
+teardown(flush) // assert all soft assertions
 
 suite("Tree Utils", () => {
     let treeSitter: TreeSitter
@@ -44,25 +47,22 @@ function bar(arg = false) {
         })
 
         test("node at start", () => {
-            const nodeAtStart = treeUtils.findNodeAtSelection(tree, selection(1, 0))
-            assert.strictEqual(nodeAtStart.type, "lexical_declaration")
-            assert.strictEqual(nodeAtStart.parent?.type, "program")
-            assert.deepStrictEqual(nodeAtStart.startPosition, { row: 1, column: 0 })
-            assert.deepStrictEqual(nodeAtStart.endPosition, {
-                row: 1,
-                column: sourceLines[1].length,
-            })
+            const node = treeUtils.findNodeAtSelection(tree, selection(1, 0))
+            softExpect(node.type).to.equal("lexical_declaration")
+            softExpect(node.parent?.type).to.equal("program")
+            softExpect(node.startPosition).to.deep.equal({ row: 1, column: 0 })
+            softExpect(node.endPosition).to.deep.equal({ row: 1, column: sourceLines[1].length })
         })
 
         test("node at end", () => {
-            const nodeAtEnd = treeUtils.findNodeAtSelection(
+            const node = treeUtils.findNodeAtSelection(
                 tree,
                 selection(sourceLines.length - 2, sourceLines[sourceLines.length - 2].length)
             )
-            assert.strictEqual(nodeAtEnd.type, "statement_block")
-            assert.strictEqual(nodeAtEnd.parent?.type, "function_declaration")
-            assert.deepStrictEqual(nodeAtEnd.startPosition, { row: 8, column: 26 })
-            assert.deepStrictEqual(nodeAtEnd.endPosition, {
+            softExpect(node.type).to.equal("statement_block")
+            softExpect(node.parent?.type).to.equal("function_declaration")
+            softExpect(node.startPosition).to.deep.equal({ row: 8, column: 26 })
+            softExpect(node.endPosition).to.deep.equal({
                 row: sourceLines.length - 2,
                 column: sourceLines[sourceLines.length - 2].length,
             })
@@ -70,18 +70,18 @@ function bar(arg = false) {
 
         test("boolean in inside", () => {
             const booleanNode = treeUtils.findNodeAtSelection(tree, selection(4, 12))
-            assert.strictEqual(booleanNode.type, "true")
-            assert.strictEqual(booleanNode.parent?.type, "arguments")
-            assert.deepStrictEqual(booleanNode.startPosition, { row: 4, column: 10 })
-            assert.deepStrictEqual(booleanNode.endPosition, { row: 4, column: 14 })
+            softExpect(booleanNode.type).to.equal("true")
+            softExpect(booleanNode.parent?.type).to.equal( "arguments")
+            softExpect(booleanNode.startPosition).to.deep.equal( { row: 4, column: 10 })
+            softExpect(booleanNode.endPosition).to.deep.equal( { row: 4, column: 14 })
         })
 
         test("whitespace selection", () => {
             const node = treeUtils.findNodeAtSelection(tree, selection(7, 0))
             // TODO not implemented yet
-            // assert.strictEqual(node.type, "variable_declaration")
-            // assert.deepStrictEqual(node.startPosition, { row: 1, column: 14 })
-            // assert.deepStrictEqual(node.endPosition, { row: 1, column: 18 })
+            // softExpect(node.type).to.equal( "variable_declaration")
+            // softExpect(node.startPosition).to.deep.equal( { row: 1, column: 14 })
+            // softExpect(node.endPosition).to.deep.equal( { row: 1, column: 18 })
         })
     })
 })
