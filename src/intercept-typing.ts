@@ -2,9 +2,11 @@ import { TextEditor, TextEditorEdit } from "vscode"
 import {
     CommandFunction,
     commandsForLanguage,
+    deleteSelection,
     insertAfter,
     insertBefore,
     selectToChange,
+    undoEdit,
 } from "./commands"
 import * as vscode from "vscode"
 import { Languages } from "./language/language-support"
@@ -20,7 +22,7 @@ export function interceptTypeCommand(
     const key = args.text
 
     const languageId = editor.document.languageId
-    if (!Languages.isSupported(languageId) || (activeState.insertMode)) {
+    if (!Languages.isSupported(languageId) || activeState.insertMode) {
         vscode.commands.executeCommand("default:type", args)
         return
     }
@@ -44,12 +46,15 @@ export function interceptTypeCommand(
         //'r': commands.moveDown,
         //'n': commands.moveLeft,
         //'t': commands.moveRight,
+        //
         // Edit
         i: insertBefore,
         e: insertAfter,
         //'l': insertAbove,
         //'a': insertBelow,
         c: selectToChange,
+        d: deleteSelection,
+        u: undoEdit,
     }
 
     const command = commandConfig[key]

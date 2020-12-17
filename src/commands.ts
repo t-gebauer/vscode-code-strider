@@ -1,14 +1,13 @@
+import * as vscode from "vscode"
 import { Selection } from "vscode"
 import { EditorState } from "./editor-state"
-import {
-    NodeAccessorFunction,
-    LanguageDefinition,
-    CommandName,
-} from "./language/language-definition"
-import { findNodeAtSelection } from "./utilities/tree-utilities"
-import { toPosition } from "./utilities/conversion-utilities"
-import { Languages } from "./language/language-support"
 import { EditorStateChange } from "./extension"
+import {
+    CommandName, LanguageDefinition, NodeAccessorFunction
+} from "./language/language-definition"
+import { Languages } from "./language/language-support"
+import { toPosition } from "./utilities/conversion-utilities"
+import { findNodeAtSelection } from "./utilities/tree-utilities"
 
 export type CommandFunction = (editor: Readonly<EditorState>) => EditorStateChange | undefined
 
@@ -52,6 +51,17 @@ export function selectToChange(_: Readonly<EditorState>): EditorStateChange {
     return {
         insertMode: true,
     }
+}
+
+export function deleteSelection(_: Readonly<EditorState>): undefined {
+    vscode.commands.executeCommand('deleteLeft')
+    return;
+}
+
+export function undoEdit(_: Readonly<EditorState>): undefined {
+    // TODO: keep track of changes during insert mode and undo them block wise
+    vscode.commands.executeCommand('undo')
+    return;
 }
 
 export function insertBefore(state: Readonly<EditorState>) {
