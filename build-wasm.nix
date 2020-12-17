@@ -1,21 +1,20 @@
 with import <nixpkgs> {};
 let
-  mkTreeSitterGrammar = {id, src}: stdenv.mkDerivation {
-    inherit src;
-    name = "tree-sitter-${id}-latest";
-    buildInputs = [ emscripten tree-sitter ];
-    configurePhase = ''
+  mkTreeSitterGrammar = {id, src}: runCommand
+    "tree-sitter-${id}-latest"
+    { inherit src; }
+    ''
       mkdir home
       export HOME=home
-    '';
-    buildPhase = ''
+
+      cp -r $src/* .
+      PATH=$PATH:${pkgs.emscripten}/bin
+
       ${pkgs.tree-sitter}/bin/tree-sitter build-wasm
-    '';
-    installPhase = ''
+
       mkdir $out
       cp *.wasm $out/
     '';
-  };
 
   grammar = id: url: mkTreeSitterGrammar {
     inherit id;
