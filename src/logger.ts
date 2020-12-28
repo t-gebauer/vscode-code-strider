@@ -1,14 +1,18 @@
 import { Disposable, OutputChannel, window } from "vscode"
+import * as util from 'util'
 
 const contextDelimiter = `-`.repeat(80)
 
 export interface Logger {
-    log(message: string): void
+    log(message: string | object): void
     context(name: string): void
 }
 
 export class ConsoleOutLogger implements Logger {
-    log(message: string) {
+    log(message: string | object) {
+        if (typeof message === 'object') {
+            message = util.inspect(message)
+        }
         console.log(formatMessage(message))
     }
     context(name: string) {
@@ -34,7 +38,10 @@ export class OutputChannelLogger implements Logger, Disposable {
         this.outputChannel.appendLine(formatContext(name))
     }
 
-    log(message: string) {
+    log(message: string | object) {
+        if (typeof message === 'object') {
+            message = util.inspect(message)
+        }
         this.outputChannel.appendLine(formatMessage(message))
     }
 }

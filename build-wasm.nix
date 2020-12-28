@@ -28,6 +28,8 @@ let
   officialGrammar = id: grammar id "https://github.com/tree-sitter/tree-sitter-${id}";
 
 in
+# We just merge all these derivations into one.
+# Could we use the trivial builder `symlinkJoin` for this?
 runCommandLocal "tree-sitter-wasm-builds-combined" {
     clojure = (grammar "clojure" https://github.com/sogaiu/tree-sitter-clojure);
     fennel = (grammar "fennel" https://github.com/travonted/tree-sitter-fennel);

@@ -64,22 +64,47 @@ function bar(arg = false) {
         })
 
         it("boolean in inside", () => {
-            const booleanNode = treeUtils.findNodeAtSelection(tree, selection(4, 12))
-            softExpect(booleanNode.type).to.equal("true")
-            softExpect(booleanNode.parent?.type).to.equal("arguments")
-            softExpect(booleanNode.startPosition).to.deep.equal({ row: 4, column: 10 })
-            softExpect(booleanNode.endPosition).to.deep.equal({ row: 4, column: 14 })
+            const node = treeUtils.findNodeAtSelection(tree, selection(4, 12))
+            softExpect(node.type).to.equal("true")
+            softExpect(node.parent?.type).to.equal("arguments")
+            softExpect(node.startPosition).to.deep.equal({ row: 4, column: 10 })
+            softExpect(node.endPosition).to.deep.equal({ row: 4, column: 14 })
+        })
+    })
+
+    context("Find node before cursor", () => {
+        const source = `
+if (something !== true) {
+  return undefined;
+}
+
+const x =          "weirdly formatted string"      ;
+        `
+        let tree: Tree
+        before(async () => {
+            tree = await treeSitter.parseText(source, "javascript")
         })
 
-        it("whitespace selection", () => {
-            const node = treeUtils.findNodeAtSelection(tree, selection(7, 0))
-            // TODO not implemented yet
-            // softExpect(node.type).to.equal( "variable_declaration")
-            // softExpect(node.startPosition).to.deep.equal( { row: 1, column: 14 })
-            // softExpect(node.endPosition).to.deep.equal( { row: 1, column: 18 })
+        it("whitespace - same line, after", () => {
+            const node = treeUtils.findNodeBeforeCursor(tree, position(3, 5))
+            softExpect(node.type).to.equal("if_statement")
+            softExpect(node.startPosition, "node start").to.deep.equal({ row: 1, column: 0 })
+            softExpect(node.endPosition, "node end").to.deep.equal({ row: 3, column: 1 })
+        })
+
+
+        it("whitespace - same line, before", () => {
+            const node = treeUtils.findNodeBeforeCursor(tree, position(2, 1))
+            softExpect(node.type).to.equal("return_statement")
+            softExpect(node.startPosition, "node start").to.deep.equal({ row: 2, column: 2 })
+            softExpect(node.endPosition, "node end").to.deep.equal({ row: 2, column: 19 })
         })
     })
 })
+
+function position(line: number, char: number) {
+    return new Position(line, char)
+}
 
 function selection(
     startLine: number,

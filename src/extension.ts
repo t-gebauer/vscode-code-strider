@@ -19,7 +19,7 @@ import { interceptTypeCommand } from "./intercept-typing"
 import { Languages } from "./language/language-support"
 import { registerStatusBar } from "./status-bar"
 import { toPoint, toRange, toSelection } from "./utilities/conversion-utilities"
-import { findNodeAtSelection } from "./utilities/tree-utilities"
+import { findNodeAtSelection, findNodeBeforeCursor } from "./utilities/tree-utilities"
 import Parser = require("web-tree-sitter")
 import { registerDecorationHandler } from "./decoration"
 import { Logger, OutputChannelLogger } from "./logger"
@@ -116,6 +116,8 @@ export class Extension implements Disposable {
             logger.log("correcting editor selection")
             state.editor.selection = targetNodeSelection
         }
+        // TODO: only reveal range when triggered change occurred via keyboard command?
+        //       Do not suddenly scroll the view, when accidentally selecting the whole program.
         state.editor.revealRange(
             toRange(state.currentNode),
             vscode.TextEditorRevealType.InCenterIfOutsideViewport
@@ -214,7 +216,11 @@ export class Extension implements Disposable {
         }
 
         const timeBefore = Date.now()
-        state.currentNode = findNodeAtSelection(state.parseTree, selection)
+        if (selection.start.isEqual(selection.end)) {
+            state.currentNode = findNodeBeforeCursor(state.parseTree, selection.start)
+        } else {
+            state.currentNode = findNodeAtSelection(state.parseTree, selection)
+        }
         logger.log(`finding matching node at selection (took ${Date.now() - timeBefore} ms)`)
         this.handleSelectedNodeChanged(state)
     }
