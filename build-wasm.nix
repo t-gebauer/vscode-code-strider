@@ -35,26 +35,19 @@ let
     ref = "master";
   };
 
-  # We just merge all these derivations into one.
-  # Could we use the trivial builder `symlinkJoin` for this?
-in runCommandLocal "tree-sitter-wasm-builds-combined" {
-  clojure = (grammar "clojure" "https://github.com/sogaiu/tree-sitter-clojure");
-  fennel = (grammar "fennel" "https://github.com/travonted/tree-sitter-fennel");
-  html = officialGrammar "html";
-  javascript = officialGrammar "javascript";
-  python = officialGrammar "python";
-  typescript = mkTreeSitterGrammar {
-    id = "typescript";
-    src = typescriptRepo;
-    # There are multiple grammars this repository: TypeScript and JSX.
-    preBuild = "cd typescript";
-  };
-} ''
-  mkdir $out
-  cp $clojure/*.wasm $out/
-  cp $fennel/*.wasm $out/
-  cp $html/*.wasm $out/
-  cp $javascript/*.wasm $out/
-  cp $python/*.wasm $out/
-  cp $typescript/*.wasm $out/
-''
+in symlinkJoin {
+  name = "tree-sitter-wasm-builds-combined";
+  paths = [
+    (grammar "clojure" "https://github.com/sogaiu/tree-sitter-clojure")
+    (grammar "fennel" "https://github.com/travonted/tree-sitter-fennel")
+    (officialGrammar "html")
+    (officialGrammar "javascript")
+    (officialGrammar "python")
+    (mkTreeSitterGrammar {
+      id = "typescript";
+      src = typescriptRepo;
+      # there are multiple grammars this repository: TypeScript and JSX
+      preBuild = "cd typescript";
+    })
+  ];
+}
