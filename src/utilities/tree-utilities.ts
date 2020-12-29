@@ -2,6 +2,7 @@ import { Position, Selection } from "vscode"
 import { SyntaxNode, Tree } from "web-tree-sitter"
 import { toRange } from "./conversion-utilities"
 
+/** Find the outmost node which is completely contained in the selection */
 export function findNodeAtSelection(tree: Tree, selection: Selection): SyntaxNode {
     // Start at the top. Walk down until the we find the last node which completely contains the selection.
     const cursor = tree.walk()
@@ -46,8 +47,8 @@ export function findNodeBeforeCursor(tree: Tree, position: Position): SyntaxNode
                 // needle is after current node
                 // -> go to next node
                 if (!cursor.gotoNextSibling()) {
-                    // this node is the last sibling
-                    throw Error("Could not find node before cursor. Is this algorithm defect?")
+                    // FIXME: when does this happen? If the position is invalid?
+                    return cursor.currentNode()
                 }
             } else if (
                 position.line < cursor.startPosition.row ||
