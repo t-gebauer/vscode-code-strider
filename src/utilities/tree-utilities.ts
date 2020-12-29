@@ -6,9 +6,6 @@ export function findNodeAtSelection(tree: Tree, selection: Selection): SyntaxNod
     // Start at the top. Walk down until the we find the last node which completely contains the selection.
     const cursor = tree.walk()
 
-    // TODO: Improvement: If whitespace is selected between nodes:
-    //       Select the node before the space instead of the parent?
-
     // For all nodes
     while (true) {
         // We know that this node completely contains the selection.

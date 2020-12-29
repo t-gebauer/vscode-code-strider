@@ -50,7 +50,11 @@ export async function activate(context: ExtensionContext) {
             ext.withState(exitInsertMode)
         ),
         ext,
-        outputChannelLogger
+        outputChannelLogger,
+        commands.registerTextEditorCommand(
+            "code-strider:toggle-ast-viewer",
+            ext.toggleAstViewer.bind(ext)
+        )
     )
 }
 
@@ -91,6 +95,18 @@ export class Extension implements Disposable {
         )
     }
 
+    toggleAstViewer() {
+        if (this.astViewer) {
+            this.astViewer.dispose()
+            this.astViewer = undefined
+        } else {
+            const state = this.activeEditorState
+            if (state) {
+                AstViewer.create(this, state).then((astViewer) => (this.astViewer = astViewer))
+            }
+        }
+    }
+
     dispose() {
         this.astViewer?.dispose()
         Disposable.from(...this.subscriptions, this.activeEditorStateChange).dispose()
@@ -100,6 +116,7 @@ export class Extension implements Disposable {
         logger.context("Event: changed ActiveTextEditor")
         const state = editor ? await this.getOrInitializeEditorState(editor) : undefined
         this.activeEditorState = state
+        commands.executeCommand("setContext", "code-strider:is-editor-active", state !== undefined)
         if (state) {
             this.handleSelectedNodeChanged(state) // will also fire the state changed event
         } else {
@@ -139,8 +156,6 @@ export class Extension implements Disposable {
             insertMode: false,
         }
         this.editorStates.set(editor, state)
-        // TODO: add a config option to decide whether to show the AST viewer by default
-        AstViewer.create(this, state).then((astViewer) => (this.astViewer = astViewer))
         return state
     }
 
@@ -159,6 +174,13 @@ export class Extension implements Disposable {
         }
 
         if (didChange) {
+            if (change.insertMode !== undefined) {
+                commands.executeCommand(
+                    "setContext",
+                    "code-strider:is-insert-mode",
+                    change.insertMode
+                )
+            }
             if (change.currentNode !== undefined) {
                 this.handleSelectedNodeChanged(activeState) // will also fire the state change event
             } else {

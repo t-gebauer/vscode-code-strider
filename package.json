@@ -17,11 +17,30 @@
     ],
     "main": "./out/extension.js",
     "contributes": {
+        "commands": [
+            {
+                "command": "code-strider:toggle-ast-viewer",
+                "title": "code-strider: Toggle AST viewer"
+            }
+        ],
+        "menus": {
+            "commandPalette": [
+                {
+                    "command": "code-strider:toggle-ast-viewer",
+                    "when": "code-strider:is-editor-active"
+                }
+            ]
+        },
         "keybindings": [
             {
                 "command": "code-strider:exit-insert-mode",
                 "key": "Escape",
-                "when": "editorTextFocus && !suggestWidgetVisible"
+                "when": "code-strider:is-editor-active && editorTextFocus && !suggestWidgetVisible"
+            },
+            {
+                "command": "code-strider:toggle-ast-viewer",
+                "key": "alt-s alt-t",
+                "when": "code-strider:is-editor-active"
             }
         ],
         "languages": [

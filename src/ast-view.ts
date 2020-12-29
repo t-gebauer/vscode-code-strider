@@ -29,9 +29,11 @@ function createUri(document: TextDocument): Uri {
 export class AstViewer implements Disposable {
     static async create(ext: Extension, state: EditorState): Promise<AstViewer> {
         const astView = new AstViewer()
-        ext.onActiveEditorStateChange((newState: EditorState | undefined) => {
-            astView.setOrUpdateState(newState)
-        })
+        astView.subscriptions.push(
+            ext.onActiveEditorStateChange((newState: EditorState | undefined) => {
+                astView.setOrUpdateState(newState)
+            })
+        )
         astView.setOrUpdateState(state)
         await astView.show(state)
         return astView
@@ -114,8 +116,9 @@ export class AstViewer implements Disposable {
     }
 
     dispose() {
-        // We could hide the AST view window here?
-        // But `TextEditor.hide()` is deprecated.
+        // TODO: `TextEditor.hide()` is deprecated.
+        // But there seems to be no real replacement. Just keep it open then?
+        this.editorWindow?.hide()
         Disposable.from(
             ...this.subscriptions,
             this.nodeDecoration,
