@@ -25,6 +25,7 @@ import { registerDecorationHandler } from "./decoration"
 import { Logger, OutputChannelLogger } from "./logger"
 import { Tree } from "web-tree-sitter"
 import { TreeSitter } from "./tree-sitter"
+import { moveDown, moveLeft, moveRight, moveUp } from "./spatial-movement-commands"
 
 export let logger: Logger
 
@@ -54,7 +55,12 @@ export async function activate(context: ExtensionContext) {
         commands.registerTextEditorCommand(
             "code-strider:toggle-ast-viewer",
             ext.toggleAstViewer.bind(ext)
-        )
+        ),
+        // spatial movement commands
+        commands.registerTextEditorCommand("code-strider:move-up", ext.withState(moveUp)),
+        commands.registerTextEditorCommand("code-strider:move-down", ext.withState(moveDown)),
+        commands.registerTextEditorCommand("code-strider:move-left", ext.withState(moveLeft)),
+        commands.registerTextEditorCommand("code-strider:move-right", ext.withState(moveRight))
     )
 }
 
@@ -169,6 +175,7 @@ export class Extension implements Disposable {
         let didChange = false
         // Is there really no type-safe way to iterate over the known properties of a type?
         for (const [k, v] of Object.entries(change)) {
+            if (v === undefined) return
             ;(activeState as any)[k] = v
             didChange = true
         }
