@@ -20,6 +20,7 @@ const languages: Map<string, LanguageDefinition> = new Map(
         defineLanguage("html"),
         defineLanguage("clojure"),
         defineLanguage("fennel"),
+        defineLanguage("typescript"),
     ].map((def: LanguageDefinition) => [def.languageId, def])
 )
 

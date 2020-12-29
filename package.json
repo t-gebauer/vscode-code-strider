@@ -9,11 +9,12 @@
     },
     "categories": ["Other"],
     "activationEvents": [
-        "onLanguage:javascript",
-        "onLanguage:html",
         "onLanguage:clojure",
+        "onLanguage:fennel",
+        "onLanguage:html",
         "onLanguage:python",
-        "onLanguage:fennel"
+        "onLanguage:javascript",
+        "onLanguage:typescript"
     ],
     "main": "./out/extension.js",
     "contributes": {
