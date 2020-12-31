@@ -8,6 +8,7 @@
 - slurping
 - barfing
 - move node around (a minor mode?)
+- undo movement (jump to last position): undo stack?
 
 # Bugs
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true)))
@@ -23,6 +24,9 @@
 - add TypeScript
 - add Kotlin
 - add CSS
+- go to first/last sibling (in the current node)
+- selection: mark current node, select everything between current and last mark
+- surround object with ?
 
 # Details
 

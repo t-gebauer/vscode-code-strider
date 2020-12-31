@@ -34,14 +34,24 @@
         },
         "keybindings": [
             {
-                "command": "code-strider:exit-insert-mode",
-                "key": "Escape",
-                "when": "editorTextFocus && !suggestWidgetVisible && code-strider:is-editor-active && code-strider:is-insert-mode"
-            },
-            {
                 "command": "code-strider:toggle-ast-viewer",
                 "key": "alt-s alt-t",
                 "when": "code-strider:is-editor-active"
+            },
+            {
+                "command": "deleteLeft",
+                "key": "backspace",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "undo",
+                "key": "u",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:exit-insert-mode",
+                "key": "Escape",
+                "when": "editorTextFocus && !suggestWidgetVisible && code-strider:is-editor-active && code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:move-up",
@@ -79,7 +89,7 @@
         "watch": "tsc -watch -p ./",
         "pretest": "npm run compile && npm run lint",
         "test": "node ./out/test/runTest.js",
-        "start": "codium --verbose --disable-extensions --extensionDevelopmentPath $(pwd)"
+        "start": "codium --wait --disable-extensions --extensionDevelopmentPath $(pwd)"
     },
     "devDependencies": {
         "@alfonso-presa/soft-assert": "^0.5.0",

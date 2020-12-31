@@ -45,7 +45,7 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(
         registerStatusBar(ext),
         registerDecorationHandler(ext),
-        commands.registerTextEditorCommand("type", ext.withState(interceptTypeCommand)),
+        commands.registerTextEditorCommand("type", ext.withState(interceptTypeCommand, interceptTypeCommand)),
         commands.registerTextEditorCommand(
             "code-strider:exit-insert-mode",
             ext.withState(exitInsertMode)
@@ -197,15 +197,18 @@ export class Extension implements Disposable {
     }
 
     withState<T extends readonly unknown[], U extends EditorStateChange>(
-        fun: (state: Readonly<EditorState>, ...args: T) => U | undefined
+        fdefined: (state: Readonly<EditorState>, ...args: T) => U | undefined,
+        fundefined?: (state: undefined, ...args: T) => void,
     ): (...args: T) => void {
         return (...rest) => {
             if (this.activeEditorState) {
                 const readonlyState = Object.freeze({ ...this.activeEditorState })
-                const change = fun(readonlyState, ...rest)
+                const change = fdefined(readonlyState, ...rest)
                 if (change !== undefined) {
                     this.updateActiveEditorState(change)
                 }
+            } else if (fundefined) {
+             fundefined(undefined, ...rest)
             }
         }
     }

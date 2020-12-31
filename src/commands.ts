@@ -1,4 +1,3 @@
-import * as vscode from "vscode"
 import { Selection } from "vscode"
 import { EditorState } from "./editor-state"
 import { EditorStateChange } from "./extension"
@@ -51,17 +50,6 @@ export function selectToChange(_: Readonly<EditorState>): EditorStateChange {
     return {
         insertMode: true,
     }
-}
-
-export function deleteSelection(_: Readonly<EditorState>): undefined {
-    vscode.commands.executeCommand('deleteLeft')
-    return;
-}
-
-export function undoEdit(_: Readonly<EditorState>): undefined {
-    // TODO: keep track of changes during insert mode and undo them block wise
-    vscode.commands.executeCommand('undo')
-    return;
 }
 
 export function insertBefore(state: Readonly<EditorState>) {
