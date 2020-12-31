@@ -71,6 +71,35 @@ export async function activate(context: ExtensionContext) {
             "code-strider:follow-structure",
             ext.withState(followStructure)
         ),
+        // (direct) tree movement commands
+        commands.registerTextEditorCommand(
+            "code-strider:tree-move-previous",
+            ext.withState((state) => ({
+                currentNode: state.currentNode.previousNamedSibling || undefined,
+            }))
+        ),
+        commands.registerTextEditorCommand(
+            "code-strider:tree-move-next",
+            ext.withState((state) => ({
+                currentNode: state.currentNode.nextNamedSibling || undefined,
+            }))
+        ),
+        commands.registerTextEditorCommand(
+            "code-strider:tree-move-parent",
+            ext.withState((state) => ({ currentNode: state.currentNode.parent || undefined }))
+        ),
+        commands.registerTextEditorCommand(
+            "code-strider:tree-move-first-child",
+            ext.withState((state) => ({
+                currentNode: state.currentNode.firstNamedChild || undefined,
+            }))
+        ),
+        commands.registerTextEditorCommand(
+            "code-strider:tree-move-last-child",
+            ext.withState((state) => ({
+                currentNode: state.currentNode.lastNamedChild || undefined,
+            }))
+        ),
         // spatial movement commands
         commands.registerTextEditorCommand("code-strider:move-up", ext.withState(moveUp)),
         commands.registerTextEditorCommand("code-strider:move-down", ext.withState(moveDown)),
@@ -269,13 +298,11 @@ export class Extension implements Disposable {
         }
 
         const timeBefore = Date.now()
-        if (selection.start.isEqual(selection.end)) {
-            state.currentNode = findNodeBeforeCursor(state.parseTree, selection.start)
-        } else {
-            state.currentNode = findNodeAtSelection(state.parseTree, selection)
-        }
+        const currentNode = selection.start.isEqual(selection.end)
+            ? findNodeBeforeCursor(state.parseTree, selection.start)
+            : findNodeAtSelection(state.parseTree, selection)
         logger.log(`finding matching node at selection (took ${Date.now() - timeBefore} ms)`)
-        this.handleSelectedNodeChanged(state)
+        this.updateActiveEditorState({ currentNode })
     }
 
     // State per open file (parse tree caching, incremental parsing)

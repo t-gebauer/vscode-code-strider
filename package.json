@@ -64,6 +64,31 @@
                 "when": "editorTextFocus && !suggestWidgetVisible && code-strider:is-editor-active && code-strider:is-insert-mode"
             },
             {
+                "command": "code-strider:tree-move-previous",
+                "key": "shift+k",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:tree-move-next",
+                "key": "shift+j",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:tree-move-parent",
+                "key": "shift+h",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:tree-move-first-child",
+                "key": "shift+l",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:tree-move-last-child",
+                "key": "shift+alt+l",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
                 "command": "code-strider:move-up",
                 "key": "k",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
