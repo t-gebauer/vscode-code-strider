@@ -6,6 +6,7 @@ const contextDelimiter = `-`.repeat(80)
 export interface Logger {
     log(message: string | object): void
     context(name: string): void
+    show?: () => void
 }
 
 export class ConsoleOutLogger implements Logger {
@@ -26,7 +27,6 @@ export class OutputChannelLogger implements Logger, Disposable {
 
     constructor(channelName: string) {
         this.outputChannel = window.createOutputChannel(channelName)
-        this.outputChannel.show(true)
     }
 
     dispose() {
@@ -43,6 +43,10 @@ export class OutputChannelLogger implements Logger, Disposable {
             message = util.inspect(message)
         }
         this.outputChannel.appendLine(formatMessage(message))
+    }
+
+    show() {
+        this.outputChannel.show(true)
     }
 }
 

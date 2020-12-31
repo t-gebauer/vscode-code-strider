@@ -59,6 +59,9 @@ export async function activate(context: ExtensionContext) {
             "code-strider:toggle-ast-viewer",
             ext.toggleAstViewer.bind(ext)
         ),
+        commands.registerTextEditorCommand("code-strider:show-log", () =>
+            logger.show ? logger.show() : undefined
+        ),
         commands.registerTextEditorCommand(
             "code-strider:back-to-previous-selection",
             ext.withState(backToPreviousSelection)

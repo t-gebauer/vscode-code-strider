@@ -39,6 +39,11 @@
                 "when": "code-strider:is-editor-active"
             },
             {
+                "command": "code-strider:show-log",
+                "key": "alt-s alt-l",
+                "when": "code-strider:is-editor-active"
+            },
+            {
                 "command": "deleteLeft",
                 "key": "backspace",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
