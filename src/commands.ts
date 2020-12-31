@@ -1,8 +1,11 @@
+import * as vscode from "vscode"
 import { Selection } from "vscode"
 import { EditorState } from "./editor-state"
 import { EditorStateChange } from "./extension"
 import {
-    CommandName, LanguageDefinition, NodeAccessorFunction
+    CommandName,
+    LanguageDefinition,
+    NodeAccessorFunction,
 } from "./language/language-definition"
 import { Languages } from "./language/language-support"
 import { toPosition } from "./utilities/conversion-utilities"
@@ -75,5 +78,16 @@ export function exitInsertMode(state: Readonly<EditorState>): EditorStateChange 
     return {
         insertMode: false,
         currentNode: findNodeAtSelection(state.parseTree, state.editor.selection),
+    }
+}
+
+export function undoEdit(_: Readonly<EditorState>): EditorStateChange {
+    vscode.commands.executeCommand("undo")
+    return {}
+}
+
+export function backToPreviousSelection(_: Readonly<EditorState>): EditorStateChange {
+    return {
+        backToPreviousNode: true,
     }
 }

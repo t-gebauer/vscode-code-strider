@@ -33,6 +33,7 @@ export function interceptTypeCommand(
     const commandConfig: { [key: string]: CommandFunction } = {
         // Movement
         p: commands.gotoParent,
+        // TODO : f should be bound to "go inside" (follow / flow)
         f: commands.gotoFirstChild,
         // eslint-disable-next-line @typescript-eslint/naming-convention
         F: commands.gotoLastChild,

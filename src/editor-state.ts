@@ -4,7 +4,8 @@ import Parser = require("web-tree-sitter")
 
 export interface EditorState {
     editor: TextEditor
-    currentNode: SyntaxNode
     insertMode: Boolean
+    currentNode: SyntaxNode
+    previousNodes: Array<SyntaxNode>
     parseTree: Parser.Tree
 }

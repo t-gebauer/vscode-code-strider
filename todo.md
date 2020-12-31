@@ -28,6 +28,8 @@
 - selection: mark current node, select everything between current and last mark
 - surround object with ?
 
+- always show start and end of selection => fold center to fit the complete selection into view
+
 # Details
 
 directional movement

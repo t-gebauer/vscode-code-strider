@@ -44,8 +44,13 @@
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {
-                "command": "undo",
+                "command": "code-strider:undo-edit",
                 "key": "u",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:back-to-previous-selection",
+                "key": "b",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {

@@ -13,7 +13,7 @@ import {
     workspace,
 } from "vscode"
 import { AstViewer } from "./ast-view"
-import { exitInsertMode } from "./commands"
+import { backToPreviousSelection, exitInsertMode, undoEdit } from "./commands"
 import { EditorState } from "./editor-state"
 import { interceptTypeCommand } from "./intercept-typing"
 import { Languages } from "./language/language-support"
@@ -23,7 +23,7 @@ import { findNodeAtSelection, findNodeBeforeCursor } from "./utilities/tree-util
 import Parser = require("web-tree-sitter")
 import { registerDecorationHandler } from "./decoration"
 import { Logger, OutputChannelLogger } from "./logger"
-import { Tree } from "web-tree-sitter"
+import { SyntaxNode, Tree } from "web-tree-sitter"
 import { TreeSitter } from "./tree-sitter"
 import { moveDown, moveLeft, moveRight, moveUp } from "./spatial-movement-commands"
 
@@ -45,7 +45,10 @@ export async function activate(context: ExtensionContext) {
     context.subscriptions.push(
         registerStatusBar(ext),
         registerDecorationHandler(ext),
-        commands.registerTextEditorCommand("type", ext.withState(interceptTypeCommand, interceptTypeCommand)),
+        commands.registerTextEditorCommand(
+            "type",
+            ext.withState(interceptTypeCommand, interceptTypeCommand)
+        ),
         commands.registerTextEditorCommand(
             "code-strider:exit-insert-mode",
             ext.withState(exitInsertMode)
@@ -56,6 +59,11 @@ export async function activate(context: ExtensionContext) {
             "code-strider:toggle-ast-viewer",
             ext.toggleAstViewer.bind(ext)
         ),
+        commands.registerTextEditorCommand(
+            "code-strider:back-to-previous-selection",
+            ext.withState(backToPreviousSelection)
+        ),
+        commands.registerTextEditorCommand("code-strider:undo-edit", ext.withState(undoEdit)),
         // spatial movement commands
         commands.registerTextEditorCommand("code-strider:move-up", ext.withState(moveUp)),
         commands.registerTextEditorCommand("code-strider:move-down", ext.withState(moveDown)),
@@ -75,7 +83,11 @@ export enum InteractionMode {
     Insert,
 }
 
-export type EditorStateChange = Partial<EditorState>
+export type EditorStateChange = {
+    currentNode?: SyntaxNode
+    insertMode?: boolean
+    backToPreviousNode?: true
+}
 
 export class Extension implements Disposable {
     // State per open editor (cursor position, node selection, decoration)
@@ -157,9 +169,10 @@ export class Extension implements Disposable {
 
         let state: EditorState = {
             editor,
-            parseTree,
-            currentNode: initialNode,
             insertMode: false,
+            currentNode: initialNode,
+            previousNodes: new Array(),
+            parseTree,
         }
         this.editorStates.set(editor, state)
         return state
@@ -171,34 +184,35 @@ export class Extension implements Disposable {
             window.showErrorMessage("Invalid state: no compatible editor active")
             return
         }
+        const currentNode = activeState.currentNode
 
-        let didChange = false
-        // Is there really no type-safe way to iterate over the known properties of a type?
-        for (const [k, v] of Object.entries(change)) {
-            if (v === undefined) return
-            ;(activeState as any)[k] = v
-            didChange = true
+        if (change.insertMode !== undefined) {
+            logger.log(`changing insertMode: ${change.insertMode}`)
+            commands.executeCommand("setContext", "code-strider:is-insert-mode", change.insertMode)
+            activeState.insertMode = change.insertMode
+        }
+        if (change.backToPreviousNode) {
+            const previousNode = activeState.previousNodes.pop()
+            if (previousNode) {
+                activeState.currentNode = previousNode
+            }
+        }
+        if (change.currentNode !== undefined && change.currentNode !== currentNode) {
+            activeState.previousNodes.push(currentNode)
+            activeState.currentNode = change.currentNode
         }
 
-        if (didChange) {
-            if (change.insertMode !== undefined) {
-                commands.executeCommand(
-                    "setContext",
-                    "code-strider:is-insert-mode",
-                    change.insertMode
-                )
-            }
-            if (change.currentNode !== undefined) {
-                this.handleSelectedNodeChanged(activeState) // will also fire the state change event
-            } else {
-                this.activeEditorStateChange.fire(activeState)
-            }
+        const didChangeNode = activeState.currentNode !== currentNode
+        if (didChangeNode) {
+            this.handleSelectedNodeChanged(activeState) // will also fire the state change event
+        } else {
+            this.activeEditorStateChange.fire(activeState)
         }
     }
 
     withState<T extends readonly unknown[], U extends EditorStateChange>(
         fdefined: (state: Readonly<EditorState>, ...args: T) => U | undefined,
-        fundefined?: (state: undefined, ...args: T) => void,
+        fundefined?: (state: undefined, ...args: T) => void
     ): (...args: T) => void {
         return (...rest) => {
             if (this.activeEditorState) {
@@ -208,7 +222,7 @@ export class Extension implements Disposable {
                     this.updateActiveEditorState(change)
                 }
             } else if (fundefined) {
-             fundefined(undefined, ...rest)
+                fundefined(undefined, ...rest)
             }
         }
     }
@@ -306,7 +320,8 @@ export class Extension implements Disposable {
         this.editorStates.forEach((state) => {
             if (state.editor.document === document) {
                 state.parseTree = newTree
-                state.currentNode = findNodeAtSelection(newTree, state.editor.selection)
+                state.currentNode = findNodeBeforeCursor(newTree, state.editor.selection.active)
+                state.previousNodes = new Array() // old references are no longer valid
             }
         })
         this.activeEditorStateChange.fire(this.activeEditorState)
