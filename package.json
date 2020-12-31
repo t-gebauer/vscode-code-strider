@@ -82,6 +82,12 @@
                 "command": "code-strider:move-right",
                 "key": "l",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "~comment": "Follow the flow of the currently selected structure. Falls back to `first-child`",
+                "command": "code-strider:follow-structure",
+                "key": "f",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             }
         ],
         "languages": [

@@ -91,3 +91,15 @@ export function backToPreviousSelection(_: Readonly<EditorState>): EditorStateCh
         backToPreviousNode: true,
     }
 }
+
+// "go inside" the currently selected node, often the same as "first-child"
+export function followStructure(state: Readonly<EditorState>): EditorStateChange {
+    const langDefinition = Languages.getDefinition(state.editor.document.languageId)
+    const langOverride = Languages.getOverrideFor(langDefinition, "firstChild", state.currentNode)
+    const nextNode = langOverride
+        ? langOverride(state.currentNode)
+        : state.currentNode.firstNamedChild
+    return {
+        currentNode: nextNode || undefined,
+    }
+}

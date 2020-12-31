@@ -13,7 +13,7 @@ import {
     workspace,
 } from "vscode"
 import { AstViewer } from "./ast-view"
-import { backToPreviousSelection, exitInsertMode, undoEdit } from "./commands"
+import { backToPreviousSelection, exitInsertMode, followStructure, undoEdit } from "./commands"
 import { EditorState } from "./editor-state"
 import { interceptTypeCommand } from "./intercept-typing"
 import { Languages } from "./language/language-support"
@@ -67,6 +67,10 @@ export async function activate(context: ExtensionContext) {
             ext.withState(backToPreviousSelection)
         ),
         commands.registerTextEditorCommand("code-strider:undo-edit", ext.withState(undoEdit)),
+        commands.registerTextEditorCommand(
+            "code-strider:follow-structure",
+            ext.withState(followStructure)
+        ),
         // spatial movement commands
         commands.registerTextEditorCommand("code-strider:move-up", ext.withState(moveUp)),
         commands.registerTextEditorCommand("code-strider:move-down", ext.withState(moveDown)),
