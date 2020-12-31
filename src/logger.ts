@@ -4,13 +4,13 @@ import * as util from 'util'
 const contextDelimiter = `-`.repeat(80)
 
 export interface Logger {
-    log(message: string | object): void
+    log(message: unknown): void
     context(name: string): void
     show?: () => void
 }
 
 export class ConsoleOutLogger implements Logger {
-    log(message: string | object) {
+    log(message: unknown) {
         if (typeof message === 'object') {
             message = util.inspect(message)
         }
@@ -38,7 +38,7 @@ export class OutputChannelLogger implements Logger, Disposable {
         this.outputChannel.appendLine(formatContext(name))
     }
 
-    log(message: string | object) {
+    log(message: unknown) {
         if (typeof message === 'object') {
             message = util.inspect(message)
         }
@@ -50,7 +50,7 @@ export class OutputChannelLogger implements Logger, Disposable {
     }
 }
 
-function formatMessage(message: string): string {
+function formatMessage(message: unknown): string {
     const ms = `${Date.now() % 1000}`.padStart(3, "0")
     return `${ms}| ${message}`
 }

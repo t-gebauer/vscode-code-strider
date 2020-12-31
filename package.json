@@ -2,7 +2,7 @@
     "name": "code-strider",
     "displayName": "Code Strider",
     "description": "Structured code navigation and editing",
-    "publisher": "ttt",
+    "publisher": "t-gebauer",
     "version": "0.0.1",
     "engines": {
         "vscode": "^1.50.0"
@@ -96,6 +96,12 @@
             {
                 "command": "code-strider:move-down",
                 "key": "j",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:move-down",
+                "key": "shift+j",
+                "args": { "force": true },
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {

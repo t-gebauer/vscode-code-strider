@@ -10,7 +10,7 @@ describe("Tree Utils", () => {
 
     before(async () => {
         const extension: vscode.Extension<unknown> | undefined = vscode.extensions.getExtension(
-            "ttt.code-strider"
+            "t-gebauer.code-strider"
         )
         treeSitter = new TreeSitter(`${extension!!.extensionPath}/wasm/`, undefined)
         await treeSitter.initialize()

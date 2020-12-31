@@ -8,7 +8,7 @@
 - slurping
 - barfing
 - move node around (a minor mode?)
-- undo movement (jump to last position): undo stack?
+- delete current node, including separators
 
 # Bugs
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true)))
@@ -18,7 +18,6 @@
 - undo complete edits
 - config + hotkeys
     - Toggle extension on/off
-    - Toggle AST view on/off
 - Select node(s) in AST view
 - add YAML
 - add TypeScript
@@ -26,7 +25,7 @@
 - add CSS
 - go to first/last sibling (in the current node)
 - selection: mark current node, select everything between current and last mark
-- surround object with ?
+- surround object with ?, brackets, quote marks, etc.
 
 - always show start and end of selection => fold center to fit the complete selection into view
 
