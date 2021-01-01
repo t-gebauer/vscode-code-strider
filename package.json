@@ -65,32 +65,38 @@
             },
             {
                 "command": "code-strider:tree-move-previous",
-                "key": "shift+k",
+                "key": "alt+k",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:tree-move-next",
-                "key": "shift+j",
+                "key": "alt+j",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:tree-move-parent",
-                "key": "shift+h",
+                "key": "alt+h",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:tree-move-first-child",
-                "key": "shift+l",
+                "key": "alt+l",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:tree-move-last-child",
-                "key": "shift+alt+l",
+                "key": "ctr+alt+l",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:move-up",
                 "key": "k",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:move-up",
+                "key": "shift+k",
+                "args": { "force": true },
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {

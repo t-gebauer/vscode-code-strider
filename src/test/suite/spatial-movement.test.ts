@@ -1,7 +1,7 @@
 import { expect } from "chai"
 import * as vscode from "vscode"
 import { SyntaxNode } from "web-tree-sitter"
-import { nodeBelow } from "../../spatial-movement-commands"
+import { nodeAbove, nodeBelow } from "../../spatial-movement-commands"
 import { TreeSitter } from "../../tree-sitter"
 
 describe("Spatial movement", () => {
@@ -15,8 +15,7 @@ describe("Spatial movement", () => {
         await treeSitter.initialize()
     })
 
-    describe("find node below", () => {
-        const source = `
+    const source = `
 export class Foo implements Bar {
 
   private readonly config: Config = new Config();
@@ -29,21 +28,20 @@ export class Foo implements Bar {
   baz = false || true;
 }
 `
-        let className: SyntaxNode
-        let returnStatement: SyntaxNode
+    let className: SyntaxNode
+    let returnStatement: SyntaxNode
 
-        before(async () => {
-            const tree = await treeSitter.parseText(source, "typescript")
-            className = tree.rootNode.firstNamedChild?.firstNamedChild?.childForFieldName("name")!
-            expect(className?.text).to.equal("Foo")
-            const classBody = tree.rootNode.firstNamedChild?.firstNamedChild?.childForFieldName(
-                "body"
-            )
-            const barDefinition = classBody?.namedChild(2)
-            returnStatement = barDefinition?.childForFieldName("body")?.firstNamedChild!
-            expect(returnStatement?.text).to.equal("return undefined;")
-        })
+    before(async () => {
+        const tree = await treeSitter.parseText(source, "typescript")
+        className = tree.rootNode.firstNamedChild?.firstNamedChild?.childForFieldName("name")!
+        expect(className?.text).to.equal("Foo")
+        const classBody = tree.rootNode.firstNamedChild?.firstNamedChild?.childForFieldName("body")
+        const barDefinition = classBody?.namedChild(2)
+        returnStatement = barDefinition?.childForFieldName("body")?.firstNamedChild!
+        expect(returnStatement?.text).to.equal("return undefined;")
+    })
 
+    describe("find node below", () => {
         it("should go into siblings children", () => {
             const result = nodeBelow(className)
             expect(result?.text).to.equal("private readonly config: Config = new Config()")
@@ -57,6 +55,18 @@ export class Foo implements Bar {
         it("should step out of parent if forced", () => {
             const result = nodeBelow(returnStatement, true)
             expect(result?.text).to.equal("baz = false || true")
+        })
+    })
+
+    describe("find node above", () => {
+        it('should not move if first child', () => {
+            const result = nodeAbove(returnStatement)
+            expect(result).to.equal(returnStatement)
+        })
+
+        it("should step out of parent if forced", () => {
+            const result = nodeAbove(returnStatement, true)
+            expect(result?.text).to.equal(`: void`)
         })
     })
 })

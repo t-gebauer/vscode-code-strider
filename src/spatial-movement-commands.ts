@@ -5,12 +5,50 @@ import { EditorStateChange, logger } from "./extension"
 
 // --- spatial movement functions (natural, planar)
 
-function nodeAbove(node: SyntaxNode): SyntaxNode | undefined {
-    const other = node.previousNamedSibling
-    if (other && other.endPosition.row < node.startPosition.row) {
-        return other
+function findNodeWithParentContainingLine(node: SyntaxNode, line: number): SyntaxNode | false {
+    while (true) {
+        if (!node.parent) {
+            return false
+        }
+        if (node.parent.startPosition.row <= line || node.parent.endPosition.row >= line) {
+            return node
+        }
+        node = node.parent
     }
-    return node.parent || undefined
+}
+
+export function nodeAbove(node: SyntaxNode, force = false): SyntaxNode | undefined {
+    const targetLine = node.startPosition.row - 1
+    // go up, until a parent contains the searched line
+    const parent = findNodeWithParentContainingLine(node, targetLine)
+    if (!parent) {
+        return node
+    }
+    node = parent
+    // search in siblings and their children
+    while (true) {
+        // traverse the siblings until we find the one, which contains the searched line
+        while (node.startPosition.row > targetLine) {
+            if (!node.previousNamedSibling) {
+                // no more siblings left
+                if (!force) return node
+                while (node.parent && !node.previousNamedSibling) {
+                    node = node.parent
+                }
+                return node.previousNamedSibling || node
+            }
+            node = node.previousNamedSibling
+        }
+        // we found a sibling containing our target line
+        if (node.endPosition.row <= targetLine) {
+            return node
+        }
+        // we found a sibling containing our target line, but it starts too early
+        if (!node.lastNamedChild) {
+            return node
+        }
+        node = node.lastNamedChild
+    }
 }
 
 // find the next node which starts on the line below this one
@@ -18,15 +56,11 @@ function nodeAbove(node: SyntaxNode): SyntaxNode | undefined {
 export function nodeBelow(node: SyntaxNode, force = false): SyntaxNode | undefined {
     const targetLine = node.endPosition.row + 1
     // go up, until a parent contains the searched line
-    while (true) {
-        if (!node.parent) {
-            return node
-        }
-        if (node.parent.endPosition.row >= targetLine) {
-            break
-        }
-        node = node.parent
+    const parent = findNodeWithParentContainingLine(node, targetLine)
+    if (!parent) {
+        return node
     }
+    node = parent
     // search in siblings and their children
     while (true) {
         // traverse the siblings until we find the one, which contains the searched line
@@ -72,9 +106,14 @@ function nodeRightOf(node: SyntaxNode): SyntaxNode | undefined {
     return nodeRightOf(other)
 }
 
-export function moveUp(state: Readonly<EditorState>): EditorStateChange {
+export function moveUp(
+    state: Readonly<EditorState>,
+    _editor: TextEditor,
+    _edit: TextEditorEdit,
+    args?: { force?: boolean }
+): EditorStateChange {
     return {
-        currentNode: nodeAbove(state.currentNode),
+        currentNode: nodeAbove(state.currentNode, args?.force),
     }
 }
 
@@ -82,7 +121,7 @@ export function moveDown(
     state: Readonly<EditorState>,
     _editor: TextEditor,
     _edit: TextEditorEdit,
-    args?: {force?: boolean}
+    args?: { force?: boolean }
 ): EditorStateChange {
     return {
         currentNode: nodeBelow(state.currentNode, args?.force),
