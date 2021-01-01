@@ -89,7 +89,7 @@ export function nodeBelow(node: SyntaxNode, force = false): SyntaxNode | undefin
     return nextNode(node, true, force)
 }
 
-function nodeLeftOf(node: SyntaxNode): SyntaxNode | undefined {
+export function nodeLeftOf(node: SyntaxNode): SyntaxNode | undefined {
     const other = node.previousNamedSibling
     if (other && other.endPosition.row === node.startPosition.row) {
         return other
@@ -97,7 +97,7 @@ function nodeLeftOf(node: SyntaxNode): SyntaxNode | undefined {
     return node.parent || undefined
 }
 
-function nodeRightOf(node: SyntaxNode): SyntaxNode | undefined {
+export function nodeRightOf(node: SyntaxNode): SyntaxNode | undefined {
     const other = node.nextNamedSibling
     if (!other) {
         return node.parent || undefined
