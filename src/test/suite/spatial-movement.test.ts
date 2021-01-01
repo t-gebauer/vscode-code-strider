@@ -1,7 +1,7 @@
 import { expect } from "chai"
 import * as vscode from "vscode"
 import { SyntaxNode } from "web-tree-sitter"
-import { nodeAbove, nodeBelow, nodeLeftOf } from "../../spatial-movement-commands"
+import { nodeAbove, nodeBelow, nodeLeftOf, nodeRightOf } from "../../spatial-movement-commands"
 import { TreeSitter } from "../../tree-sitter"
 
 describe("Spatial movement", () => {
@@ -97,6 +97,34 @@ export class Foo implements Bar {
             expect(secondBarParameter?.text).to.equal('arg2: string | null')
             const result = nodeLeftOf(secondBarParameter)
             expect(result?.text).to.equal('arg1: number')
+        })
+    })
+
+    describe("find node right", () => {
+        it('should select parent when nothing else is there', () => {
+            const result = nodeRightOf(className)
+            expect(result?.text).to.match(/^implements Bar$/)
+        })
+
+        xit('should stay inside parent block', () => {
+            // TODO
+            const result = nodeRightOf(barDefinition)
+            expect(result).to.equal(barDefinition)
+        })
+
+        it("should move inside parameter list", () => {
+            const firstBarParameter = barDefinition.childForFieldName('parameters')?.firstNamedChild!
+            expect(firstBarParameter?.text).to.equal('arg1: number')
+            const result = nodeRightOf(firstBarParameter)
+            expect(result?.text).to.equal('arg2: string | null')
+        })
+
+        xit("should not move when already last parameter", () => {
+            // TODO
+            const secondBarParameter = barDefinition.childForFieldName('parameters')?.firstNamedChild?.nextNamedSibling!
+            expect(secondBarParameter?.text).to.equal('arg2: string | null')
+            const result = nodeRightOf(secondBarParameter)
+            expect(result).to.equal(secondBarParameter)
         })
     })
 })
