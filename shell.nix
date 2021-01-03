@@ -6,10 +6,6 @@ pkgs.mkShell {
     nodejs-12_x
     nodePackages.node-gyp
 
-    # To generate wasm files
-    tree-sitter
-    emscripten
-
     # Code formatting
     nodePackages.prettier
   ];
