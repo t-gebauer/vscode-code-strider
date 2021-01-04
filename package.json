@@ -3,6 +3,11 @@
     "displayName": "Code Strider",
     "description": "Structured code navigation and editing",
     "publisher": "t-gebauer",
+    "license": "MIT",
+    "repository": {
+        "type": "git",
+        "url": "https://github.com/t-gebauer/vscode-code-strider"
+    },
     "version": "0.0.1",
     "engines": {
         "vscode": "^1.50.0"
