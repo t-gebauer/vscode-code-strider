@@ -16,7 +16,7 @@
         "onLanguage:javascript",
         "onLanguage:typescript"
     ],
-    "main": "./out/extension.js",
+    "main": "./dist/extension.js",
     "contributes": {
         "commands": [
             {
@@ -96,7 +96,9 @@
             {
                 "command": "code-strider:move-up",
                 "key": "shift+k",
-                "args": { "force": true },
+                "args": {
+                    "force": true
+                },
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {
@@ -107,7 +109,9 @@
             {
                 "command": "code-strider:move-down",
                 "key": "shift+j",
-                "args": { "force": true },
+                "args": {
+                    "force": true
+                },
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {
@@ -136,11 +140,12 @@
         ]
     },
     "scripts": {
-        "vscode:prepublish": "npm run compile",
-        "compile": "tsc -p ./",
+        "vscode:prepublish": "webpack --mode production",
+        "webpack": "cp node_modules/web-tree-sitter/tree-sitter.wasm dist/ && webpack --mode development",
+        "webpack-dev": "npm run webpack -- --watch",
+        "test-compile": "tsc -p ./",
         "lint": "eslint src --ext ts",
-        "watch": "tsc -watch -p ./",
-        "pretest": "npm run compile && npm run lint",
+        "pretest": "npm run test-compile && npm run lint",
         "test": "node ./out/test/runTest.js",
         "start": "codium --wait --disable-extensions --extensionDevelopmentPath $(pwd)"
     },
@@ -158,8 +163,11 @@
         "glob": "^7.1.6",
         "mocha": "^8.1.3",
         "prettier": "^2.2.1",
+        "ts-loader": "^8.0.13",
         "typescript": "^4.0.2",
-        "vscode-test": "^1.4.0"
+        "vscode-test": "^1.4.0",
+        "webpack": "^5.11.1",
+        "webpack-cli": "^4.3.1"
     },
     "dependencies": {
         "web-tree-sitter": "^0.17.1"
