@@ -29,6 +29,8 @@
 
 - always show start and end of selection => fold center to fit the complete selection into view
 
+- remove not-really-needed testing library: soft-assert?
+
 # Details
 
 directional movement
@@ -70,7 +72,7 @@ vscode.commands.executeCommand('workbench.action.openGlobalKeybindings', 'query'
 
 Could use a `CustomEditorProvider` for either the main editor and/or the AST viewer. No idea whether that would simply be more complicated, or also improve, maybe even simplify interactions.
 
-The AST view could also be rendered as `WebviewPanel` or `TreeView`.
+The AST view could also be rendered as `WebviewPanel` or `TreeView`. This could allow easy implementation of bi-directional selection.
 
 
 # Limitations of VS Code
