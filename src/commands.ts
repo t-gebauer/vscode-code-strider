@@ -1,5 +1,5 @@
 import * as vscode from "vscode"
-import { Selection } from "vscode"
+import { Selection, TextEditor, TextEditorEdit } from "vscode"
 import { EditorState } from "./editor-state"
 import { EditorStateChange } from "./extension"
 import {
@@ -49,7 +49,18 @@ export function commandsForLanguage(languageDefinition: LanguageDefinition) {
     }
 }
 
-export function selectToChange(_: Readonly<EditorState>): EditorStateChange {
+export async function insertOnNewLine(state: Readonly<EditorState>, textEditor: TextEditor, editBuilder: TextEditorEdit): Promise<EditorStateChange> {
+    const { editor, currentNode } = state
+    const line = editor.document.lineAt(currentNode.endPosition.row)
+    editor.selection = new Selection(line.range.end, line.range.end)
+    editBuilder.insert(line.range.end, '\n')
+    return {
+        insertMode: true,
+    }
+}
+
+export function deleteAndInsert(_: Readonly<EditorState>): EditorStateChange {
+    vscode.commands.executeCommand('deleteLeft');
     return {
         insertMode: true,
     }

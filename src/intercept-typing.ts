@@ -4,7 +4,7 @@ import {
     commandsForLanguage,
     insertAfter,
     insertBefore,
-    selectToChange,
+    deleteAndInsert,
 } from "./commands"
 import * as vscode from "vscode"
 import { Languages } from "./language/language-support"
@@ -42,7 +42,7 @@ export function interceptTypeCommand(
         e: insertAfter,
         //'l': insertAbove,
         //'a': insertBelow,
-        c: selectToChange,
+        c: deleteAndInsert,
     }
 
     const command = commandConfig[key]

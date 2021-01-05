@@ -13,7 +13,7 @@ import {
     workspace,
 } from "vscode"
 import { AstViewer } from "./ast-view"
-import { backToPreviousSelection, exitInsertMode, followStructure, undoEdit } from "./commands"
+import { backToPreviousSelection, exitInsertMode, followStructure, insertOnNewLine, undoEdit } from "./commands"
 import { EditorState } from "./editor-state"
 import { interceptTypeCommand } from "./intercept-typing"
 import { Languages } from "./language/language-support"
@@ -52,6 +52,10 @@ export async function activate(context: ExtensionContext) {
         commands.registerTextEditorCommand(
             "code-strider:exit-insert-mode",
             ext.withState(exitInsertMode)
+        ),
+        commands.registerTextEditorCommand(
+            "code-strider:insert-on-new-line",
+            ext.withState(insertOnNewLine)
         ),
         ext,
         outputChannelLogger,
@@ -247,18 +251,18 @@ export class Extension implements Disposable {
     }
 
     withState<T extends readonly unknown[], U extends EditorStateChange>(
-        fdefined: (state: Readonly<EditorState>, ...args: T) => U | undefined,
-        fundefined?: (state: undefined, ...args: T) => void
-    ): (...args: T) => void {
-        return (...rest) => {
+        fdefined: (state: Readonly<EditorState>, ...args: T) => Promise<U> | U | undefined,
+        fundefined?: (state: undefined, ...args: T) => Promise<void> | unknown | undefined
+    ): (...args: T) => Promise<void>{
+        return async (...rest) => {
             if (this.activeEditorState) {
                 const readonlyState = Object.freeze({ ...this.activeEditorState })
-                const change = fdefined(readonlyState, ...rest)
+                const change = await fdefined(readonlyState, ...rest)
                 if (change !== undefined) {
                     this.updateActiveEditorState(change)
                 }
             } else if (fundefined) {
-                fundefined(undefined, ...rest)
+                await fundefined(undefined, ...rest)
             }
         }
     }
