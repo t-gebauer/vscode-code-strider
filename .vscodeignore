@@ -1,6 +1,7 @@
 .vscode/**
 .vscode-test/**
 out/**
+target/**
 src/**
 .gitignore
 .yarnrc
@@ -9,4 +10,12 @@ vsc-extension-quickstart.md
 **/.eslintrc.json
 **/*.map
 **/*.ts
-**/*.nix
+
+.envrc
+.prettierignore
+.prettierrc.toml
+shell.nix
+todo.md
+webpack.config.js
+
+node_modules/**
