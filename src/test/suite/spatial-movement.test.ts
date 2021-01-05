@@ -31,6 +31,7 @@ export class Foo implements Bar {
     let className: SyntaxNode
     let barDefinition: SyntaxNode
     let returnStatement: SyntaxNode
+    let bazAssignement: SyntaxNode
 
     before(async () => {
         const tree = await treeSitter.parseText(source, "typescript")
@@ -41,6 +42,8 @@ export class Foo implements Bar {
         expect(barDefinition?.text).to.match(/^bar\(arg1: /)
         returnStatement = barDefinition?.childForFieldName("body")?.firstNamedChild!
         expect(returnStatement?.text).to.equal("return undefined;")
+        bazAssignement = classBody?.namedChild(3)!
+        expect(bazAssignement?.text).to.equal("baz = false || true")
     })
 
     describe("find node below", () => {
@@ -49,25 +52,20 @@ export class Foo implements Bar {
             expect(result?.text).to.equal("private readonly config: Config = new Config()")
         })
 
-        it("should not move if last child", () => {
+        it("should step out of parent if last child and a parent has further siblings", () => {
             const result = nodeBelow(returnStatement)
-            expect(result).to.equal(returnStatement)
+            expect(result?.text).to.equal("baz = false || true")
         })
 
-        it("should step out of parent if forced", () => {
-            const result = nodeBelow(returnStatement, true)
-            expect(result?.text).to.equal("baz = false || true")
+        it("should not move if last child and no parent has further siblings", () => {
+            const result = nodeBelow(bazAssignement)
+            expect(result).to.equal(undefined)
         })
     })
 
     describe("find node above", () => {
-        it('should not move if first child', () => {
+        it("should step out of parent if first child and parent has further siblings", () => {
             const result = nodeAbove(returnStatement)
-            expect(result).to.equal(returnStatement)
-        })
-
-        it("should step out of parent if forced", () => {
-            const result = nodeAbove(returnStatement, true)
             expect(result?.text).to.equal(`: void`)
         })
     })

@@ -33,12 +33,12 @@
 
 - improve editor scrolling. 
 - "move right" should not select parent
-- "move down" should always move down if possible
 - switching files should not scroll to top! (and generally, be less buggy ;))
 - implement "raise"
 - implement "ace jump" to nth-child
 - "delete" should delete lines if there is nothing else on the line
 - bug: decorations are initially not visible!
+- key:x "select node starting on line"?
 
 # Details
 

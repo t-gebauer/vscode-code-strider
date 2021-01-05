@@ -95,24 +95,12 @@
             },
             {
                 "command": "code-strider:move-up",
-                "key": "shift+k",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
-            },
-            {
-                "command": "code-strider:move-up",
                 "key": "k",
-                "args": { "force": true },
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
-            },
-            {
-                "command": "code-strider:move-down",
-                "key": "shift+j",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:move-down",
                 "key": "j",
-                "args": { "force": true },
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {
@@ -163,7 +151,7 @@
         "lint": "eslint src --ext ts",
         "pretest": "npm run test-compile && npm run lint",
         "test": "node ./out/test/runTest.js",
-        "start": "codium --disable-extensions --extensionDevelopmentPath $(pwd)"
+        "start": "codium --extensionDevelopmentPath $(pwd)"
     },
     "devDependencies": {
         "@alfonso-presa/soft-assert": "^0.5.0",

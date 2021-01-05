@@ -44,16 +44,16 @@ function findSiblingContainingLine(
     return node
 }
 
-function findNextSiblingOfParent(node: SyntaxNode, forward = true): SyntaxNode {
+function findNextSiblingOfParent(node: SyntaxNode, forward = true): SyntaxNode | false {
     while (node.parent && !nextSibling(node, forward)) {
         node = node.parent
     }
-    return nextSibling(node, forward) || node
+    return nextSibling(node, forward) || false
 }
 
-// Find the next node which starts on the line below|above this one
-// Will step outside of the bounds of this nodes parent if `force` is set.
-function nextNode(node: SyntaxNode, forward = true, force = false): SyntaxNode | undefined {
+// Find the next node which starts on the line below|above this one.
+// Will step outside of the bounds of this nodes parent if the selected node is the last child.
+function nextNode(node: SyntaxNode, forward = true): SyntaxNode | undefined {
     const targetLine = forward ? node.endPosition.row + 1 : node.startPosition.row - 1
     // go up, until a parent contains the searched line
     const parent = findNodeWithParentContainingLine(node, targetLine, forward)
@@ -65,7 +65,8 @@ function nextNode(node: SyntaxNode, forward = true, force = false): SyntaxNode |
     while (true) {
         const sibling = findSiblingContainingLine(node, targetLine, forward)
         if (!sibling) {
-            return force ? findNextSiblingOfParent(node, forward) : node
+            // TODO: should only find siblings on the target line
+            return findNextSiblingOfParent(node, forward) || undefined
         }
         node = sibling
         // We found a sibling containing our target line
@@ -81,12 +82,12 @@ function nextNode(node: SyntaxNode, forward = true, force = false): SyntaxNode |
     }
 }
 
-export function nodeAbove(node: SyntaxNode, force = false): SyntaxNode | undefined {
-    return nextNode(node, false, force)
+export function nodeAbove(node: SyntaxNode): SyntaxNode | undefined {
+    return nextNode(node, false)
 }
 
-export function nodeBelow(node: SyntaxNode, force = false): SyntaxNode | undefined {
-    return nextNode(node, true, force)
+export function nodeBelow(node: SyntaxNode): SyntaxNode | undefined {
+    return nextNode(node, true)
 }
 
 export function nodeLeftOf(node: SyntaxNode): SyntaxNode | undefined {
@@ -111,22 +112,20 @@ export function nodeRightOf(node: SyntaxNode): SyntaxNode | undefined {
 export function moveUp(
     state: Readonly<EditorState>,
     _editor: TextEditor,
-    _edit: TextEditorEdit,
-    args?: { force?: boolean }
+    _edit: TextEditorEdit
 ): EditorStateChange {
     return {
-        currentNode: nodeAbove(state.currentNode, args?.force),
+        currentNode: nodeAbove(state.currentNode),
     }
 }
 
 export function moveDown(
     state: Readonly<EditorState>,
     _editor: TextEditor,
-    _edit: TextEditorEdit,
-    args?: { force?: boolean }
+    _edit: TextEditorEdit
 ): EditorStateChange {
     return {
-        currentNode: nodeBelow(state.currentNode, args?.force),
+        currentNode: nodeBelow(state.currentNode),
     }
 }
 
