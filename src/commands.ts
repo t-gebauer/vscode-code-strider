@@ -51,6 +51,8 @@ export function commandsForLanguage(languageDefinition: LanguageDefinition) {
 
 export async function insertOnNewLine(state: Readonly<EditorState>, textEditor: TextEditor, editBuilder: TextEditorEdit, args: { before?: true }): Promise<EditorStateChange> {
     if (args && args.before) {
+        const firstLine = toPosition(state.currentNode.startPosition)
+        textEditor.selection = new Selection(firstLine, firstLine)
         vscode.commands.executeCommand('editor.action.insertLineBefore')
     } else {
         vscode.commands.executeCommand('editor.action.insertLineAfter')

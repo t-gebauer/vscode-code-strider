@@ -255,6 +255,7 @@ export class Extension implements Disposable {
         fundefined?: (state: undefined, ...args: T) => Promise<void> | unknown | undefined
     ): (...args: T) => Promise<void>{
         return async (...rest) => {
+            logger.context('State changing event: ' + fdefined.name)
             if (this.activeEditorState) {
                 const readonlyState = Object.freeze({ ...this.activeEditorState })
                 const change = await fdefined(readonlyState, ...rest)
