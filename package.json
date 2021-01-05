@@ -20,6 +20,7 @@
         "onLanguage:fennel",
         "onLanguage:html",
         "onLanguage:java",
+        "onLanguage:kotlin",
         "onLanguage:javascript",
         "onLanguage:json",
         "onLanguage:markdown",
@@ -147,6 +148,11 @@
                 "id": "nix",
                 "extensions": [".nix"],
                 "aliases": ["Nix"]
+            },
+            {
+                "id": "kotlin",
+                "extensions": [".kt"],
+                "aliases": ["Kotlin"]
             }
         ]
     },

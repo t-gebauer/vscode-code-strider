@@ -21,6 +21,7 @@ const languages: Map<string, LanguageDefinition> = new Map(
         defineLanguage("fennel"),
         defineLanguage("html"),
         defineLanguage("java"),
+        defineLanguage("kotlin"),
         javaScript,
         // TODO: VSCode maps some json files to "jsonc" - JSON with comments.
         //       The normal "json" grammar should suffice. Even though the

@@ -49,6 +49,8 @@ in symlinkJoin {
     (officialGrammar "json")
     (officialGrammar "python")
     (grammar "clojure" "https://github.com/sogaiu/tree-sitter-clojure")
+    # TODO: Kotlin build takes very long (and lots of RAM: 12 GB virtual, 6,5 GB physical)
+    # (grammar "kotlin" "https://github.com/fwcd/tree-sitter-kotlin")
     (grammar "fennel" "https://github.com/travonted/tree-sitter-fennel")
     (grammar "markdown" "https://github.com/ikatyang/tree-sitter-markdown")
     (grammar "nix" "https://github.com/cstrahan/tree-sitter-nix")
