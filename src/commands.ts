@@ -1,14 +1,15 @@
 import * as vscode from "vscode"
 import { Selection, TextEditor, TextEditorEdit } from "vscode"
+import { SyntaxNode } from "web-tree-sitter"
 import { EditorState } from "./editor-state"
-import { EditorStateChange } from "./extension"
+import { EditorStateChange, logger } from "./extension"
 import {
     CommandName,
     LanguageDefinition,
     NodeAccessorFunction,
 } from "./language/language-definition"
 import { Languages } from "./language/language-support"
-import { toPosition } from "./utilities/conversion-utilities"
+import { toPosition, toRange } from "./utilities/conversion-utilities"
 import { findNodeAtSelection } from "./utilities/tree-utilities"
 
 export type CommandFunction = (editor: Readonly<EditorState>) => EditorStateChange | undefined
@@ -49,13 +50,18 @@ export function commandsForLanguage(languageDefinition: LanguageDefinition) {
     }
 }
 
-export async function insertOnNewLine(state: Readonly<EditorState>, textEditor: TextEditor, editBuilder: TextEditorEdit, args: { before?: true }): Promise<EditorStateChange> {
+export async function insertOnNewLine(
+    state: Readonly<EditorState>,
+    textEditor: TextEditor,
+    _editBuilder: TextEditorEdit,
+    args: { before?: true }
+): Promise<EditorStateChange> {
     if (args && args.before) {
         const firstLine = toPosition(state.currentNode.startPosition)
         textEditor.selection = new Selection(firstLine, firstLine)
-        vscode.commands.executeCommand('editor.action.insertLineBefore')
+        vscode.commands.executeCommand("editor.action.insertLineBefore")
     } else {
-        vscode.commands.executeCommand('editor.action.insertLineAfter')
+        vscode.commands.executeCommand("editor.action.insertLineAfter")
     }
     return {
         insertMode: true,
@@ -63,7 +69,7 @@ export async function insertOnNewLine(state: Readonly<EditorState>, textEditor: 
 }
 
 export function deleteAndInsert(_: Readonly<EditorState>): EditorStateChange {
-    vscode.commands.executeCommand('deleteLeft');
+    vscode.commands.executeCommand("deleteLeft")
     return {
         insertMode: true,
     }
@@ -110,9 +116,11 @@ export function backToPreviousSelection(_: Readonly<EditorState>): EditorStateCh
 export function followStructure(state: Readonly<EditorState>): EditorStateChange {
     const langDefinition = Languages.getDefinition(state.editor.document.languageId)
     const langOverride = Languages.getOverrideFor(langDefinition, "firstChild", state.currentNode)
-    const nextNode = langOverride
-        ? langOverride(state.currentNode)
-        : state.currentNode.firstNamedChild
+    let nextNode: SyntaxNode | null | undefined = state.currentNode
+    do {
+        logger.log("next node!")
+        nextNode = langOverride ? langOverride(nextNode) : nextNode.firstNamedChild
+    } while (nextNode && toRange(nextNode).isEqual(toRange(state.currentNode)))
     return {
         currentNode: nextNode || undefined,
     }

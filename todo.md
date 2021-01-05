@@ -1,14 +1,14 @@
 # Prioritized
-- automatically skip nodes which take the same space
+- different commands: first child/last child and follow flow
+  "follow flow" should go inside AND to the next line while, first child probably stays on the line
 - generally don't select empty nodes? (*looking at html*)
-- directional movement (similar to find-node-at-selection, but instead of starting at the root node, we can start at the current-node: search forward, search backward?)
-- improve javascript outwards movement
-- add Python
-- add HTML rules
+- improve javascript outwards movement (consider removing most JS specifics and implement them language agnostic)
+  Only define "blocks" per language?
 - slurping
 - barfing
 - move node around (a minor mode?)
 - delete current node, including separators
+- add HTML rules
 
 # Bugs
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true)))

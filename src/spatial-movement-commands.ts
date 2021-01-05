@@ -109,21 +109,13 @@ export function nodeRightOf(node: SyntaxNode): SyntaxNode | undefined {
     return nodeRightOf(other)
 }
 
-export function moveUp(
-    state: Readonly<EditorState>,
-    _editor: TextEditor,
-    _edit: TextEditorEdit
-): EditorStateChange {
+export function moveUp(state: Readonly<EditorState>): EditorStateChange {
     return {
         currentNode: nodeAbove(state.currentNode),
     }
 }
 
-export function moveDown(
-    state: Readonly<EditorState>,
-    _editor: TextEditor,
-    _edit: TextEditorEdit
-): EditorStateChange {
+export function moveDown(state: Readonly<EditorState>): EditorStateChange {
     return {
         currentNode: nodeBelow(state.currentNode),
     }
