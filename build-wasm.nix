@@ -2,18 +2,21 @@ with import <nixpkgs> { };
 let
   mkTreeSitterGrammar = { id, src, preBuild ? "" }:
     runCommand "tree-sitter-${id}-latest" { inherit src; } ''
+      mkdir $out
       mkdir home
       export HOME=$PWD/home
 
       cp -r $src/* .
       chmod -R 777 .
 
+      test -e LICENSE && cp LICENSE $out/tree-sitter-${id}.LICENSE
+      test -e COPYING.txt && cp COPYING.txt $out/tree-sitter-${id}.COPYING.txt
+
       ${preBuild}
 
       PATH=$PATH:${pkgs.emscripten}/bin
       ${pkgs.tree-sitter}/bin/tree-sitter build-wasm
 
-      mkdir $out
       cp *.wasm $out/
     '';
 
@@ -38,11 +41,18 @@ let
 in symlinkJoin {
   name = "tree-sitter-wasm-builds-combined";
   paths = [
+    (officialGrammar "c")
+    (officialGrammar "css")
+    (officialGrammar "html")
+    (officialGrammar "java")
+    (officialGrammar "javascript")
+    (officialGrammar "json")
+    (officialGrammar "python")
     (grammar "clojure" "https://github.com/sogaiu/tree-sitter-clojure")
     (grammar "fennel" "https://github.com/travonted/tree-sitter-fennel")
-    (officialGrammar "html")
-    (officialGrammar "javascript")
-    (officialGrammar "python")
+    (grammar "markdown" "https://github.com/ikatyang/tree-sitter-markdown")
+    (grammar "nix" "https://github.com/cstrahan/tree-sitter-nix")
+    # (grammar "yaml" "https://github.com/ikatyang/tree-sitter-yaml") TODO: build fails
     (mkTreeSitterGrammar {
       id = "typescript";
       src = typescriptRepo;

@@ -1,4 +1,5 @@
 # Prioritized
+- option to disable the extension
 - different commands: first child/last child and follow flow
   "follow flow" should go inside AND to the next line while, first child probably stays on the line
 - generally don't select empty nodes? (*looking at html*)
@@ -8,21 +9,18 @@
 - barfing
 - move node around (a minor mode?)
 - delete current node, including separators
-- add HTML rules
 
 # Bugs
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true)))
 
 # More
-- select multiple nodes at once
+- add an option to disable specific languages
+- select multiple nodes at once (maybe just two, and everything between?)
 - undo complete edits
 - config + hotkeys
     - Toggle extension on/off
 - Select node(s) in AST view
-- add YAML
-- add TypeScript
 - add Kotlin
-- add CSS
 - go to first/last sibling (in the current node)
 - selection: mark current node, select everything between current and last mark
 - surround object with ?, brackets, quote marks, etc.
@@ -61,8 +59,7 @@ It's hard enough to build a solution that works for one language. Yes, sure, tre
 
 # Open questions
 
-How to navigate efficiently over lots of one line statements? We do not want to navigate line-by-line.
-
+How to navigate efficiently over lots of one line statements? We do not want to navigate line-by-line. Ace jump?
 
 Show ast in tree-view sidebar?
 

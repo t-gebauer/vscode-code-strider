@@ -14,11 +14,17 @@
     },
     "categories": ["Other"],
     "activationEvents": [
+        "onLanguage:c",
         "onLanguage:clojure",
+        "onLanguage:css",
         "onLanguage:fennel",
         "onLanguage:html",
-        "onLanguage:python",
+        "onLanguage:java",
         "onLanguage:javascript",
+        "onLanguage:json",
+        "onLanguage:markdown",
+        "onLanguage:nix",
+        "onLanguage:python",
         "onLanguage:typescript"
     ],
     "main": "./dist/extension.js",
@@ -136,6 +142,11 @@
                 "id": "fennel",
                 "extensions": [".fnl"],
                 "aliases": ["Fennel", "fnl"]
+            },
+            {
+                "id": "nix",
+                "extensions": [".nix"],
+                "aliases": ["Nix"]
             }
         ]
     },

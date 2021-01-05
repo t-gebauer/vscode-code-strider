@@ -61,6 +61,15 @@ export class Foo implements Bar {
             const result = nodeBelow(bazAssignement)
             expect(result).to.equal(undefined)
         })
+
+        // TODO: "below" and "above" should jump between functions in this code:
+		// server.start().then(function () {
+		// 	log.info('Pact Mock Server running on port: ' + server.options.port);
+		// 	// Remove current server from starting servers array
+		// 	startingServers = startingServers.filter(x => x !== server.options.port);
+		// }, function (err) {
+		// 	log.error('Error while trying to run karma-pact: ' + err);
+		// });
     })
 
     describe("find node above", () => {
