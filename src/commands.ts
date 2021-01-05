@@ -49,11 +49,12 @@ export function commandsForLanguage(languageDefinition: LanguageDefinition) {
     }
 }
 
-export async function insertOnNewLine(state: Readonly<EditorState>, textEditor: TextEditor, editBuilder: TextEditorEdit): Promise<EditorStateChange> {
-    const { editor, currentNode } = state
-    const line = editor.document.lineAt(currentNode.endPosition.row)
-    editor.selection = new Selection(line.range.end, line.range.end)
-    editBuilder.insert(line.range.end, '\n')
+export async function insertOnNewLine(state: Readonly<EditorState>, textEditor: TextEditor, editBuilder: TextEditorEdit, args: { before?: true }): Promise<EditorStateChange> {
+    if (args && args.before) {
+        vscode.commands.executeCommand('editor.action.insertLineBefore')
+    } else {
+        vscode.commands.executeCommand('editor.action.insertLineAfter')
+    }
     return {
         insertMode: true,
     }
