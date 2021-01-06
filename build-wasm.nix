@@ -52,6 +52,7 @@ in symlinkJoin {
     (grammar "fennel" "https://github.com/travonted/tree-sitter-fennel")
     (grammar "markdown" "https://github.com/ikatyang/tree-sitter-markdown")
     (grammar "nix" "https://github.com/cstrahan/tree-sitter-nix")
+    (grammar "scss" "https://github.com/serenadeai/tree-sitter-scss")
     # (grammar "yaml" "https://github.com/ikatyang/tree-sitter-yaml") TODO: build fails
     (mkTreeSitterGrammar {
       id = "typescript";

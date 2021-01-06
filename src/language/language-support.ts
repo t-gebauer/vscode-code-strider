@@ -30,6 +30,7 @@ const languages: Map<string, LanguageDefinition> = new Map(
         defineLanguage("markdown"),
         defineLanguage("nix"),
         python,
+        defineLanguage("scss"),
         defineLanguage("typescript"),
     ].map((def: LanguageDefinition) => [def.languageId, def])
 )

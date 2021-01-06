@@ -1,5 +1,5 @@
-# Prioritized
-- option to disable the extension
+# Prioritized for v1.0
+- Toggle extension on/off
 - different commands: first child/last child and follow flow
   "follow flow" should go inside AND to the next line while, first child probably stays on the line
 - generally don't select empty nodes? (*looking at html*)
@@ -12,31 +12,49 @@
 
 # Bugs
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true)))
-
-# More
-- add an option to disable specific languages
-- select multiple nodes at once (maybe just two, and everything between?)
-- undo complete edits
-- config + hotkeys
-    - Toggle extension on/off
-- Select node(s) in AST view
-- add Kotlin
-- go to first/last sibling (in the current node)
-- selection: mark current node, select everything between current and last mark
-- surround object with ?, brackets, quote marks, etc.
-
-- always show start and end of selection => fold center to fit the complete selection into view
-
-- remove not-really-needed testing library: soft-assert?
-
-- improve editor scrolling. 
 - "move right" should not select parent
 - switching files should not scroll to top! (and generally, be less buggy ;))
+- decorations are initially not visible!
+
+# More ideas
+- "delete" should delete lines if there is nothing else on the line (maybe a different delete command?)
+- key:x "select node starting on line"?
+- select multiple nodes at once (maybe just two, and everything between?)
+- formatting
+  - format node
+  - indent node
+  - add line above/below
+- multi-cursors
+  - add cursors before/behind all child nodes (or all selected nodes)
+- undo complete edits (ideavim still doesn't do that, do they have a good reason?)
+- config + hotkeys
+  - add an option to disable specific languages
+- Select node(s) in AST view
+- add Kotlin (grammar exists, but wasm-build is slow)
+- go to first/last sibling (in the current node)
+- selection: mark current node, select everything between current and last mark
+- surround object with ? (brackets, quote marks, etc.)
+- always show start and end of selection => fold center to fit the complete selection into view
+- remove not-really-needed testing library: soft-assert?
+- improve editor scrolling.
 - implement "raise"
 - implement "ace jump" to nth-child
-- "delete" should delete lines if there is nothing else on the line
-- bug: decorations are initially not visible!
-- key:x "select node starting on line"?
+
+- (always) should node numbers in the gutter (like line numbers)
+  - jump to node by number
+
+- everything else that VIM can do:
+  - marks
+  - go to line / beginning / end of file
+  - split / merge line
+
+- ace jump everywhere
+  - direct child nodes
+  - any child nodes
+  - inside a node and insert
+
+- shortcuts during insert mode
+  - jump to beginning/end of (previous) node
 
 # Details
 

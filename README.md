@@ -43,7 +43,13 @@ cp ./result/*.wasm ./wasm
 
 ## Known Issues
 
-Some :)
+- when switching files:
+  - an error message pops up "Invalid state: no compatible editor active"
+  - the first node in the file gets selected
+
+### AST Viewer
+
+The AST viewer does not update during insert mode for performance reasons.
 
 ## Release Notes
 

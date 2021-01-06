@@ -25,6 +25,7 @@
         "onLanguage:markdown",
         "onLanguage:nix",
         "onLanguage:python",
+        "onLanguage:scss",
         "onLanguage:typescript"
     ],
     "main": "./dist/extension.js",
