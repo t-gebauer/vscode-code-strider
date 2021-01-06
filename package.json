@@ -76,6 +76,21 @@
                 "when": "editorTextFocus && !suggestWidgetVisible && code-strider:is-editor-active && code-strider:is-insert-mode"
             },
             {
+                "command": "code-strider:insert-before",
+                "key": "i",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:insert-after",
+                "key": "a",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:delete-and-insert",
+                "key": "c",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
                 "command": "code-strider:tree-move-previous-sibling",
                 "key": "alt+k",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"

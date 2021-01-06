@@ -16,8 +16,11 @@ import {
 import { AstViewer } from "./ast-view"
 import {
     backToPreviousSelection,
+    deleteAndInsert,
     exitInsertMode,
     followStructure,
+    insertAfter,
+    insertBefore,
     insertOnNewLine,
     undoEdit,
 } from "./commands"
@@ -82,7 +85,10 @@ export async function activate(context: ExtensionContext) {
     }
 
     registerCommandWithState("exit-insert-mode", exitInsertMode)
+    registerCommandWithState("insert-before", insertBefore)
+    registerCommandWithState("insert-after", insertAfter)
     registerCommandWithState("insert-on-new-line", insertOnNewLine)
+    registerCommandWithState("delete-and-insert", deleteAndInsert)
     registerCommandWithState("back-to-previous-selection", backToPreviousSelection)
     registerCommandWithState("undo-edit", undoEdit)
     registerCommandWithState("follow-structure", followStructure)
