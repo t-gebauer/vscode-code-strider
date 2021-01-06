@@ -1,5 +1,4 @@
 # Prioritized for v1.0
-- Toggle extension on/off
 - different commands: first child/last child and follow flow
   "follow flow" should go inside AND to the next line while, first child probably stays on the line
 - generally don't select empty nodes? (*looking at html*)
@@ -13,7 +12,6 @@
 # Bugs
 - parse tree gets out of sync after some edits?
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true)))
-- "move right" should not select parent
 - switching files should not scroll to top! (and generally, be less buggy ;))
 - decorations are initially not visible!
 
@@ -58,6 +56,11 @@
 
 - shortcuts during insert mode
   - jump to beginning/end of (previous) node
+
+# Rejected ideas (for now)
+- Toggle extension on/off: Why? VS Code can already enable and disable the extension (globally, per workspace).
+  Use "insert mode" instead. It already disables all commands and enables normal selection.
+  Better add an option to toggle specific languages.
 
 # Details
 

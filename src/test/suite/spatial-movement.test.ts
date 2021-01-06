@@ -113,10 +113,9 @@ export class Foo implements Bar {
             expect(result?.text).to.match(/^implements Bar$/)
         })
 
-        xit('should stay inside parent block', () => {
-            // TODO
+        it('should stay inside parent block', () => {
             const result = nodeRightOf(barDefinition)
-            expect(result).to.equal(barDefinition)
+            expect(result).to.equal(undefined)
         })
 
         it("should move inside parameter list", () => {
@@ -126,12 +125,11 @@ export class Foo implements Bar {
             expect(result?.text).to.equal('arg2: string | null')
         })
 
-        xit("should not move when already last parameter", () => {
-            // TODO
+        it("should not move when already last parameter", () => {
             const secondBarParameter = barDefinition.childForFieldName('parameters')?.firstNamedChild?.nextNamedSibling!
             expect(secondBarParameter?.text).to.equal('arg2: string | null')
             const result = nodeRightOf(secondBarParameter)
-            expect(result).to.equal(secondBarParameter)
+            expect(result).to.equal(undefined)
         })
     })
 })
