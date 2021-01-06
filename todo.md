@@ -11,6 +11,7 @@
 - delete current node, including separators
 
 # Bugs
+- parse tree gets out of sync after some edits?
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true)))
 - "move right" should not select parent
 - switching files should not scroll to top! (and generally, be less buggy ;))
@@ -31,7 +32,7 @@
   - add an option to disable specific languages
 - Select node(s) in AST view
 - add Kotlin (grammar exists, but wasm-build is slow)
-- go to first/last sibling (in the current node)
+- go to first/last sibling (in the current node) (note: this is already possible with one more key: "parent->first-child" or "parent->last-child")
 - selection: mark current node, select everything between current and last mark
 - surround object with ? (brackets, quote marks, etc.)
 - always show start and end of selection => fold center to fit the complete selection into view
@@ -39,6 +40,8 @@
 - improve editor scrolling.
 - implement "raise"
 - implement "ace jump" to nth-child
+- highlight errors
+- force the user to fix errors before leaving insert mode (how would that work if the file already has errors prior to opening?)
 
 - (always) should node numbers in the gutter (like line numbers)
   - jump to node by number

@@ -76,12 +76,12 @@
                 "when": "editorTextFocus && !suggestWidgetVisible && code-strider:is-editor-active && code-strider:is-insert-mode"
             },
             {
-                "command": "code-strider:tree-move-previous",
+                "command": "code-strider:tree-move-previous-sibling",
                 "key": "alt+k",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {
-                "command": "code-strider:tree-move-next",
+                "command": "code-strider:tree-move-next-sibling",
                 "key": "alt+j",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },

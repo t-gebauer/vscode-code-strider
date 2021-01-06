@@ -8,12 +8,19 @@ import {
     TextDocument,
     TextDocumentChangeEvent,
     TextEditor,
+    TextEditorEdit,
     TextEditorSelectionChangeEvent,
     window,
     workspace,
 } from "vscode"
 import { AstViewer } from "./ast-view"
-import { backToPreviousSelection, exitInsertMode, followStructure, insertOnNewLine, undoEdit } from "./commands"
+import {
+    backToPreviousSelection,
+    exitInsertMode,
+    followStructure,
+    insertOnNewLine,
+    undoEdit,
+} from "./commands"
 import { EditorState } from "./editor-state"
 import { interceptTypeCommand } from "./intercept-typing"
 import { Languages } from "./language/language-support"
@@ -42,7 +49,49 @@ export async function activate(context: ExtensionContext) {
     const ext = new Extension(treeSitter)
     await ext.registerEventHandlers()
 
+    function registerCommandWithState(
+        id: string,
+        callback: (
+            state: Readonly<EditorState>,
+            textEditor: TextEditor,
+            edit: TextEditorEdit,
+            ...args: any[]
+        ) => Promise<EditorStateChange> | EditorStateChange | undefined
+    ) {
+        context.subscriptions.push(
+            commands.registerTextEditorCommand("code-strider:" + id, ext.withState(callback))
+        )
+    }
+
+    registerCommandWithState("exit-insert-mode", exitInsertMode)
+    registerCommandWithState("insert-on-new-line", insertOnNewLine)
+    registerCommandWithState("back-to-previous-selection", backToPreviousSelection)
+    registerCommandWithState("undo-edit", undoEdit)
+    registerCommandWithState("follow-structure", followStructure)
+    // direct tree movement commands
+    registerCommandWithState("tree-move-previous-sibling", (state) => ({
+        currentNode: state.currentNode.previousNamedSibling || undefined,
+    }))
+    registerCommandWithState("tree-move-next-sibling", (state) => ({
+        currentNode: state.currentNode.nextNamedSibling || undefined,
+    }))
+    registerCommandWithState("tree-move-parent", (state) => ({
+        currentNode: state.currentNode.parent || undefined,
+    }))
+    registerCommandWithState("tree-move-first-child", (state) => ({
+        currentNode: state.currentNode.firstNamedChild || undefined,
+    }))
+    registerCommandWithState("tree-move-last-child", (state) => ({
+        currentNode: state.currentNode.lastNamedChild || undefined,
+    }))
+    // spatial movement commands
+    registerCommandWithState("move-up", moveUp)
+    registerCommandWithState("move-down", moveDown)
+    registerCommandWithState("move-left", moveLeft)
+    registerCommandWithState("move-right", moveRight)
+
     context.subscriptions.push(
+        outputChannelLogger,
         registerStatusBar(ext),
         registerDecorationHandler(ext),
         commands.registerTextEditorCommand(
@@ -50,65 +99,12 @@ export async function activate(context: ExtensionContext) {
             ext.withState(interceptTypeCommand, interceptTypeCommand)
         ),
         commands.registerTextEditorCommand(
-            "code-strider:exit-insert-mode",
-            ext.withState(exitInsertMode)
-        ),
-        commands.registerTextEditorCommand(
-            "code-strider:insert-on-new-line",
-            ext.withState(insertOnNewLine)
-        ),
-        ext,
-        outputChannelLogger,
-        commands.registerTextEditorCommand(
             "code-strider:toggle-ast-viewer",
             ext.toggleAstViewer.bind(ext)
         ),
         commands.registerTextEditorCommand("code-strider:show-log", () =>
             logger.show ? logger.show() : undefined
-        ),
-        commands.registerTextEditorCommand(
-            "code-strider:back-to-previous-selection",
-            ext.withState(backToPreviousSelection)
-        ),
-        commands.registerTextEditorCommand("code-strider:undo-edit", ext.withState(undoEdit)),
-        commands.registerTextEditorCommand(
-            "code-strider:follow-structure",
-            ext.withState(followStructure)
-        ),
-        // (direct) tree movement commands
-        commands.registerTextEditorCommand(
-            "code-strider:tree-move-previous",
-            ext.withState((state) => ({
-                currentNode: state.currentNode.previousNamedSibling || undefined,
-            }))
-        ),
-        commands.registerTextEditorCommand(
-            "code-strider:tree-move-next",
-            ext.withState((state) => ({
-                currentNode: state.currentNode.nextNamedSibling || undefined,
-            }))
-        ),
-        commands.registerTextEditorCommand(
-            "code-strider:tree-move-parent",
-            ext.withState((state) => ({ currentNode: state.currentNode.parent || undefined }))
-        ),
-        commands.registerTextEditorCommand(
-            "code-strider:tree-move-first-child",
-            ext.withState((state) => ({
-                currentNode: state.currentNode.firstNamedChild || undefined,
-            }))
-        ),
-        commands.registerTextEditorCommand(
-            "code-strider:tree-move-last-child",
-            ext.withState((state) => ({
-                currentNode: state.currentNode.lastNamedChild || undefined,
-            }))
-        ),
-        // spatial movement commands
-        commands.registerTextEditorCommand("code-strider:move-up", ext.withState(moveUp)),
-        commands.registerTextEditorCommand("code-strider:move-down", ext.withState(moveDown)),
-        commands.registerTextEditorCommand("code-strider:move-left", ext.withState(moveLeft)),
-        commands.registerTextEditorCommand("code-strider:move-right", ext.withState(moveRight))
+        )
     )
 }
 
@@ -253,9 +249,9 @@ export class Extension implements Disposable {
     withState<T extends readonly unknown[], U extends EditorStateChange>(
         fdefined: (state: Readonly<EditorState>, ...args: T) => Promise<U> | U | undefined,
         fundefined?: (state: undefined, ...args: T) => Promise<void> | unknown | undefined
-    ): (...args: T) => Promise<void>{
+    ): (...args: T) => Promise<void> {
         return async (...rest) => {
-            logger.context('State changing event: ' + fdefined.name)
+            logger.context("State changing event: " + fdefined.name)
             if (this.activeEditorState) {
                 const readonlyState = Object.freeze({ ...this.activeEditorState })
                 const change = await fdefined(readonlyState, ...rest)
