@@ -47,7 +47,25 @@ export async function activate(context: ExtensionContext) {
     await treeSitter.initialize()
 
     const ext = new Extension(treeSitter)
-    await ext.registerEventHandlers()
+    ext.registerEventHandlers()
+
+    context.subscriptions.push(
+        ext,
+        outputChannelLogger,
+        registerStatusBar(ext),
+        registerDecorationHandler(ext),
+        commands.registerTextEditorCommand(
+            "type",
+            ext.withState(interceptTypeCommand, interceptTypeCommand)
+        ),
+        commands.registerTextEditorCommand(
+            "code-strider:toggle-ast-viewer",
+            ext.toggleAstViewer.bind(ext)
+        ),
+        commands.registerTextEditorCommand("code-strider:show-log", () =>
+            logger.show ? logger.show() : undefined
+        )
+    )
 
     function registerCommandWithState(
         id: string,
@@ -90,22 +108,8 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("move-left", moveLeft)
     registerCommandWithState("move-right", moveRight)
 
-    context.subscriptions.push(
-        outputChannelLogger,
-        registerStatusBar(ext),
-        registerDecorationHandler(ext),
-        commands.registerTextEditorCommand(
-            "type",
-            ext.withState(interceptTypeCommand, interceptTypeCommand)
-        ),
-        commands.registerTextEditorCommand(
-            "code-strider:toggle-ast-viewer",
-            ext.toggleAstViewer.bind(ext)
-        ),
-        commands.registerTextEditorCommand("code-strider:show-log", () =>
-            logger.show ? logger.show() : undefined
-        )
-    )
+    logger.log("... fully activated.")
+    ext.handleChangeActiveTextEditor(window.activeTextEditor)
 }
 
 // Called by VS Code. But, nothing to do here for now, everything should have been added to
@@ -140,8 +144,7 @@ export class Extension implements Disposable {
 
     constructor(private readonly treeSitter: TreeSitter) {}
 
-    async registerEventHandlers() {
-        await this.handleChangeActiveTextEditor(window.activeTextEditor)
+    registerEventHandlers() {
         this.subscriptions.push(
             window.onDidChangeActiveTextEditor(this.handleChangeActiveTextEditor.bind(this)),
             window.onDidChangeTextEditorSelection(this.handleChangeTextEditorSelection.bind(this)),
@@ -166,7 +169,7 @@ export class Extension implements Disposable {
         Disposable.from(...this.subscriptions, this.activeEditorStateChange).dispose()
     }
 
-    private async handleChangeActiveTextEditor(editor: TextEditor | undefined) {
+    async handleChangeActiveTextEditor(editor: TextEditor | undefined) {
         logger.context("Event: changed ActiveTextEditor")
         const state = editor ? await this.getOrInitializeEditorState(editor) : undefined
         this.activeEditorState = state
@@ -214,10 +217,11 @@ export class Extension implements Disposable {
         return state
     }
 
-    private updateActiveEditorState(change: EditorStateChange) {
+    private changeActiveEditorState(change: EditorStateChange) {
+        // TODO: is it possible that the `change` belongs to another previous editor state?
         const activeState = this.activeEditorState
         if (!activeState) {
-            window.showErrorMessage("Invalid state: no compatible editor active")
+            logger.log("WARNING: inconsistent state: no editor active")
             return
         }
         const currentNode = activeState.currentNode
@@ -256,7 +260,7 @@ export class Extension implements Disposable {
                 const readonlyState = Object.freeze({ ...this.activeEditorState })
                 const change = await fdefined(readonlyState, ...rest)
                 if (change !== undefined) {
-                    this.updateActiveEditorState(change)
+                    this.changeActiveEditorState(change)
                 }
             } else if (fundefined) {
                 await fundefined(undefined, ...rest)
@@ -299,11 +303,12 @@ export class Extension implements Disposable {
         }
 
         const timeBefore = Date.now()
+        // Is the selection just a single character?
         const currentNode = selection.start.isEqual(selection.end)
             ? findNodeBeforeCursor(state.parseTree, selection.start)
             : findNodeAtSelection(state.parseTree, selection)
         logger.log(`finding matching node at selection (took ${Date.now() - timeBefore} ms)`)
-        this.updateActiveEditorState({ currentNode })
+        this.changeActiveEditorState({ currentNode })
     }
 
     // State per open file (parse tree caching, incremental parsing)
