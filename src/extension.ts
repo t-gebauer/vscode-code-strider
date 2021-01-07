@@ -18,10 +18,10 @@ import {
     backToPreviousSelection,
     deleteAndInsert,
     exitInsertMode,
-    followStructure,
     insertAfter,
     insertBefore,
     insertOnNewLine,
+    mkFollowStructure,
     undoEdit,
 } from "./commands"
 import { EditorState } from "./editor-state"
@@ -91,7 +91,8 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("delete-and-insert", deleteAndInsert)
     registerCommandWithState("back-to-previous-selection", backToPreviousSelection)
     registerCommandWithState("undo-edit", undoEdit)
-    registerCommandWithState("follow-structure", followStructure)
+    registerCommandWithState("follow-structure", mkFollowStructure(true))
+    registerCommandWithState("follow-structure-last", mkFollowStructure(false))
     // direct tree movement commands
     registerCommandWithState("tree-move-previous-sibling", (state) => ({
         currentNode: state.currentNode.previousNamedSibling || undefined,

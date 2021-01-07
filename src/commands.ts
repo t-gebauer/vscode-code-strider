@@ -3,52 +3,8 @@ import { Selection, TextEditor, TextEditorEdit } from "vscode"
 import { SyntaxNode } from "web-tree-sitter"
 import { EditorState } from "./editor-state"
 import { EditorStateChange, logger } from "./extension"
-import {
-    CommandName,
-    LanguageDefinition,
-    NodeAccessorFunction,
-} from "./language/language-definition"
-import { Languages } from "./language/language-support"
 import { toPosition, toRange } from "./utilities/conversion-utilities"
 import { findNodeAtSelection } from "./utilities/tree-utilities"
-
-export type CommandFunction = (editor: Readonly<EditorState>) => EditorStateChange | undefined
-
-function movementCommand(selectNext: NodeAccessorFunction): CommandFunction {
-    return (state: Readonly<EditorState>): EditorStateChange | undefined => {
-        const next = selectNext(state.currentNode)
-        if (next) {
-            return { currentNode: next }
-        }
-    }
-}
-
-export function commandsForLanguage(languageDefinition: LanguageDefinition) {
-    function withOverride(
-        commandName: CommandName,
-        defaultFunction: NodeAccessorFunction
-    ): NodeAccessorFunction {
-        return (node) => {
-            const overrideFun = Languages.getOverrideFor(languageDefinition, commandName, node)
-            if (overrideFun) {
-                return overrideFun(node)
-            }
-            return defaultFunction(node)
-        }
-    }
-
-    return {
-        gotoParent: movementCommand(withOverride("gotoParent", (node) => node.parent)),
-        gotoFirstChild: movementCommand(withOverride("firstChild", (node) => node.firstNamedChild)),
-        gotoLastChild: movementCommand(withOverride("lastChild", (node) => node.lastNamedChild)),
-        gotoNextSibling: movementCommand(
-            withOverride("nextSibling", (node) => node.nextNamedSibling)
-        ),
-        gotoPreviousSibling: movementCommand(
-            withOverride("previousSibling", (node) => node.previousNamedSibling)
-        ),
-    }
-}
 
 export async function insertOnNewLine(
     state: Readonly<EditorState>,
@@ -111,16 +67,16 @@ export function backToPreviousSelection(_: Readonly<EditorState>): EditorStateCh
     }
 }
 
-// "go inside" the currently selected node, often the same as "first-child"
-export function followStructure(state: Readonly<EditorState>): EditorStateChange {
-    const langDefinition = Languages.getDefinition(state.editor.document.languageId)
-    const langOverride = Languages.getOverrideFor(langDefinition, "firstChild", state.currentNode)
-    let nextNode: SyntaxNode | null | undefined = state.currentNode
-    do {
-        logger.log("next node!")
-        nextNode = langOverride ? langOverride(nextNode) : nextNode.firstNamedChild
-    } while (nextNode && toRange(nextNode).isEqual(toRange(state.currentNode)))
-    return {
-        currentNode: nextNode || undefined,
+// "go inside" the currently selected node. Smart version of "first-child".
+export function mkFollowStructure(forward = true) {
+    return function followStructure(state: Readonly<EditorState>): EditorStateChange {
+        let nextNode: SyntaxNode | null | undefined = state.currentNode
+        do {
+            logger.log("next node!")
+            nextNode = forward ? nextNode.firstNamedChild : nextNode.lastNamedChild
+        } while (nextNode && toRange(nextNode).isEqual(toRange(state.currentNode)))
+        return {
+            currentNode: nextNode || undefined,
+        }
     }
 }

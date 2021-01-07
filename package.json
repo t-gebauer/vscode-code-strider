@@ -162,6 +162,16 @@
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {
+                "command": "code-strider:follow-structure-last",
+                "key": "shift+f",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:tree-move-parent",
+                "key": "g",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
                 "command": "code-strider:insert-on-new-line",
                 "key": "o",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"

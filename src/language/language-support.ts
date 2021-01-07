@@ -1,12 +1,7 @@
-import { SyntaxNode } from "web-tree-sitter"
 import {
     defineLanguage,
-    RuleExecutor,
     LanguageDefinition,
-    NodeAccessorFunction,
 } from "./language-definition"
-import { javaScript } from "./languages/language-javascript"
-import { python } from "./languages/language-python"
 
 // All supported languages must be listed here. A minimal definition simply declares that the language is supported.
 // The language ids have to match VS Codes internal language ids.
@@ -21,7 +16,7 @@ const languages: Map<string, LanguageDefinition> = new Map(
         defineLanguage("fennel"),
         defineLanguage("html"),
         defineLanguage("java"),
-        javaScript,
+        defineLanguage("javascript"),
         // TODO: VSCode maps some json files to "jsonc" - JSON with comments.
         //       The normal "json" grammar should suffice. Even though the
         //       comments would be labeled as ERROR.
@@ -29,7 +24,7 @@ const languages: Map<string, LanguageDefinition> = new Map(
         // TODO: ignore / don't select "soft_line_break"s
         defineLanguage("markdown"),
         defineLanguage("nix"),
-        python,
+        defineLanguage("python"),
         defineLanguage("scss"),
         defineLanguage("typescript"),
     ].map((def: LanguageDefinition) => [def.languageId, def])
@@ -50,24 +45,5 @@ export namespace Languages {
             throw new Error(`Missing language definition: ${languageId}`)
         }
         return def
-    }
-
-    export function getOverrideFor(
-        languageDefinition: LanguageDefinition,
-        command: keyof RuleExecutor,
-        node: SyntaxNode
-    ): NodeAccessorFunction | undefined {
-        const firstMatchingRule = languageDefinition.rules.find(([matcher, executor]) => {
-            return (
-                executor[command] &&
-                (!matcher.selected || matcher.selected === node.type) &&
-                (!matcher.parent || matcher.parent === node.parent?.type)
-            )
-        })
-        if (firstMatchingRule) {
-            const [, executor] = firstMatchingRule
-            return executor[command]
-        }
-        return undefined
     }
 }

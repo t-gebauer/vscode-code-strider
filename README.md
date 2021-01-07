@@ -26,16 +26,7 @@ No dependencies. This extension uses *wasm* builds of `tree-sitter`, thus no nat
 
 ## Extension Settings
 
-// TODO: explain configuration
-
-Include if your extension adds any VS Code settings through the `contributes.configuration` extension point.
-
-For example:
-
-This extension contributes the following settings:
-
-* `myExtension.enable`: enable/disable this extension
-* `myExtension.thing`: set to `blah` to do something
+Currently, there are no configurable settings.
 
 ## Contributions
 
@@ -52,7 +43,7 @@ cp ./result/*.wasm ./wasm/
 
 ## Known Issues
 
-- there is a style collision between the custom selection decoratior and the default text selection decorators:
+- there is a style collision between the custom selection decorator and the default text selection decorators:
   - line-breaks highlighted/selected in the current node
   - the default cursor is still visible (it has no meaning in the structured navigation mode)
 
@@ -60,8 +51,9 @@ cp ./result/*.wasm ./wasm/
   - an error message pops up "Invalid state: no compatible editor active"
   - the first node in the file gets selected
 
-- The extension does not initialize when changing the language mode of a file.
-  You have to switch to another editor and back to initialize the parser.
+- The extension does not (re-)initialize when changing the language mode of a file.
+  It is necessary to switch to another editor and back to detect the language change.
+
 ### AST Viewer
 
 For performance reasons the AST viewer does not update during insert mode.
