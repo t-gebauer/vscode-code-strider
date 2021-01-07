@@ -1,4 +1,6 @@
 # Prioritized for v1.0
+- !!!! selection is always 0 on active editor change!!!!
+- and the selection event WILL always fire afterwards!
 - slurping
 - barfing
 - move node around (a minor mode?)

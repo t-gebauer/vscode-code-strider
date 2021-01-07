@@ -119,8 +119,17 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("move-left", moveLeft)
     registerCommandWithState("move-right", moveRight)
 
-    logger.log("... activation complete.")
-    ext.handleChangeActiveTextEditor(window.activeTextEditor)
+    logger.log("... registration complete.")
+
+    // Reproduce initially missed events
+    const editor = window.activeTextEditor
+    // XXX: We should not `await` the returned promise here, because neither would vscode.
+    ext.handleChangeActiveTextEditor(editor)
+    if (editor) {
+        ext.handleChangeTextEditorSelection({ textEditor: editor, selections: editor.selections })
+    }
+
+    logger.log('... activation complete.')
 }
 
 // Called by VS Code. But, nothing to do here for now, everything should have been added to
@@ -180,18 +189,22 @@ export class Extension implements Disposable {
 
     async handleChangeActiveTextEditor(editor: TextEditor | undefined) {
         logger.context("Event: changed ActiveTextEditor " + (editor as any)?.id)
+        // XXX: Initially the `editor.selection` will always be " 0,0,0,0 ".
+        // We have to wait for the `onDidChangeTextEditorSelection` event which will always
+        // fire a few milliseconds later, restoring the selection.
+        // Is this a bug or a feature?
+        // TODO: do not do any heavy initialization here. (no async please)
+        // Just set some dummy values, so that we have an activeEditorState and can handle events.
         const state = editor && Languages.isSupported(editor.document.languageId) ? await this.createNewEditorState(editor) : undefined
         this.activeEditorState = state
         commands.executeCommand("setContext", "code-strider:is-editor-active", state !== undefined)
-        if (state) {
-            this.handleSelectedNodeChanged(state) // will also fire the state changed event
-        } else {
+        if (state === undefined) {
             this.activeEditorStateChange.fire(this.activeEditorState)
         }
         logger.log('change ActiveTextEditor: done')
     }
 
-    handleSelectedNodeChanged(state: EditorState) {
+    private handleSelectedNodeChanged(state: EditorState) {
         logger.log("handle selectedNode change")
         // Ensure that the complete node is selected
         const targetNodeSelection = toSelection(state.currentNode)
@@ -211,15 +224,14 @@ export class Extension implements Disposable {
     }
 
     private async createNewEditorState(editor: TextEditor): Promise<EditorState> {
-        const { document, selection } = editor
+        const { document } = editor
         logger.log("initializing new editor state")
         const parseTree = this.parseTrees.get(document) ?? (await this.parseTextDocument(document))
-        const initialNode = findNodeAtSelection(parseTree, selection)
 
         let state: EditorState = {
             editor,
             insertMode: false,
-            currentNode: initialNode,
+            currentNode: parseTree.rootNode,
             previousNodes: new Array(),
             parseTree,
         }
@@ -278,8 +290,10 @@ export class Extension implements Disposable {
         }
     }
 
-    private async handleChangeTextEditorSelection(event: TextEditorSelectionChangeEvent) {
+    async handleChangeTextEditorSelection(event: TextEditorSelectionChangeEvent) {
+        // TODO: How often does this event fire? Do we need to debounce it?
         const state = this.activeEditorState
+        // TODO: wait for the state to initialize and don't ignore the initial event after onDidActiveTextEditorChange
         if (!state || state.editor !== event.textEditor || state.insertMode) {
             return
         }
@@ -315,7 +329,7 @@ export class Extension implements Disposable {
         return newTree
     }
 
-    private async handleTextDocumentChange(event: TextDocumentChangeEvent) {
+    async handleTextDocumentChange(event: TextDocumentChangeEvent) {
         const { document, contentChanges } = event
         // Did the content change? The event is also fired when other properties of the document change.
         if (contentChanges.length === 0) return
