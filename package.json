@@ -136,6 +136,26 @@
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },
             {
+                "command": "code-strider:move-up",
+                "key": "Up",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:move-down",
+                "key": "Down",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:move-left",
+                "key": "Left",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:move-right",
+                "key": "Right",
+                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+            },
+            {
                 "~comment": "Follow the flow of the currently selected structure. Falls back to `first-child`",
                 "command": "code-strider:follow-structure",
                 "key": "f",
