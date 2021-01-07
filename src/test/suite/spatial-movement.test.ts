@@ -1,18 +1,14 @@
 import { expect } from "chai"
-import * as vscode from "vscode"
 import { SyntaxNode } from "web-tree-sitter"
 import { nodeAbove, nodeBelow, nodeLeftOf, nodeRightOf } from "../../spatial-movement-commands"
 import { TreeSitter } from "../../tree-sitter"
+import { TestUtils } from "../test-utils"
 
 describe("Spatial movement", () => {
     let treeSitter: TreeSitter
 
     before(async () => {
-        const extension: vscode.Extension<unknown> | undefined = vscode.extensions.getExtension(
-            "t-gebauer.code-strider"
-        )
-        treeSitter = new TreeSitter(`${extension!!.extensionPath}/wasm/`, undefined)
-        await treeSitter.initialize()
+        treeSitter = await TestUtils.initializeTreeSitter()
     })
 
     describe("TypeScript", () => {

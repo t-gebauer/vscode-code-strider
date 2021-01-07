@@ -1,12 +1,11 @@
 # Prioritized for v1.0
-- improve javascript outwards movement (consider removing most JS specifics and implement them language agnostic)
-  Only define "blocks" per language?
 - delete current node, including separators
 - slurping
 - barfing
 - move node around (a minor mode?)
 - different commands: first child/last child and follow flow
   "follow flow" should go inside AND to the next line while, first child probably stays on the line
+- Define "blocks" per language?
 
 # Bugs
 - parse tree gets out of sync after some edits?

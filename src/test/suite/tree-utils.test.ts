@@ -1,21 +1,10 @@
-import * as vscode from "vscode"
 import { Position, Selection } from "vscode"
 import { Tree } from "web-tree-sitter"
-import { TreeSitter } from "../../tree-sitter"
 import * as treeUtils from "../../utilities/tree-utilities"
 import { softExpect } from "../soft-expect"
+import { TestUtils } from "../test-utils"
 
 describe("Tree Utils", () => {
-    let treeSitter: TreeSitter
-
-    before(async () => {
-        const extension: vscode.Extension<unknown> | undefined = vscode.extensions.getExtension(
-            "t-gebauer.code-strider"
-        )
-        treeSitter = new TreeSitter(`${extension!!.extensionPath}/wasm/`, undefined)
-        await treeSitter.initialize()
-    })
-
     context("Find node in selection", async () => {
         const source = `
 const foo = require("foo")
@@ -38,6 +27,7 @@ function bar(arg = false) {
         let tree: Tree
 
         before(async () => {
+            const treeSitter = await TestUtils.initializeTreeSitter()
             tree = await treeSitter.parseText(source, "javascript")
         })
 
@@ -82,6 +72,7 @@ const x =          "weirdly formatted string"      ;
         `
         let tree: Tree
         before(async () => {
+            const treeSitter = await TestUtils.initializeTreeSitter()
             tree = await treeSitter.parseText(source, "javascript")
         })
 
