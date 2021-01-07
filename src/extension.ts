@@ -5,6 +5,7 @@ import {
     Event,
     EventEmitter,
     ExtensionContext,
+    Selection,
     TextDocument,
     TextDocumentChangeEvent,
     TextEditor,
@@ -18,6 +19,7 @@ import {
     backToPreviousSelection,
     deleteAndInsert,
     exitInsertMode,
+    greedyDelete,
     insertAfter,
     insertBefore,
     insertOnNewLine,
@@ -89,6 +91,7 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("insert-after", insertAfter)
     registerCommandWithState("insert-on-new-line", insertOnNewLine)
     registerCommandWithState("delete-and-insert", deleteAndInsert)
+    registerCommandWithState("greedy-delete", greedyDelete)
     registerCommandWithState("back-to-previous-selection", backToPreviousSelection)
     registerCommandWithState("undo-edit", undoEdit)
     registerCommandWithState("follow-structure", mkFollowStructure(true))
@@ -272,6 +275,7 @@ export class Extension implements Disposable {
             } else if (fundefined) {
                 await fundefined(undefined, ...rest)
             }
+            logger.log("State change event done: " + fdefined.name)
         }
     }
 
@@ -309,13 +313,9 @@ export class Extension implements Disposable {
             return
         }
 
-        const timeBefore = Date.now()
-        // Is the selection just a single character?
-        const currentNode = selection.start.isEqual(selection.end)
-            ? findNodeBeforeCursor(state.parseTree, selection.start)
-            : findNodeAtSelection(state.parseTree, selection)
-        logger.log(`finding matching node at selection (took ${Date.now() - timeBefore} ms)`)
-        this.changeActiveEditorState({ currentNode })
+        this.changeActiveEditorState({
+            currentNode: this.findBestNodeForSelection(state.parseTree, selection),
+        })
     }
 
     // State per open file (parse tree caching, incremental parsing)
@@ -367,10 +367,20 @@ export class Extension implements Disposable {
         this.editorStates.forEach((state) => {
             if (state.editor.document === document) {
                 state.parseTree = newTree
-                state.currentNode = findNodeBeforeCursor(newTree, state.editor.selection.active)
+                state.currentNode = this.findBestNodeForSelection(newTree, state.editor.selection)
                 state.previousNodes = new Array() // old references are no longer valid
             }
         })
         this.activeEditorStateChange.fire(this.activeEditorState)
+    }
+
+    private findBestNodeForSelection(parseTree: Tree, selection: Selection): SyntaxNode {
+        const timeBefore = Date.now()
+        // Is the selection just a single character?
+        const currentNode = selection.start.isEqual(selection.end)
+            ? findNodeBeforeCursor(parseTree, selection.start)
+            : findNodeAtSelection(parseTree, selection)
+        logger.log(`finding matching node at selection (took ${Date.now() - timeBefore} ms)`)
+        return currentNode
     }
 }

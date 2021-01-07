@@ -1,5 +1,4 @@
 # Prioritized for v1.0
-- delete current node, including separators
 - slurping
 - barfing
 - move node around (a minor mode?)

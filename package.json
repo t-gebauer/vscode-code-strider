@@ -56,7 +56,7 @@
                 "when": "code-strider:is-editor-active"
             },
             {
-                "command": "deleteLeft",
+                "command": "code-strider:greedy-delete",
                 "key": "backspace",
                 "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
             },

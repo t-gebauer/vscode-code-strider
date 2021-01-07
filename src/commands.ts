@@ -3,7 +3,7 @@ import { Selection, TextEditor, TextEditorEdit } from "vscode"
 import { SyntaxNode } from "web-tree-sitter"
 import { EditorState } from "./editor-state"
 import { EditorStateChange, logger } from "./extension"
-import { toPosition, toRange } from "./utilities/conversion-utilities"
+import { toPosition, toRange, toSelection } from "./utilities/conversion-utilities"
 import { findNodeAtSelection } from "./utilities/tree-utilities"
 
 export async function insertOnNewLine(
@@ -78,5 +78,23 @@ export function mkFollowStructure(forward = true) {
         return {
             currentNode: nextNode || undefined,
         }
+    }
+}
+
+export function greedyDelete(
+    state: Readonly<EditorState>,
+    _editor: TextEditor,
+    edit: TextEditorEdit
+): EditorStateChange {
+    const { currentNode } = state
+    const previousNode = currentNode.previousNamedSibling
+    const nextNode = currentNode.nextNamedSibling
+    const startPosition = currentNode.startPosition
+    const endPosition = nextNode?.startPosition ?? currentNode.endPosition
+    // The edit-builder will trigger a text document change event, but only after this command is completely processed.
+    edit.delete(new vscode.Range(toPosition(startPosition), toPosition(endPosition)))
+    return {
+        // TODO: this only works well, if the previous node is defined.
+        currentNode: previousNode ?? currentNode,
     }
 }
