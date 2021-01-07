@@ -11,6 +11,7 @@ import {
     TextEditor,
     TextEditorEdit,
     TextEditorSelectionChangeEvent,
+    Uri,
     window,
     workspace,
 } from "vscode"
@@ -46,7 +47,7 @@ export async function activate(context: ExtensionContext) {
     console.log('Extension "code-strider" is now active!')
     const outputChannelLogger = new OutputChannelLogger("code-strider debug")
     logger = outputChannelLogger
-    logger.context("Activation")
+    logger.context("Activating extension ...")
 
     const treeSitter = new TreeSitter(context.asAbsolutePath("./wasm/"), logger)
     await treeSitter.initialize()
@@ -118,7 +119,7 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("move-left", moveLeft)
     registerCommandWithState("move-right", moveRight)
 
-    logger.log("... fully activated.")
+    logger.log("... activation complete.")
     ext.handleChangeActiveTextEditor(window.activeTextEditor)
 }
 
@@ -128,6 +129,7 @@ export function deactivate() {
     logger.context("Deactivation")
 }
 
+// XXX: This is not used as much as it should be
 export enum InteractionMode {
     Structural,
     Insert,
@@ -140,9 +142,6 @@ export type EditorStateChange = {
 }
 
 export class Extension implements Disposable {
-    // State per open editor (cursor position, node selection, decoration)
-    private readonly editorStates = new Map<TextEditor, EditorState>()
-
     private activeEditorStateChange = new EventEmitter<EditorState | undefined>()
     readonly onActiveEditorStateChange: Event<EditorState | undefined> = this
         .activeEditorStateChange.event
@@ -152,7 +151,7 @@ export class Extension implements Disposable {
 
     private readonly subscriptions: { dispose(): unknown }[] = []
 
-    constructor(private readonly treeSitter: TreeSitter) {}
+    constructor(private readonly treeSitter: TreeSitter) { }
 
     registerEventHandlers() {
         this.subscriptions.push(
@@ -180,8 +179,8 @@ export class Extension implements Disposable {
     }
 
     async handleChangeActiveTextEditor(editor: TextEditor | undefined) {
-        logger.context("Event: changed ActiveTextEditor")
-        const state = editor ? await this.getOrInitializeEditorState(editor) : undefined
+        logger.context("Event: changed ActiveTextEditor " + (editor as any)?.id)
+        const state = editor && Languages.isSupported(editor.document.languageId) ? await this.createNewEditorState(editor) : undefined
         this.activeEditorState = state
         commands.executeCommand("setContext", "code-strider:is-editor-active", state !== undefined)
         if (state) {
@@ -189,6 +188,7 @@ export class Extension implements Disposable {
         } else {
             this.activeEditorStateChange.fire(this.activeEditorState)
         }
+        logger.log('change ActiveTextEditor: done')
     }
 
     handleSelectedNodeChanged(state: EditorState) {
@@ -223,7 +223,6 @@ export class Extension implements Disposable {
             previousNodes: new Array(),
             parseTree,
         }
-        this.editorStates.set(editor, state)
         return state
     }
 
@@ -279,26 +278,9 @@ export class Extension implements Disposable {
         }
     }
 
-    private async getOrInitializeEditorState(
-        editor: TextEditor | undefined
-    ): Promise<EditorState | undefined> {
-        if (!editor) {
-            return
-        }
-        const existingState = this.editorStates.get(editor)
-        if (existingState) {
-            return existingState
-        }
-        const languageId = editor.document.languageId
-        if (!Languages.isSupported(languageId)) {
-            return
-        }
-        return this.createNewEditorState(editor)
-    }
-
     private async handleChangeTextEditorSelection(event: TextEditorSelectionChangeEvent) {
-        const state = this.editorStates.get(event.textEditor)
-        if (!state || state.insertMode) {
+        const state = this.activeEditorState
+        if (!state || state.editor !== event.textEditor || state.insertMode) {
             return
         }
         logger.context(`Event: changed TextEditorSelection (${event.kind})`)
@@ -364,17 +346,26 @@ export class Extension implements Disposable {
     }
 
     private invalidateEditorStatesForDocument(document: TextDocument, newTree: Parser.Tree) {
-        this.editorStates.forEach((state) => {
-            if (state.editor.document === document) {
-                state.parseTree = newTree
-                state.currentNode = this.findBestNodeForSelection(newTree, state.editor.selection)
-                state.previousNodes = new Array() // old references are no longer valid
-            }
-        })
-        this.activeEditorStateChange.fire(this.activeEditorState)
+        const state = this.activeEditorState
+        if (state && state.editor.document === document) {
+            state.parseTree = newTree
+            state.currentNode = this.findBestNodeForSelection(newTree, state.editor.selection)
+            state.previousNodes = new Array() // old references are no longer valid
+            this.activeEditorStateChange.fire(this.activeEditorState)
+        }
     }
 
+    // TODO: there is not "the one" solution to finding the "best" node for the selection
+    // Maybe we need to try different ways and choose the best one?
+    // if selection completely matches a node -> choose the node
+    // if the selection is just a single cursor,
+    //   if it is positioned on whitespace
+    //      either choose the node on this line, or on a previous line
+    //   if not on whitespace -> chose a node on this position?
+    // We should also consider whether this is an automatic reaction or a
+    //   user generated (mouse selection) event.
     private findBestNodeForSelection(parseTree: Tree, selection: Selection): SyntaxNode {
+        // TODO: remove this benchmarking here?
         const timeBefore = Date.now()
         // Is the selection just a single character?
         const currentNode = selection.start.isEqual(selection.end)

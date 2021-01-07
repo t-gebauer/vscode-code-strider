@@ -54,6 +54,9 @@ cp ./result/*.wasm ./wasm/
 - The extension does not (re-)initialize when changing the language mode of a file.
   It is necessary to switch to another editor and back to detect the language change.
 
+- Control-click (go to definition) does not seem work in the structured selection mode.
+  Either a keyboard hotkey, or go to insert mode first.
+
 ### AST Viewer
 
 For performance reasons the AST viewer does not update during insert mode.
