@@ -60,6 +60,8 @@ cp ./result/*.wasm ./wasm/
   - an error message pops up "Invalid state: no compatible editor active"
   - the first node in the file gets selected
 
+- The extension does not initialize when changing the language mode of a file.
+  You have to switch to another editor and back to initialize the parser.
 ### AST Viewer
 
 For performance reasons the AST viewer does not update during insert mode.

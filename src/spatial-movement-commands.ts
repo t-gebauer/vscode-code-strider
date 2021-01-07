@@ -1,4 +1,3 @@
-import { TextEditor, TextEditorEdit } from "vscode"
 import { SyntaxNode } from "web-tree-sitter"
 import { EditorState } from "./editor-state"
 import { EditorStateChange } from "./extension"
@@ -21,8 +20,17 @@ function findNodeWithParentContainingLine(
     }
 }
 
+// Nodes which are pure whitespace: `text` nodes in HTML and line breaks in Markdown.
+function isPureWhitespace(node: SyntaxNode) {
+    return node.text.trim() === ""
+}
+
 function nextSibling(node: SyntaxNode, forward = true) {
-    return node[forward ? "nextNamedSibling" : "previousNamedSibling"]
+    let next: SyntaxNode | null = node
+    do {
+        next = next[forward ? "nextNamedSibling" : "previousNamedSibling"]
+    } while (next && isPureWhitespace(next))
+    return next
 }
 
 function nextChild(node: SyntaxNode, forward = true) {

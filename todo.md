@@ -1,7 +1,6 @@
 # Prioritized for v1.0
 - improve javascript outwards movement (consider removing most JS specifics and implement them language agnostic)
   Only define "blocks" per language?
-- generally don't select empty nodes? (*looking at html*)
 - delete current node, including separators
 - slurping
 - barfing
@@ -55,7 +54,7 @@
   - inside a node and insert
 
 - shortcuts during insert mode
-  - jump to beginning/end of (previous) node
+  - jump to beginning/end of node next and previous nodes
 
 # Rejected ideas (for now)
 - Toggle extension on/off: Why? VS Code can already enable and disable the extension (globally, per workspace).
@@ -72,11 +71,6 @@ navigation: move around
 change: edit the selected structure in a predefined way
 insert: normal text insertion
 
-## Html
-
-Don't select "empty" text nodes.
-Don't select start and end tags.
-
 ### Do not do everything
 
 It's hard enough to build a solution that works for one language. Yes, sure, tree walking is possible in every language, but you knew that already. The navigation has to feel smooth and useful. This will only be possible with manual -- per language -- intervention.
@@ -85,12 +79,12 @@ It's hard enough to build a solution that works for one language. Yes, sure, tre
 
 How to navigate efficiently over lots of one line statements? We do not want to navigate line-by-line. Ace jump?
 
-Show ast in tree-view sidebar?
+# Interesting VS Code changelogs
+## v1.49
 
-# v1.49
 - Only format modified text
 
-# v1.52
+## v1.52
 
 - Open Keyboard Shortcuts editor with query filter
 vscode.commands.executeCommand('workbench.action.openGlobalKeybindings', 'query');
@@ -100,10 +94,9 @@ vscode.commands.executeCommand('workbench.action.openGlobalKeybindings', 'query'
 
 # Alternative implementations
 
-Could use a `CustomEditorProvider` for either the main editor and/or the AST viewer. No idea whether that would simply be more complicated, or also improve, maybe even simplify interactions.
+Could use a `CustomEditorProvider` for either the main editor and/or the AST viewer. Could simply be more complicated, but on the other hand also improve, maybe even simplify interactions.
 
 The AST view could also be rendered as `WebviewPanel` or `TreeView`. This could allow easy implementation of bi-directional selection.
-
 
 # Limitations of VS Code
 
