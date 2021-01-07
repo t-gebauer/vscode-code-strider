@@ -36,6 +36,10 @@ const languages: Map<string, LanguageDefinition> = new Map(
 )
 
 export namespace Languages {
+    export function list(): string[] {
+        return new Array(...languages.keys())
+    }
+
     export function isSupported(languageId: string): boolean {
         return languages.has(languageId)
     }

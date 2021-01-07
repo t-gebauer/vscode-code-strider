@@ -2,10 +2,15 @@ import * as fs from "fs"
 import Parser = require("web-tree-sitter")
 import { Tree } from "web-tree-sitter"
 import { Logger } from "./logger"
+import { Languages } from "./language/language-support"
 
 export class TreeSitter {
+
+    private parsers = new Map<string, Parser>()
+
     constructor(private readonly wasmDirPath: string, private readonly logger?: Logger) {
         this.logger?.log("WASM location: " + wasmDirPath)
+        this.checkWasmFiles()
     }
 
     async initialize() {
@@ -14,24 +19,32 @@ export class TreeSitter {
     }
 
     async parseText(text: string, languageId: string, previousTree?: Tree): Promise<Tree> {
-        // TODO: should we reuse the Parser for better performance?
-        // There seems to be a small fixed effort necessary for loading (or setting) the language?
-        this.logger?.log("1 initializing parser instance ...")
-        const parser = new Parser()
-        this.logger?.log("2 setting language ...")
-        parser.setLanguage(await this.loadTreeSitterLanguage(languageId))
-        this.logger?.log("3 parsing text ...")
+        this.logger?.log("1 initializing parser ...")
+        const parser = this.parsers.get(languageId) ?? await this.initializeNewParser(languageId)
+        this.logger?.log("2 parsing text ...")
         const result = parser.parse(text, previousTree)
-        this.logger?.log("4 done.")
+        this.logger?.log("3 done.")
         return result
     }
 
-    private loadTreeSitterLanguage(languageId: string): Promise<Parser.Language> {
-        // const wasmFilePath = extensionContext.asAbsolutePath(`./wasm/tree-sitter-${languageId}.wasm`)
-        const wasmFilePath = this.wasmDirPath + `tree-sitter-${languageId}.wasm`
-        if (!fs.existsSync(wasmFilePath)) {
-            throw new Error(`Missing language file: '${wasmFilePath}'`)
-        }
-        return Parser.Language.load(wasmFilePath)
+    private async initializeNewParser(languageId: string): Promise<Parser> {
+        this.logger?.log(`-- initializing new parser instance for '${languageId}'`)
+        const parser = new Parser()
+        parser.setLanguage(await Parser.Language.load(this.wasmFilePath(languageId)))
+        this.parsers.set(languageId, parser)
+        return parser
+    }
+
+    private wasmFilePath(languageId: string): string {
+        return `${this.wasmDirPath}tree-sitter-${languageId}.wasm`
+    }
+
+    private checkWasmFiles() {
+        Languages.list().forEach(languageId => {
+            const wasmFilePath = this.wasmFilePath(languageId)
+            if (!fs.existsSync(wasmFilePath)) {
+                throw new Error(`Missing parser: '${wasmFilePath}'`)
+            }
+        })
     }
 }

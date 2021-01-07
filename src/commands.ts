@@ -94,7 +94,6 @@ export function insertAfter(state: Readonly<EditorState>): EditorStateChange {
 }
 
 export function exitInsertMode(state: Readonly<EditorState>): EditorStateChange {
-    // TODO: should handle multiple selections
     return {
         insertMode: false,
         currentNode: findNodeAtSelection(state.parseTree, state.editor.selection),

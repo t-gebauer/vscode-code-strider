@@ -1,13 +1,13 @@
 # Prioritized for v1.0
-- different commands: first child/last child and follow flow
-  "follow flow" should go inside AND to the next line while, first child probably stays on the line
-- generally don't select empty nodes? (*looking at html*)
 - improve javascript outwards movement (consider removing most JS specifics and implement them language agnostic)
   Only define "blocks" per language?
+- generally don't select empty nodes? (*looking at html*)
+- delete current node, including separators
 - slurping
 - barfing
 - move node around (a minor mode?)
-- delete current node, including separators
+- different commands: first child/last child and follow flow
+  "follow flow" should go inside AND to the next line while, first child probably stays on the line
 
 # Bugs
 - parse tree gets out of sync after some edits?
