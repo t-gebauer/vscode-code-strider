@@ -40,7 +40,7 @@
             "commandPalette": [
                 {
                     "command": "code-strider:toggle-ast-viewer",
-                    "when": "code-strider:is-editor-active"
+                    "when": "code-strider:is-editor-supported"
                 }
             ]
         },
@@ -48,139 +48,139 @@
             {
                 "command": "code-strider:toggle-ast-viewer",
                 "key": "alt-s alt-t",
-                "when": "code-strider:is-editor-active"
+                "when": "code-strider:is-editor-supported"
             },
             {
                 "command": "code-strider:show-log",
                 "key": "alt-s alt-l",
-                "when": "code-strider:is-editor-active"
+                "when": "code-strider:is-editor-supported"
             },
             {
                 "command": "code-strider:greedy-delete",
                 "key": "backspace",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:undo-edit",
                 "key": "u",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:back-to-previous-selection",
                 "key": "b",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:exit-insert-mode",
                 "key": "Escape",
-                "when": "editorTextFocus && !suggestWidgetVisible && code-strider:is-editor-active && code-strider:is-insert-mode"
+                "when": "editorTextFocus && !suggestWidgetVisible && code-strider:is-editor-supported && code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:insert-before",
                 "key": "i",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:insert-after",
                 "key": "a",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:delete-and-insert",
                 "key": "c",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:tree-move-previous-sibling",
                 "key": "alt+k",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:tree-move-next-sibling",
                 "key": "alt+j",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:tree-move-parent",
                 "key": "alt+h",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:tree-move-first-child",
                 "key": "alt+l",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:tree-move-last-child",
                 "key": "ctr+alt+l",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:move-up",
                 "key": "k",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:move-down",
                 "key": "j",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:move-left",
                 "key": "h",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:move-right",
                 "key": "l",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:move-up",
                 "key": "Up",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:move-down",
                 "key": "Down",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:move-left",
                 "key": "Left",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:move-right",
                 "key": "Right",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "~comment": "Follow the flow of the currently selected structure. Falls back to `first-child`",
                 "command": "code-strider:follow-structure",
                 "key": "f",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:follow-structure-last",
                 "key": "shift+f",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:tree-move-parent",
                 "key": "g",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:insert-on-new-line",
                 "key": "o",
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:insert-on-new-line",
                 "key": "shift+o",
                 "args": { "before": true },
-                "when": "editorTextFocus && code-strider:is-editor-active && !code-strider:is-insert-mode"
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             }
         ],
         "languages": [

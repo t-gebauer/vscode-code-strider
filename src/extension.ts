@@ -5,6 +5,7 @@ import {
     Event,
     EventEmitter,
     ExtensionContext,
+    Position,
     Selection,
     TextDocument,
     TextDocumentChangeEvent,
@@ -123,13 +124,12 @@ export async function activate(context: ExtensionContext) {
 
     // Reproduce initially missed events
     const editor = window.activeTextEditor
-    // XXX: We should not `await` the returned promise here, because neither would vscode.
-    ext.handleChangeActiveTextEditor(editor)
+    ext.onDidChangeActiveTextEditor(editor)
     if (editor) {
-        ext.handleChangeTextEditorSelection({ textEditor: editor, selections: editor.selections })
+        ext.onDidChangeTextEditorSelection({ textEditor: editor, selections: editor.selections })
     }
 
-    logger.log('... activation complete.')
+    logger.log("... activation complete.")
 }
 
 // Called by VS Code. But, nothing to do here for now, everything should have been added to
@@ -160,12 +160,12 @@ export class Extension implements Disposable {
 
     private readonly subscriptions: { dispose(): unknown }[] = []
 
-    constructor(private readonly treeSitter: TreeSitter) { }
+    constructor(private readonly treeSitter: TreeSitter) {}
 
     registerEventHandlers() {
         this.subscriptions.push(
-            window.onDidChangeActiveTextEditor(this.handleChangeActiveTextEditor.bind(this)),
-            window.onDidChangeTextEditorSelection(this.handleChangeTextEditorSelection.bind(this)),
+            window.onDidChangeActiveTextEditor(this.onDidChangeActiveTextEditor.bind(this)),
+            window.onDidChangeTextEditorSelection(this.onDidChangeTextEditorSelection.bind(this)),
             workspace.onDidChangeTextDocument(this.handleTextDocumentChange.bind(this))
         )
     }
@@ -187,21 +187,59 @@ export class Extension implements Disposable {
         Disposable.from(...this.subscriptions, this.activeEditorStateChange).dispose()
     }
 
-    async handleChangeActiveTextEditor(editor: TextEditor | undefined) {
-        logger.context("Event: changed ActiveTextEditor " + (editor as any)?.id)
-        // XXX: Initially the `editor.selection` will always be " 0,0,0,0 ".
+    onDidChangeActiveTextEditor(editor?: TextEditor) {
+        logger.context("Event: changed activeTextEditor")
+        this.activeEditorState = undefined
+        const isEditorSupported = editor && Languages.isSupported(editor.document.languageId)
+        commands.executeCommand("setContext", "code-strider:is-editor-supported", isEditorSupported)
+        if (!editor) return
+        // XXX: Initially the `editor.selection` will be " 0,0,0,0 " if switching to another tab.
+        // (When a new editor window is created?)
         // We have to wait for the `onDidChangeTextEditorSelection` event which will always
         // fire a few milliseconds later, restoring the selection.
         // Is this a bug or a feature?
-        // TODO: do not do any heavy initialization here. (no async please)
-        // Just set some dummy values, so that we have an activeEditorState and can handle events.
-        const state = editor && Languages.isSupported(editor.document.languageId) ? await this.createNewEditorState(editor) : undefined
-        this.activeEditorState = state
-        commands.executeCommand("setContext", "code-strider:is-editor-active", state !== undefined)
-        if (state === undefined) {
-            this.activeEditorStateChange.fire(this.activeEditorState)
+        logger.log(editor?.selection)
+        const {start, isEmpty} = editor.selection
+        if (isEmpty && start.isEqual(new Position(0,0))) {
+            // FIXME: this position is totally valid when opening a brand new file.
+            logger.log('invalid!')
         }
-        logger.log('change ActiveTextEditor: done')
+    }
+
+    // TODO: How often does this event fire? Do we need to debounce it?
+    onDidChangeTextEditorSelection(event: TextEditorSelectionChangeEvent) {
+        if (event.textEditor !== window.activeTextEditor) {
+            return
+        }
+        logger.log('on did change text selection')
+        const state = this.activeEditorState
+        if (state === undefined) {
+            this.initializeActiveEditorState()
+            return
+        }
+        if (event.textEditor !== state.editor) {
+            // Is this possible?
+            logger.log("WARNING: Invalid state? activeEditorState.editor should always be equal to window.activeTextEditor")
+            return
+        }
+        logger.context(`Event: changed ActiveTextEditorSelection (${event.kind})`)
+        // TODO: should handle multiple selections
+        this.handleTextSelectionChange(state, event.selections[0])
+    }
+
+    private handleTextSelectionChange(state: EditorState, selection: Selection) {
+        if (state.insertMode) {
+            return
+        }
+        if (selection.isEqual(toSelection(state.currentNode))) {
+            // Nothing to do, the current node already spans the selection.
+            // Also happens if we are changing the selection manually after a movement command.
+            logger.log("selection already matches current node, nothing to do")
+            return
+        }
+        this.changeActiveEditorState({
+            currentNode: this.findBestNodeForSelection(state.parseTree, selection),
+        })
     }
 
     private handleSelectedNodeChanged(state: EditorState) {
@@ -223,23 +261,32 @@ export class Extension implements Disposable {
         this.activeEditorStateChange.fire(this.activeEditorState)
     }
 
-    private async createNewEditorState(editor: TextEditor): Promise<EditorState> {
-        const { document } = editor
-        logger.log("initializing new editor state")
-        const parseTree = this.parseTrees.get(document) ?? (await this.parseTextDocument(document))
+    private async initializeActiveEditorState() {
+        const editor = window.activeTextEditor
+        if (!editor || !Languages.isSupported(editor.document.languageId)) {
+            return
+        }
+        const newState = await this.createNewEditorState(editor)
+        this.activeEditorState = newState
+        this.activeEditorStateChange.fire(newState)
+    }
 
+    private async createNewEditorState(editor: TextEditor): Promise<EditorState> {
+        logger.log("Starting to create new editor state ...")
+        const { document } = editor
+        const parseTree = this.parseTrees.get(document) ?? (await this.parseTextDocument(document))
         let state: EditorState = {
             editor,
             insertMode: false,
-            currentNode: parseTree.rootNode,
+            currentNode: findNodeAtSelection(parseTree, editor.selection),
             previousNodes: new Array(),
             parseTree,
         }
+        logger.log("... editor state created.")
         return state
     }
 
     private changeActiveEditorState(change: EditorStateChange) {
-        // TODO: is it possible that the `change` belongs to another previous editor state?
         const activeState = this.activeEditorState
         if (!activeState) {
             logger.log("WARNING: inconsistent state: no editor active")
@@ -288,30 +335,6 @@ export class Extension implements Disposable {
             }
             logger.log("State change event done: " + fdefined.name)
         }
-    }
-
-    async handleChangeTextEditorSelection(event: TextEditorSelectionChangeEvent) {
-        // TODO: How often does this event fire? Do we need to debounce it?
-        const state = this.activeEditorState
-        // TODO: wait for the state to initialize and don't ignore the initial event after onDidActiveTextEditorChange
-        if (!state || state.editor !== event.textEditor || state.insertMode) {
-            return
-        }
-        logger.context(`Event: changed TextEditorSelection (${event.kind})`)
-
-        // TODO: should handle multiple selections
-        const selection = event.selections[0]
-
-        if (selection.isEqual(toSelection(state.currentNode))) {
-            // Nothing to do, the current node already spans the selection.
-            // Also happens if we are changing the selection manually after a movement command.
-            logger.log("selection already matches current node, nothing to do")
-            return
-        }
-
-        this.changeActiveEditorState({
-            currentNode: this.findBestNodeForSelection(state.parseTree, selection),
-        })
     }
 
     // State per open file (parse tree caching, incremental parsing)
