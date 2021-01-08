@@ -1,6 +1,4 @@
 # Prioritized for v1.0
-- !!!! selection is always 0 on active editor change!!!!
-- and the selection event WILL always fire afterwards!
 - slurping
 - barfing
 - move node around (a minor mode?)
@@ -11,10 +9,10 @@
 # Bugs
 - parse tree gets out of sync after some edits?
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true)))
-- switching files should not scroll to top! (and generally, be less buggy ;))
-- decorations are initially not visible!
 
 # More ideas
+- implement "raise"
+- implement "ace jump" to nth-child
 - "delete" should delete lines if there is nothing else on the line (maybe a different delete command?)
 - key:x "select node starting on line"?
 - select multiple nodes at once (maybe just two, and everything between?)
@@ -34,10 +32,8 @@
 - surround object with ? (brackets, quote marks, etc.)
 - always show start and end of selection => fold center to fit the complete selection into view
 - remove not-really-needed testing library: soft-assert?
-- improve editor scrolling.
-- implement "raise"
-- implement "ace jump" to nth-child
 - highlight errors
+- use the keys "pos1/home" and "end" to go to parents and children?
 - force the user to fix errors before leaving insert mode (how would that work if the file already has errors prior to opening?)
 
 - (always) should node numbers in the gutter (like line numbers)

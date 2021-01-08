@@ -47,10 +47,6 @@ cp ./result/*.wasm ./wasm/
   - line-breaks highlighted/selected in the current node
   - the default cursor is still visible (it has no meaning in the structured navigation mode)
 
-- when switching files:
-  - an error message pops up "Invalid state: no compatible editor active"
-  - the first node in the file gets selected
-
 - The extension does not (re-)initialize when changing the language mode of a file.
   It is necessary to switch to another editor and back to detect the language change.
 
