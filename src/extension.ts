@@ -39,6 +39,7 @@ import { Logger, OutputChannelLogger } from "./logger"
 import { SyntaxNode, Tree } from "web-tree-sitter"
 import { TreeSitter } from "./tree-sitter"
 import { moveDown, moveLeft, moveRight, moveUp } from "./spatial-movement-commands"
+import { Delayer } from "./utils"
 
 export let logger: Logger
 
@@ -206,12 +207,14 @@ export class Extension implements Disposable {
             promise.then((newState) => {
                 this.activeEditorState = newState
                 this.handleSelectedNodeChanged(newState)
-                this.handleModeChange(newState)
+                this.handleModeChanged(newState)
             })
         }, 1)
     }
 
-    // TODO: How often does this event fire? Do we need to debounce it (on mouse selection?)?
+    // XXX: This delay just needs to be high enough for [Ctrl-LeftButton] "Go to definition" to
+    // work correctly.
+    private readonly textSelectionChangeDelayer = new Delayer(30)
     onDidChangeTextEditorSelection(event: TextEditorSelectionChangeEvent) {
         if (event.textEditor !== window.activeTextEditor) {
             return
@@ -220,29 +223,32 @@ export class Extension implements Disposable {
         if (!state) {
             return
         }
-        logger.context(`Event: changed ActiveTextEditorSelection (${event.kind})`)
         if (event.textEditor !== state.editor) {
             // The active state should always match the `activeTextEditor` or be `undefined`,
             // therefore, this should not be possible?
             logger.log("WARNING: discarding stale selection event")
             return
         }
-        // TODO: should handle multiple selections
-        this.handleTextSelectionChange(state, event.selections[0])
-    }
-
-    private handleTextSelectionChange(state: EditorState, selection: Selection) {
         if (state.insertMode) {
             return
         }
+        // TODO: should handle multiple selections
+        const selection = event.selections[0]
         if (selection.isEqual(toSelection(state.currentNode))) {
             // Nothing to do, the current node already spans the selection.
             // Also happens if we are changing the selection manually after a movement command.
-            logger.log("-> selection already matches current node, nothing to do")
             return
         }
-        this.changeActiveEditorState({
-            currentNode: this.findBestNodeForSelection(state.parseTree, selection),
+        logger.context(`Event: changed ActiveTextEditorSelection (${event.kind})`)
+        // XXX: this does not only debounce multiple events, but also delays single events to
+        // ensure that we are not directly changing the selection inside this event callback.
+        // This seems to be important for the mouse action [Ctrl-LeftButton] "Go to definition"
+        // to work.
+        this.textSelectionChangeDelayer.delay(() => {
+            // TODO: discard this event when the the state changed during the delay?
+            this.changeActiveEditorState({
+                currentNode: this.findBestNodeForSelection(state.parseTree, selection),
+            })
         })
     }
 
@@ -253,6 +259,9 @@ export class Extension implements Disposable {
         const currentSelection = state.editor.selection
         if (!currentSelection.isEqual(targetNodeSelection)) {
             logger.log("correcting editor selection")
+            // TODO: automatically changing the selection causes way too many problems:
+            // ctrl-leftButton : does not work. We could fix that one by delaying the selection update
+
             state.editor.selection = targetNodeSelection
         }
         // TODO: only reveal range when triggered change occurred via keyboard command?
@@ -286,11 +295,15 @@ export class Extension implements Disposable {
             logger.log("WARNING: inconsistent state: no editor active")
             return
         }
+        if (activeState.editor !== window.activeTextEditor) {
+            logger.log("WARNING: stale editor reference")
+            return
+        }
         const currentNode = activeState.currentNode
 
         if (change.insertMode !== undefined) {
             activeState.insertMode = change.insertMode
-            this.handleModeChange(activeState)
+            this.handleModeChanged(activeState)
         }
         if (change.backToPreviousNode) {
             const previousNode = activeState.previousNodes.pop()
@@ -311,7 +324,7 @@ export class Extension implements Disposable {
         }
     }
 
-    private handleModeChange(state: EditorState) {
+    private handleModeChanged(state: EditorState) {
         logger.log(`changing insertMode: ${state.insertMode}`)
         commands.executeCommand("setContext", "code-strider:is-insert-mode", state.insertMode)
     }
