@@ -90,9 +90,5 @@ cp ./result/*.wasm ./wasm/
 
 ## Known Issues
 
-- there is a style collision between the custom selection decorator and the default text selection decorators:
-  - line-breaks highlighted/selected in the current node
-  - the default cursor is still visible (it has no meaning in the structured navigation mode)
-
 - The extension does not (re-)initialize when changing the language mode of a file.
   It is necessary to switch to another editor and back to detect the language change.

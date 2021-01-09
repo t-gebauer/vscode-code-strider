@@ -26,7 +26,7 @@ describe("Spatial movement", () => {
         }
         `
         let className: SyntaxNode
-        let barDefinition: SyntaxNode
+        let barFunction: SyntaxNode
         let returnStatement: SyntaxNode
         let bazAssignement: SyntaxNode
 
@@ -37,9 +37,9 @@ describe("Spatial movement", () => {
             const classBody = tree.rootNode.firstNamedChild?.firstNamedChild?.childForFieldName(
                 "body"
             )
-            barDefinition = classBody?.namedChild(2)!
-            expect(barDefinition?.text).to.match(/^bar\(arg1: /)
-            returnStatement = barDefinition?.childForFieldName("body")?.firstNamedChild!
+            barFunction = classBody?.namedChild(2)!
+            expect(barFunction?.text).to.match(/^bar\(arg1: /)
+            returnStatement = barFunction?.childForFieldName("body")?.firstNamedChild!
             expect(returnStatement?.text).to.equal("return undefined;")
             bazAssignement = classBody?.namedChild(3)!
             expect(bazAssignement?.text).to.equal("baz = false || true")
@@ -86,13 +86,13 @@ describe("Spatial movement", () => {
 
             xit("should stay inside parent block", () => {
                 // TODO: is it not correct to select the parent?
-                const result = nodeLeftOf(barDefinition)
+                const result = nodeLeftOf(barFunction)
                 expect(result?.text).to.match(/^bar\(arg1: number,/)
             })
 
             xit("should not move if already first parameter", () => {
                 // TODO: is it not correct to select the parent?
-                const firstBarParameter = barDefinition.childForFieldName("parameters")
+                const firstBarParameter = barFunction.childForFieldName("parameters")
                     ?.firstNamedChild!
                 expect(firstBarParameter?.text).to.equal("arg1: number")
                 const result = nodeLeftOf(firstBarParameter)
@@ -100,7 +100,7 @@ describe("Spatial movement", () => {
             })
 
             it("should move inside parameter list", () => {
-                const secondBarParameter = barDefinition.childForFieldName("parameters")
+                const secondBarParameter = barFunction.childForFieldName("parameters")
                     ?.firstNamedChild?.nextNamedSibling!
                 expect(secondBarParameter?.text).to.equal("arg2: string | null")
                 const result = nodeLeftOf(secondBarParameter)
@@ -115,12 +115,12 @@ describe("Spatial movement", () => {
             })
 
             it("should stay inside parent block", () => {
-                const result = nodeRightOf(barDefinition)
+                const result = nodeRightOf(barFunction)
                 expect(result).to.equal(undefined)
             })
 
             it("should move inside parameter list", () => {
-                const firstBarParameter = barDefinition.childForFieldName("parameters")
+                const firstBarParameter = barFunction.childForFieldName("parameters")
                     ?.firstNamedChild!
                 expect(firstBarParameter?.text).to.equal("arg1: number")
                 const result = nodeRightOf(firstBarParameter)
@@ -128,7 +128,7 @@ describe("Spatial movement", () => {
             })
 
             it("should not move when already last parameter", () => {
-                const secondBarParameter = barDefinition.childForFieldName("parameters")
+                const secondBarParameter = barFunction.childForFieldName("parameters")
                     ?.firstNamedChild?.nextNamedSibling!
                 expect(secondBarParameter?.text).to.equal("arg2: string | null")
                 const result = nodeRightOf(secondBarParameter)

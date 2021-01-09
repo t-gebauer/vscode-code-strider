@@ -25,11 +25,17 @@ function setOrResetDecorations(
 
 export function registerDecorationHandler(ext: Extension): Disposable {
     const currentDecorationType = window.createTextEditorDecorationType({
+        backgroundColor: Colors.selectionBackground,
+    })
+
+    const currentLineDecorationType = window.createTextEditorDecorationType({
+        isWholeLine: true,
         backgroundColor: Colors.inactiveSelectionBackground,
     })
 
     function setDecorationsForNode(editor: TextEditor, node?: SyntaxNode): void {
         setOrResetDecorations(editor, currentDecorationType, node)
+        setOrResetDecorations(editor, currentLineDecorationType, node)
     }
 
     function updateSelection(state?: EditorState): void {
@@ -47,5 +53,5 @@ export function registerDecorationHandler(ext: Extension): Disposable {
     // TODO: Ideally, we would also change the decorations for inactive editors
     ext.onActiveEditorStateChange(updateSelection)
 
-    return Disposable.from(currentDecorationType)
+    return Disposable.from(currentDecorationType, currentLineDecorationType)
 }
