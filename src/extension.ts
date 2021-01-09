@@ -24,6 +24,7 @@ import {
     insertBefore,
     insertOnNewLine,
     mkFollowStructure,
+    raise,
     undoEdit,
 } from "./commands"
 import { EditorState } from "./editor-state"
@@ -92,6 +93,7 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("insert-on-new-line", insertOnNewLine)
     registerCommandWithState("delete-and-insert", deleteAndInsert)
     registerCommandWithState("greedy-delete", greedyDelete)
+    registerCommandWithState("raise", raise)
     registerCommandWithState("back-to-previous-selection", backToPreviousSelection)
     registerCommandWithState("undo-edit", undoEdit)
     registerCommandWithState("follow-structure", mkFollowStructure(true))

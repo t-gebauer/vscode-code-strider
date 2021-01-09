@@ -1,9 +1,9 @@
 # Prioritized for v1.0
+- different commands: first child/last child and follow flow
+  "follow flow" should go inside AND to the next line while, first child probably stays on the line
 - slurping
 - barfing
 - move node around (a minor mode?)
-- different commands: first child/last child and follow flow
-  "follow flow" should go inside AND to the next line while, first child probably stays on the line
 - Define "blocks" per language?
 
 # Bugs
@@ -11,11 +11,10 @@
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true)))
 
 # More ideas
-- implement "raise"
 - implement "ace jump" to nth-child
-- "delete" should delete lines if there is nothing else on the line (maybe a different delete command?)
 - key:x "select node starting on line"?
 - select multiple nodes at once (maybe just two, and everything between?)
+  - mark a node with [m] and then select everything the marked node and the current position?
 - formatting
   - format node
   - indent node
@@ -26,6 +25,7 @@
 - config + hotkeys
   - add an option to disable specific languages
 - Select node(s) in AST view
+- improve "raise" for complex languages (e.g. TypeScript)
 - add Kotlin (grammar exists, but wasm-build is slow)
 - go to first/last sibling (in the current node) (note: this is already possible with one more key: "parent->first-child" or "parent->last-child")
 - selection: mark current node, select everything between current and last mark

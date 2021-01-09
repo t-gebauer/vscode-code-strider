@@ -98,3 +98,18 @@ export function greedyDelete(
         currentNode: previousNode ?? currentNode,
     }
 }
+
+export function raise(
+    state: Readonly<EditorState>,
+    editor: TextEditor,
+    edit: TextEditorEdit
+): EditorStateChange {
+    const { currentNode } = state
+    const parent = currentNode.parent
+    if (parent) {
+        edit.replace(toRange(parent), currentNode.text)
+        return { currentNode: parent }
+    } else {
+        return {}
+    }
+}

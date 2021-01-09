@@ -61,6 +61,11 @@
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
+                "command": "code-strider:raise",
+                "key": "alt-s r",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
                 "command": "code-strider:undo-edit",
                 "key": "u",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
