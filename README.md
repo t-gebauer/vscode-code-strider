@@ -2,27 +2,21 @@
 
 ## Features
 
-Describe specific features of your extension including screenshots of your extension in action. Image paths are relative to this README file.
+### Navigate complex code structures with ease
 
-For example if there is an image subfolder under your extension project workspace:
+### Perform syntax aware editing operations
 
-\!\[feature X\]\(images/feature-x.png\)
+- `code-strider:greedy-delete` (default binding: [Backspace])
+  Delete the currently targeted structure and everything around it up until the next named node.
 
-> Tip: Many popular extensions utilize animations. This is an excellent way to show off your extension! We recommend short, focused animations that are easy to follow.
-
-// TODO: add animations?
+![greedy-delete GIF](images/greedy-delete.gif)
+<!-- TODO: add animations -->
 
 ## Requirements
 
-### Hardware / Slight performance impact
-
-Don't try to use this extension if your computer is already struggling with your existing VS Code extensions. Other than that, tree-sitter incremental parsing is actually quite fast.
+No dependencies. This extension uses *wasm* builds of `tree-sitter`, thus no native dependencies are required.
 
 In the future I might try to integrate native tree-sitter again, but that is currently quite complicated. The extension would need to be compiled with the exact same version of VS Code where it will be used.
-
-### Software
-
-No dependencies. This extension uses *wasm* builds of `tree-sitter`, thus no native dependencies are required.
 
 ## Extension Settings
 

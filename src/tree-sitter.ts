@@ -28,20 +28,21 @@ export class TreeSitter {
     }
 
     private async initializeNewParser(languageId: string): Promise<Parser> {
-        this.logger?.log(`-- initializing new parser instance for '${languageId}'`)
+        const { grammarId } = Languages.get(languageId)
+        this.logger?.log(`-- initializing new parser instance for '${languageId}' with grammar '${grammarId}`)
         const parser = new Parser()
-        parser.setLanguage(await Parser.Language.load(this.wasmFilePath(languageId)))
+        parser.setLanguage(await Parser.Language.load(this.wasmFilePath(grammarId)))
         this.parsers.set(languageId, parser)
         return parser
     }
 
-    private wasmFilePath(languageId: string): string {
-        return `${this.wasmDirPath}tree-sitter-${languageId}.wasm`
+    private wasmFilePath(grammarId: string): string {
+        return `${this.wasmDirPath}tree-sitter-${grammarId}.wasm`
     }
 
     private checkWasmFiles() {
-        Languages.list().forEach(languageId => {
-            const wasmFilePath = this.wasmFilePath(languageId)
+        Languages.list().forEach(language => {
+            const wasmFilePath = this.wasmFilePath(language.grammarId)
             if (!fs.existsSync(wasmFilePath)) {
                 throw new Error(`Missing parser: '${wasmFilePath}'`)
             }

@@ -17,29 +17,31 @@ const languages: Map<string, LanguageDefinition> = new Map(
         defineLanguage("html"),
         defineLanguage("java"),
         defineLanguage("javascript"),
+        defineLanguage("json"),
         // TODO: VSCode maps some json files to "jsonc" - JSON with comments.
         //       The normal "json" grammar should suffice. Even though the
-        //       comments would be labeled as ERROR.
-        defineLanguage("json"),
-        // TODO: ignore / don't select "soft_line_break"s
+        //       comments are labeled as ERROR.
+        defineLanguage("jsonc", "json"),
         defineLanguage("markdown"),
         defineLanguage("nix"),
+        // TODO: create a real (simple) grammar for text: words, paragraphs?
+        defineLanguage("plaintext", "markdown"),
         defineLanguage("python"),
         defineLanguage("scss"),
         defineLanguage("typescript"),
-    ].map((def: LanguageDefinition) => [def.languageId, def])
+    ].map((def: LanguageDefinition) => [def.id, def])
 )
 
 export namespace Languages {
-    export function list(): string[] {
-        return new Array(...languages.keys())
+    export function list(): LanguageDefinition[] {
+        return new Array(...languages.values())
     }
 
     export function isSupported(languageId: string): boolean {
         return languages.has(languageId)
     }
 
-    export function getDefinition(languageId: string): LanguageDefinition {
+    export function get(languageId: string): LanguageDefinition {
         const def = languages.get(languageId)
         if (!def) {
             throw new Error(`Missing language definition: ${languageId}`)

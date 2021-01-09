@@ -3,9 +3,15 @@ import { SyntaxNode } from "web-tree-sitter"
 export type NodeAccessorFunction = (node: SyntaxNode) => SyntaxNode | null | undefined
 
 export type LanguageDefinition = {
-    languageId: string
+    // vscode language id
+    id: string,
+    // tree-sitter grammar id
+    grammarId: string,
 }
 
-export function defineLanguage(languageId: string): LanguageDefinition {
-    return { languageId }
+export function defineLanguage(languageId: string, grammarId?: string): LanguageDefinition {
+    return {
+        id: languageId,
+        grammarId: grammarId ?? languageId,
+    }
 }
