@@ -29,7 +29,6 @@
 - improve "raise" for complex languages (e.g. TypeScript)
 - add Kotlin (grammar exists, but wasm-build is slow)
 - go to first/last sibling (in the current node) (note: this is already possible with one more key: "parent->first-child" or "parent->last-child")
-- selection: mark current node, select everything between current and last mark
 - surround object with ? (brackets, quote marks, etc.)
 - always show start and end of selection => fold center to fit the complete selection into view
 - remove not-really-needed testing library: soft-assert?
@@ -44,6 +43,7 @@
   - marks
   - go to line / beginning / end of file
   - split / merge line
+  - ...
 
 - ace jump everywhere
   - direct child nodes

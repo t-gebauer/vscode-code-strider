@@ -91,6 +91,16 @@
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
+                "command": "code-strider:insert-above",
+                "key": "shift+o",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:insert-below",
+                "key": "o",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
                 "command": "code-strider:delete-and-insert",
                 "key": "c",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
@@ -174,17 +184,6 @@
             {
                 "command": "code-strider:tree-move-parent",
                 "key": "g",
-                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
-            },
-            {
-                "command": "code-strider:insert-on-new-line",
-                "key": "o",
-                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
-            },
-            {
-                "command": "code-strider:insert-on-new-line",
-                "key": "shift+o",
-                "args": { "before": true },
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             }
         ],

@@ -22,7 +22,8 @@ import {
     greedyDelete,
     insertAfter,
     insertBefore,
-    insertOnNewLine,
+    insertOnNewLineAbove,
+    insertOnNewLineBelow,
     mkFollowStructure,
     raise,
     undoEdit,
@@ -91,7 +92,8 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("exit-insert-mode", exitInsertMode)
     registerCommandWithState("insert-before", insertBefore)
     registerCommandWithState("insert-after", insertAfter)
-    registerCommandWithState("insert-on-new-line", insertOnNewLine)
+    registerCommandWithState("insert-above", insertOnNewLineAbove)
+    registerCommandWithState("insert-below", insertOnNewLineBelow)
     registerCommandWithState("delete-and-insert", deleteAndInsert)
     registerCommandWithState("greedy-delete", greedyDelete)
     registerCommandWithState("raise", raise)

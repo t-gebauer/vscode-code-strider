@@ -3,22 +3,23 @@ import { Selection, TextEditor, TextEditorEdit } from "vscode"
 import { SyntaxNode } from "web-tree-sitter"
 import { EditorState } from "./editor-state"
 import { EditorStateChange, logger } from "./extension"
-import { toPosition, toRange, toSelection } from "./utilities/conversion-utilities"
+import { toPosition, toRange } from "./utilities/conversion-utilities"
 import { findNodeAtSelection } from "./utilities/tree-utilities"
 
-export async function insertOnNewLine(
+export function insertOnNewLineAbove(
     state: Readonly<EditorState>,
-    textEditor: TextEditor,
-    _editBuilder: TextEditorEdit,
-    args: { before?: true }
-): Promise<EditorStateChange> {
-    if (args && args.before) {
-        const firstLine = toPosition(state.currentNode.startPosition)
-        textEditor.selection = new Selection(firstLine, firstLine)
-        vscode.commands.executeCommand("editor.action.insertLineBefore")
-    } else {
-        vscode.commands.executeCommand("editor.action.insertLineAfter")
+    textEditor: TextEditor
+): EditorStateChange {
+    const firstLine = toPosition(state.currentNode.startPosition)
+    textEditor.selection = new Selection(firstLine, firstLine)
+    vscode.commands.executeCommand("editor.action.insertLineBefore")
+    return {
+        insertMode: true,
     }
+}
+
+export function insertOnNewLineBelow(_: Readonly<EditorState>): EditorStateChange {
+    vscode.commands.executeCommand("editor.action.insertLineAfter")
     return {
         insertMode: true,
     }
