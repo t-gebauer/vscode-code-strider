@@ -206,6 +206,7 @@ export class Extension implements Disposable {
             promise.then((newState) => {
                 this.activeEditorState = newState
                 this.handleSelectedNodeChanged(newState)
+                this.handleModeChange(newState)
             })
         }, 1)
     }
@@ -288,9 +289,8 @@ export class Extension implements Disposable {
         const currentNode = activeState.currentNode
 
         if (change.insertMode !== undefined) {
-            logger.log(`changing insertMode: ${change.insertMode}`)
-            commands.executeCommand("setContext", "code-strider:is-insert-mode", change.insertMode)
             activeState.insertMode = change.insertMode
+            this.handleModeChange(activeState)
         }
         if (change.backToPreviousNode) {
             const previousNode = activeState.previousNodes.pop()
@@ -309,6 +309,11 @@ export class Extension implements Disposable {
         } else {
             this.activeEditorStateChange.fire(activeState)
         }
+    }
+
+    private handleModeChange(state: EditorState) {
+        logger.log(`changing insertMode: ${state.insertMode}`)
+        commands.executeCommand("setContext", "code-strider:is-insert-mode", state.insertMode)
     }
 
     withState<T extends readonly unknown[], U extends EditorStateChange>(
