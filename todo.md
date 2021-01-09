@@ -12,6 +12,8 @@
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true)))
 
 # More ideas
+- always highlight the whole lines of the selected node, to make it easier to see, where `move-up` and similar actions will do
+- prevent "reveal range" from reaching the top of the editor (add some extra lines?)
 - implement "ace jump" to nth-child
 - key:x "select node starting on line"?
 - select multiple nodes at once (maybe just two, and everything between?)

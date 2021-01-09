@@ -34,7 +34,7 @@ export class AstViewer implements Disposable {
                 astView.setOrUpdateState(newState)
             })
         )
-        astView.setOrUpdateState(state)
+        astView.setOrUpdateState(state, true)
         await astView.show(state)
         return astView
     }
@@ -66,18 +66,17 @@ export class AstViewer implements Disposable {
         )
     }
 
-    setOrUpdateState(editorState: EditorState | undefined) {
+    setOrUpdateState(editorState: EditorState | undefined, forceUpdate = false) {
         this.editorState = editorState
         if (editorState === undefined) {
             // remove decorations
             this.editorWindow?.setDecorations(this.nodeDecoration, [])
             return
         }
-        if (!editorState.insertMode && editorState.parseTree !== this.parseTree) {
+        if (forceUpdate || (!editorState.insertMode && editorState.parseTree !== this.parseTree)) {
             logger.log("AST view: Parse tree change detected")
             this.parseTree = editorState.parseTree
             this.editorState = editorState
-            // DO this when the parse tree has changed, e.g. the content changed
             const [content, rangeFinder] = renderTree(editorState.parseTree)
             this.contentProvider.content = content
             this.rangeFinder = rangeFinder
