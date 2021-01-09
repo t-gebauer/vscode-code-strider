@@ -19,12 +19,14 @@ import {
     backToPreviousSelection,
     deleteAndInsert,
     exitInsertMode,
+    goToFirstChild,
+    goToLastChild,
+    goToParent,
     greedyDelete,
     insertAfter,
     insertBefore,
     insertOnNewLineAbove,
     insertOnNewLineBelow,
-    mkFollowStructure,
     raise,
     undoEdit,
 } from "./commands"
@@ -99,8 +101,6 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("raise", raise)
     registerCommandWithState("back-to-previous-selection", backToPreviousSelection)
     registerCommandWithState("undo-edit", undoEdit)
-    registerCommandWithState("follow-structure", mkFollowStructure(true))
-    registerCommandWithState("follow-structure-last", mkFollowStructure(false))
     // direct tree movement commands
     registerCommandWithState("tree-move-previous-sibling", (state) => ({
         currentNode: state.currentNode.previousNamedSibling || undefined,
@@ -117,11 +117,17 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("tree-move-last-child", (state) => ({
         currentNode: state.currentNode.lastNamedChild || undefined,
     }))
+    // tree-movement, but ignores nodes that take the same space
+    registerCommandWithState("first-child", goToFirstChild)
+    registerCommandWithState("last-child", goToLastChild)
+    registerCommandWithState("move-parent", goToParent)
     // spatial movement commands
     registerCommandWithState("move-up", moveUp)
     registerCommandWithState("move-down", moveDown)
     registerCommandWithState("move-left", moveLeft)
     registerCommandWithState("move-right", moveRight)
+    registerCommandWithState("follow-structure", goToFirstChild)
+    registerCommandWithState("follow-structure-last", goToLastChild)
 
     logger.log("... registration complete.")
 

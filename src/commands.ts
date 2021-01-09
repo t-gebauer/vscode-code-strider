@@ -68,13 +68,16 @@ export function backToPreviousSelection(_: Readonly<EditorState>): EditorStateCh
     }
 }
 
-// "go inside" the currently selected node. Smart version of "first-child".
-export function mkFollowStructure(forward = true) {
-    return function followStructure(state: Readonly<EditorState>): EditorStateChange {
+export const goToFirstChild = repeatUntilVisuallyChanged((node) => node.firstNamedChild)
+export const goToLastChild = repeatUntilVisuallyChanged((node) => node.lastNamedChild)
+export const goToParent = repeatUntilVisuallyChanged(node => node.parent)
+
+// Ignore nodes which take the same space as the original node
+function repeatUntilVisuallyChanged(fn: (node: SyntaxNode) => SyntaxNode | null | undefined) {
+    return function (state: Readonly<EditorState>): EditorStateChange {
         let nextNode: SyntaxNode | null | undefined = state.currentNode
         do {
-            logger.log("next node!")
-            nextNode = forward ? nextNode.firstNamedChild : nextNode.lastNamedChild
+            nextNode = fn(nextNode)
         } while (nextNode && toRange(nextNode).isEqual(toRange(state.currentNode)))
         return {
             currentNode: nextNode || undefined,

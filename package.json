@@ -33,7 +33,7 @@
         "commands": [
             {
                 "command": "code-strider:toggle-ast-viewer",
-                "title": "code-strider: Toggle AST viewer"
+                "title": "Code-strider: Toggle AST viewer"
             }
         ],
         "menus": {
@@ -171,7 +171,7 @@
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
-                "~comment": "Follow the flow of the currently selected structure. Falls back to `first-child`",
+                "~comment": "Follow the flow of the currently selected structure.",
                 "command": "code-strider:follow-structure",
                 "key": "f",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
@@ -182,7 +182,17 @@
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
-                "command": "code-strider:tree-move-parent",
+                "command": "code-strider:first-child",
+                "key": "alt+f",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:last-child",
+                "key": "shift+alt+f",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:move-parent",
                 "key": "g",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             }
