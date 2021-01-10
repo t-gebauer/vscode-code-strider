@@ -92,3 +92,6 @@ cp ./result/*.wasm ./wasm/
 
 - The extension does not (re-)initialize when changing the language mode of a file.
   It is necessary to switch to another editor and back to detect the language change.
+
+- Do not try to move the AST viewer manually. Change the editor layout instead. Otherwise the selections will not update.
+  For example, use `View: Two rows editor layout` **after** opening the AST viewer to move it to the bottom row.

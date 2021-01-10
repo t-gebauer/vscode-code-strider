@@ -1,6 +1,6 @@
 import { expect } from "chai"
 import { SyntaxNode } from "web-tree-sitter"
-import { nodeAbove, nodeBelow, nodeLeftOf, nodeRightOf } from "../../spatial-movement-commands"
+import { nodeAbove, nodeBelow, nodeLeftOf, nodeRightOf } from "../../spatial-movement"
 import { TreeSitter } from "../../tree-sitter"
 import { TestUtils } from "../test-utils"
 

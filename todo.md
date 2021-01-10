@@ -1,7 +1,5 @@
 # Prioritized for v1.0
 - change to visual mode for selection [v]?
-- different commands: first child/last child and follow flow
-  "follow flow" should go inside AND to the next line while, first child probably stays on the line
 - slurping
 - barfing
 - move node around (a minor mode?)

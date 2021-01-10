@@ -42,6 +42,7 @@ export class AstViewer implements Disposable {
     private parseTree?: Tree
     private editorState?: EditorState
     private rangeFinder?: (node: SyntaxNode) => Range | undefined
+    // TODO: moving the AST view (e.g. from right to bottom) creates a new editor window?
     private editorWindow?: TextEditor
 
     private readonly subscriptions: Disposable[] = []
@@ -77,7 +78,7 @@ export class AstViewer implements Disposable {
             logger.log("AST view: Parse tree change detected")
             this.parseTree = editorState.parseTree
             this.editorState = editorState
-            const [content, rangeFinder] = renderTree(editorState.parseTree)
+            const [content, rangeFinder] = renderTreeWithRanges(editorState.parseTree)
             this.contentProvider.content = content
             this.rangeFinder = rangeFinder
             this.contentProvider.contentChangeEmitter.fire(createUri(editorState.editor.document))
@@ -94,7 +95,7 @@ export class AstViewer implements Disposable {
         const node = this.editorState.currentNode
         const currentRange = this.rangeFinder(node)
         if (currentRange) {
-            // move the cursor out of the way to prevent automatic "similarity highlighting", and to hide the cursor
+            // move the cursor out of the way to prevent automatic "similarity highlighting", and to "hide" the cursor
             this.editorWindow.selection = new Selection(new Position(0, 0), new Position(0, 0))
             this.editorWindow.setDecorations(this.nodeDecoration, [currentRange])
             this.editorWindow.revealRange(
@@ -106,6 +107,7 @@ export class AstViewer implements Disposable {
 
     async show(editorState: EditorState) {
         const document = await workspace.openTextDocument(createUri(editorState.editor.document))
+        // XXX: `ViewColumn.Beside` is currently the only non-fixed option here. We can not open it "below"
         this.editorWindow = await window.showTextDocument(document, {
             preserveFocus: true,
             viewColumn: ViewColumn.Beside,
@@ -116,14 +118,21 @@ export class AstViewer implements Disposable {
 
     dispose() {
         // TODO: `TextEditor.hide()` is deprecated.
-        // But there seems to be no real replacement. Just keep it open then?
-        this.editorWindow?.hide()
+        // But there seems to be no direct replacement. Just keep it open then?
+        // Alternatively, we could close all editors which are showing this content by checking their document?
+        if (this.editorWindow?.hide) {
+            this.editorWindow?.hide()
+        }
         Disposable.from(
             ...this.subscriptions,
             this.nodeDecoration,
             this.contentProvider.contentChangeEmitter
         ).dispose()
     }
+}
+
+export function renderTree(tree: Tree): string {
+    return renderTreeWithRanges(tree)[0]
 }
 
 /**
@@ -134,7 +143,7 @@ export class AstViewer implements Disposable {
  *   2. a function to query the position of the string representation of
  *      a SyntaxNode in the rendered string.
  */
-function renderTree(
+function renderTreeWithRanges(
     tree: Tree
 ): [source: string, getRange: (node: SyntaxNode) => Range | undefined] {
     const ranges = new Map<string, Range>()

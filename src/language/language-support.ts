@@ -25,7 +25,7 @@ const languages: Map<string, LanguageDefinition> = new Map(
         defineLanguage("markdown"),
         defineLanguage("nix"),
         // TODO: create a real (simple) grammar for text: words, paragraphs?
-        defineLanguage("plaintext", "markdown"),
+        // defineLanguage("plaintext", "markdown"),
         defineLanguage("python"),
         defineLanguage("scss"),
         defineLanguage("typescript"),
