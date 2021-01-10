@@ -32,11 +32,11 @@ describe("Spatial movement", () => {
 
         before(async () => {
             const tree = await treeSitter.parseText(source, "typescript")
-            className = tree.rootNode.firstNamedChild?.firstNamedChild?.childForFieldName("name")!
+            const fooClass = tree.rootNode.firstNamedChild?.firstNamedChild
+            expect(fooClass?.type).to.equal("class_declaration")
+            className = fooClass?.childForFieldName("name")!
             expect(className?.text).to.equal("Foo")
-            const classBody = tree.rootNode.firstNamedChild?.firstNamedChild?.childForFieldName(
-                "body"
-            )
+            const classBody = fooClass?.childForFieldName("body")
             barFunction = classBody?.namedChild(2)!
             expect(barFunction?.text).to.match(/^bar\(arg1: /)
             returnStatement = barFunction?.childForFieldName("body")?.firstNamedChild!
@@ -60,15 +60,6 @@ describe("Spatial movement", () => {
                 const result = nodeBelow(bazAssignement)
                 expect(result).to.equal(undefined)
             })
-
-            // TODO: "below" and "above" should jump between functions in this code:
-            // server.start().then(function () {
-            // 	log.info('Pact Mock Server running on port: ' + server.options.port);
-            // 	// Remove current server from starting servers array
-            // 	startingServers = startingServers.filter(x => x !== server.options.port);
-            // }, function (err) {
-            // 	log.error('Error while trying to run karma-pact: ' + err);
-            // });
         })
 
         describe("find node above", () => {
@@ -134,6 +125,52 @@ describe("Spatial movement", () => {
                 const result = nodeRightOf(secondBarParameter)
                 expect(result).to.equal(undefined)
             })
+        })
+    })
+
+    describe("JavaScript", () => {
+        const source = `
+            server.start().then(function () {
+              log.info('Pact Mock Server running on port: ' + server.options.port);
+              // Remove current server from starting servers array
+              startingServers = startingServers.filter(x => x !== server.options.port);
+            }, function (err) {
+              log.error('Error while trying to run karma-pact: ' + err);
+            });
+        `
+
+        const successFunctionRegex = /^function \(\) /
+        let successFunction: SyntaxNode
+        const errorFunctionRegex = /^function \(err\) /
+        let errorFunction: SyntaxNode
+
+        before(async () => {
+            const tree = await treeSitter.parseText(source, "javascript")
+            const callExpresssion = tree.rootNode.firstNamedChild?.firstNamedChild
+            expect(callExpresssion?.text).to.match(/^server.start/)
+            const callExpressionArguments = callExpresssion?.childForFieldName('arguments')
+            successFunction = callExpressionArguments?.namedChild(0)!
+            expect(successFunction?.text).to.match(successFunctionRegex)
+            errorFunction = callExpressionArguments?.namedChild(1)!
+            expect(errorFunction?.text).to.match(errorFunctionRegex)
+        })
+
+        // FIXME
+        xit('should move down to error function', () => {
+            expect(nodeBelow(successFunction)?.text).to.match(errorFunctionRegex)
+        })
+
+        // FIXME
+        xit('should move up to success function', () => {
+            expect(nodeAbove(errorFunction)?.text).to.match(successFunctionRegex)
+        })
+
+        it('should move right to error function', () => {
+            expect(nodeRightOf(successFunction)?.text).to.match(errorFunctionRegex)
+        })
+
+        it('should move left to error function', () => {
+            expect(nodeLeftOf(errorFunction)?.text).to.match(successFunctionRegex)
         })
     })
 

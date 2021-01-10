@@ -98,6 +98,9 @@ export function nodeBelow(node: SyntaxNode): SyntaxNode | undefined {
     return nextNode(node, true)
 }
 
+// TODO: left and right should behave more like above and below. Crossing parent
+//       boundaries if necessary.
+
 export function nodeLeftOf(node: SyntaxNode): SyntaxNode | undefined {
     const other = node.previousNamedSibling
     if (other && other.endPosition.row === node.startPosition.row) {
