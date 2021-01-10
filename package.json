@@ -36,11 +36,6 @@
             {
                 "command": "code-strider:toggle-ast-viewer",
                 "title": "Code-strider: Toggle AST viewer"
-            },
-            {
-                "command": "code-strider:_ready",
-                "title": "Code-strider: _ready",
-                "enablement": "false"
             }
         ],
         "menus": {
