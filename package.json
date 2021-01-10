@@ -210,17 +210,17 @@
             },
             {
                 "command": "code-strider:slurp-right",
-                "key": "0",
-                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
-            },
-            {
-                "command": "code-strider:barf-left",
                 "key": "8",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
+                "command": "code-strider:barf-left",
+                "key": "shift+7",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
                 "command": "code-strider:barf-right",
-                "key": "9",
+                "key": "shift+8",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             }
         ],

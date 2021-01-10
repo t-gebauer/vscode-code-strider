@@ -132,7 +132,6 @@ function slurpNext(
     console.log(child.text)
     edit.delete(toRange(sibling))
     edit.insert(toPosition(forward ? child.startPosition : child.endPosition), sibling.text)
-    // node will update automatically according to the new selection
     return {}
 }
 
@@ -154,6 +153,7 @@ export function slurpRight(
 
 function barfNext(
     state: Readonly<EditorState>,
+    editor: TextEditor,
     edit: TextEditorEdit,
     forward = true
 ): EditorStateChange {
@@ -163,8 +163,12 @@ function barfNext(
     const sibling = nextSibling(child, !forward)
     if (!sibling) return {}
     edit.delete(toRange(sibling))
-    edit.insert(toPosition(forward ? current.endPosition : current.startPosition), sibling.text)
-    // node will update automatically according to the new selection
+    edit.replace(toPosition(forward ? current.endPosition : current.startPosition), sibling.text)
+    // TODO: selections should always be around the original node on its new position
+    editor.selection = new Selection(
+        toPosition(forward ? current.startPosition : current.endPosition),
+        toPosition(forward ? sibling.endPosition : sibling.startPosition)
+    )
     return {}
 }
 
@@ -173,7 +177,7 @@ export function barfLeft(
     editor: TextEditor,
     edit: TextEditorEdit
 ): EditorStateChange {
-    return barfNext(state, edit, false)
+    return barfNext(state, editor, edit, false)
 }
 
 export function barfRight(
@@ -181,5 +185,5 @@ export function barfRight(
     editor: TextEditor,
     edit: TextEditorEdit
 ): EditorStateChange {
-    return barfNext(state, edit, true)
+    return barfNext(state, editor, edit, true)
 }

@@ -144,6 +144,9 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("follow-structure-last", goToLastChild)
 
     // editing commands
+    // TODO: afaik, slurping and barfing only works for HTML.
+    //       Configure per language "how much" of the selected node is its border?
+    //       In HTML: the first named child node
     registerCommandWithState("slurp-left", slurpLeft)
     registerCommandWithState("slurp-right", slurpRight)
     registerCommandWithState("barf-left", barfLeft)
