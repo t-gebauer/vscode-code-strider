@@ -12,7 +12,9 @@
     "engines": {
         "vscode": "^1.50.0"
     },
-    "categories": ["Other"],
+    "categories": [
+        "Other"
+    ],
     "activationEvents": [
         "onLanguage:c",
         "onLanguage:clojure",
@@ -34,6 +36,11 @@
             {
                 "command": "code-strider:toggle-ast-viewer",
                 "title": "Code-strider: Toggle AST viewer"
+            },
+            {
+                "command": "code-strider:_ready",
+                "title": "Code-strider: _ready",
+                "enablement": "false"
             }
         ],
         "menus": {
@@ -127,7 +134,7 @@
             },
             {
                 "command": "code-strider:tree-move-last-child",
-                "key": "ctr+alt+l",
+                "key": "ctrl+alt+l",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
@@ -195,18 +202,47 @@
                 "command": "code-strider:move-parent",
                 "key": "g",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:slurp-left",
+                "key": "7",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:slurp-right",
+                "key": "0",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:barf-left",
+                "key": "8",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:barf-right",
+                "key": "9",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             }
         ],
         "languages": [
             {
                 "id": "fennel",
-                "extensions": [".fnl"],
-                "aliases": ["Fennel", "fnl"]
+                "extensions": [
+                    ".fnl"
+                ],
+                "aliases": [
+                    "Fennel",
+                    "fnl"
+                ]
             },
             {
                 "id": "nix",
-                "extensions": [".nix"],
-                "aliases": ["Nix"]
+                "extensions": [
+                    ".nix"
+                ],
+                "aliases": [
+                    "Nix"
+                ]
             }
         ]
     },

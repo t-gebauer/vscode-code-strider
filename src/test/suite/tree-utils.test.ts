@@ -2,7 +2,7 @@ import { Position, Selection } from "vscode"
 import { Tree } from "web-tree-sitter"
 import * as treeUtils from "../../utilities/tree-utilities"
 import { softExpect } from "../soft-expect"
-import { TestUtils } from "../test-utils"
+import { TestTreeSitter } from "../test-utils"
 
 describe("Tree Utils", () => {
     context("Find node in selection", async () => {
@@ -27,7 +27,7 @@ function bar(arg = false) {
         let tree: Tree
 
         before(async () => {
-            const treeSitter = await TestUtils.initializeTreeSitter()
+            const treeSitter = await TestTreeSitter.initializeTreeSitter()
             tree = await treeSitter.parseText(source, "javascript")
         })
 
@@ -72,7 +72,7 @@ const x =          "weirdly formatted string"      ;
         `
         let tree: Tree
         before(async () => {
-            const treeSitter = await TestUtils.initializeTreeSitter()
+            const treeSitter = await TestTreeSitter.initializeTreeSitter()
             tree = await treeSitter.parseText(source, "javascript")
         })
 

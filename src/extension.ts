@@ -17,6 +17,7 @@ import {
 import { AstViewer } from "./ast-view"
 import {
     backToPreviousSelection,
+    slurpLeft,
     deleteAndInsert,
     exitInsertMode,
     goToFirstChild,
@@ -29,6 +30,9 @@ import {
     insertOnNewLineBelow,
     raise,
     undoEdit,
+    slurpRight,
+    barfLeft,
+    barfRight,
 } from "./commands"
 import { EditorState } from "./editor-state"
 import { interceptTypeCommand } from "./intercept-typing"
@@ -48,7 +52,6 @@ export let logger: Logger
 
 // Main entry point. This method is called when the extension is activated. Configured in package.json.
 export async function activate(context: ExtensionContext) {
-    console.log('Extension "code-strider" is now active!')
     const outputChannelLogger = new OutputChannelLogger("code-strider debug")
     logger = outputChannelLogger
     logger.context("Activating extension ...")
@@ -74,6 +77,14 @@ export async function activate(context: ExtensionContext) {
         ),
         commands.registerTextEditorCommand("code-strider:show-log", () =>
             logger.show ? logger.show() : undefined
+        ),
+        // Used during integration tests to wait until the extension is initialized
+        commands.registerCommand(
+            "code-strider:_ready",
+            () =>
+                new Promise((resolve) =>
+                    ext.onActiveEditorStateChange((state) => (state ? resolve(state) : undefined))
+                )
         )
     )
 
@@ -101,6 +112,7 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("raise", raise)
     registerCommandWithState("back-to-previous-selection", backToPreviousSelection)
     registerCommandWithState("undo-edit", undoEdit)
+
     // direct tree movement commands
     registerCommandWithState("tree-move-previous-sibling", (state) => ({
         currentNode: state.currentNode.previousNamedSibling || undefined,
@@ -117,10 +129,12 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("tree-move-last-child", (state) => ({
         currentNode: state.currentNode.lastNamedChild || undefined,
     }))
+
     // tree-movement, but ignores nodes that take the same space
     registerCommandWithState("first-child", goToFirstChild)
     registerCommandWithState("last-child", goToLastChild)
     registerCommandWithState("move-parent", goToParent)
+
     // spatial movement commands
     registerCommandWithState("move-up", moveUp)
     registerCommandWithState("move-down", moveDown)
@@ -128,6 +142,12 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("move-right", moveRight)
     registerCommandWithState("follow-structure", goToFirstChild)
     registerCommandWithState("follow-structure-last", goToLastChild)
+
+    // editing commands
+    registerCommandWithState("slurp-left", slurpLeft)
+    registerCommandWithState("slurp-right", slurpRight)
+    registerCommandWithState("barf-left", barfLeft)
+    registerCommandWithState("barf-right", barfRight)
 
     logger.log("... registration complete.")
 

@@ -2,13 +2,13 @@ import { expect } from "chai"
 import { SyntaxNode } from "web-tree-sitter"
 import { nodeAbove, nodeBelow, nodeLeftOf, nodeRightOf } from "../../spatial-movement"
 import { TreeSitter } from "../../tree-sitter"
-import { TestUtils } from "../test-utils"
+import { TestTreeSitter } from "../test-utils"
 
 describe("Spatial movement", () => {
     let treeSitter: TreeSitter
 
     before(async () => {
-        treeSitter = await TestUtils.initializeTreeSitter()
+        treeSitter = await TestTreeSitter.initializeTreeSitter()
     })
 
     describe("TypeScript", () => {

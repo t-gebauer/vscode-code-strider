@@ -2,8 +2,9 @@ import * as vscode from "vscode"
 import { Selection, TextEditor, TextEditorEdit } from "vscode"
 import { SyntaxNode } from "web-tree-sitter"
 import { EditorState } from "./editor-state"
-import { EditorStateChange, logger } from "./extension"
+import { EditorStateChange } from "./extension"
 import { toPosition, toRange } from "./utilities/conversion-utilities"
+import { nextChild, nextSibling } from "./utilities/node-utilities"
 import { findNodeAtSelection } from "./utilities/tree-utilities"
 
 export function insertOnNewLineAbove(
@@ -70,7 +71,7 @@ export function backToPreviousSelection(_: Readonly<EditorState>): EditorStateCh
 
 export const goToFirstChild = repeatUntilVisuallyChanged((node) => node.firstNamedChild)
 export const goToLastChild = repeatUntilVisuallyChanged((node) => node.lastNamedChild)
-export const goToParent = repeatUntilVisuallyChanged(node => node.parent)
+export const goToParent = repeatUntilVisuallyChanged((node) => node.parent)
 
 // Ignore nodes which take the same space as the original node
 function repeatUntilVisuallyChanged(fn: (node: SyntaxNode) => SyntaxNode | null | undefined) {
@@ -116,4 +117,69 @@ export function raise(
     } else {
         return {}
     }
+}
+
+function slurpNext(
+    state: Readonly<EditorState>,
+    edit: TextEditorEdit,
+    forward = true
+): EditorStateChange {
+    const { currentNode } = state
+    const sibling = nextSibling(currentNode, forward)
+    const child = nextChild(currentNode, !forward)
+    if (!(child && sibling)) return {}
+    console.log(sibling?.text)
+    console.log(child.text)
+    edit.delete(toRange(sibling))
+    edit.insert(toPosition(forward ? child.startPosition : child.endPosition), sibling.text)
+    // node will update automatically according to the new selection
+    return {}
+}
+
+export function slurpLeft(
+    state: Readonly<EditorState>,
+    editor: TextEditor,
+    edit: TextEditorEdit
+): EditorStateChange {
+    return slurpNext(state, edit, false)
+}
+
+export function slurpRight(
+    state: Readonly<EditorState>,
+    editor: TextEditor,
+    edit: TextEditorEdit
+): EditorStateChange {
+    return slurpNext(state, edit, true)
+}
+
+function barfNext(
+    state: Readonly<EditorState>,
+    edit: TextEditorEdit,
+    forward = true
+): EditorStateChange {
+    const { currentNode: current } = state
+    const child = nextChild(current, !forward)
+    if (!child) return {}
+    const sibling = nextSibling(child, !forward)
+    if (!sibling) return {}
+    edit.delete(toRange(sibling))
+    edit.insert(toPosition(forward ? current.endPosition : current.startPosition), sibling.text)
+    // node will update automatically according to the new selection
+    return {}
+}
+
+export function barfLeft(
+    state: Readonly<EditorState>,
+    editor: TextEditor,
+    edit: TextEditorEdit
+): EditorStateChange {
+    return barfNext(state, edit, false)
+}
+
+export function barfRight(
+    state: Readonly<EditorState>,
+    editor: TextEditor,
+    edit: TextEditorEdit
+): EditorStateChange {
+    return barfNext(state, edit, true)
 }
