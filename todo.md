@@ -1,15 +1,13 @@
 # Prioritized for v1.0
-- change to visual mode for selection [v]?
-- slurping
-- barfing
+- // TODO: remove Fennel if unlicensed!
 - move node around (a minor mode?)
-- Define "blocks" per language?
 
 # Bugs
-- parse tree gets out of sync after some edits?
+- parse tree gets out of sync after some edits? Might happen if the edits are happening quickly and the processing takes too long?
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true)))
 
 # More ideas
+- repository/code layout: differentiate between vscode-extension specific (commands, events) and tree-sitter specific code (algorithms for tree and node traversal, etc)
 - "greedy delete" needs to be more greedy when no named siblings are around
 - always highlight the whole lines of the selected node, to make it easier to see, where `move-up` and similar actions will do
 - prevent "reveal range" from reaching the top of the editor (add some extra lines?)
@@ -32,6 +30,7 @@
 - go to first/last sibling (in the current node) (note: this is already possible with one more key: "parent->first-child" or "parent->last-child")
 - surround object with ? (brackets, quote marks, etc.)
 - always show start and end of selection => fold center to fit the complete selection into view
+- fold everything :)
 - remove not-really-needed testing library: soft-assert?
 - highlight errors
 - use the keys "pos1/home" and "end" to go to parents and children?
@@ -53,6 +52,8 @@
 
 - shortcuts during insert mode
   - jump to beginning/end of node next and previous nodes
+
+- hacky tree-sitter use: can we find nodes by editing the tree and then asking the tree, where the changes are?
 
 # Rejected ideas (for now)
 - Toggle extension on/off: Why? VS Code can already enable and disable the extension (globally, per workspace).

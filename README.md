@@ -8,9 +8,6 @@ This interface is modal. You can either navigate around the code or insert text 
 
 All keybindings are configurable. The defaults are heavily influenced by Vim.
 
-
-To exit insert-mode, simply press [Escape] (`exit-insert-mode`).
-
 ### Navigate complex code structures with ease
 
 Use the arrow keys or the HJKL keys (default) to easily move over source code fragments.
@@ -20,7 +17,7 @@ The commands `follow-structure` [f] and `follow-structure-last` [Shift+f] should
 
 <!-- TODO: add animations -->
 
-If any movement operaton did not select your wished for node, you can return to previously selected nodes by using `back-to-previous-selection` [b]. (Note: this undo-stack is cleared on file-change or any file modifications)
+If any movement operation did not select your wished for node, you can return to previously selected nodes by using `back-to-previous-selection` [b]. (Note: this undo-stack is cleared on file-change or any file modifications)
 
 #### Direct tree navigation
 
@@ -36,6 +33,8 @@ It is also possible to move directly on the Tree-sitter AST with the `tree-move-
 - `insert-above` [Shift-o] Start inserting text on a line *above* the currently selected node
 - `delete-insert` [c] Change the currently selected node by deleting its text and entering insert-mode.
 
+To exit insert-mode, simply press [Escape] (`exit-insert-mode`).
+
 #### Deleting nodes
 
 - `greedy-delete` (default binding: [Backspace])
@@ -43,7 +42,23 @@ It is also possible to move directly on the Tree-sitter AST with the `tree-move-
 
 ![greedy-delete GIF](images/greedy-delete.gif)
 
-For convinience the default VS Code `undo` command is bound to [u].
+For convenience the default VS Code `undo` command is bound to [u].
+
+### Supported languages
+
+        c
+        clojure
+        css
+        fennel
+        html
+        java
+        javascript
+        json
+        markdown
+        nix
+        python
+        scss
+        typescript
 
 ### Inspect the abstract syntax tree (AST)
 
