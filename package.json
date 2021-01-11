@@ -83,6 +83,11 @@
                 "when": "editorTextFocus && !suggestWidgetVisible && code-strider:is-editor-supported && code-strider:is-insert-mode"
             },
             {
+                "command": "code-strider:toggle-selection-anchor",
+                "key": "v",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
                 "command": "code-strider:insert-before",
                 "key": "i",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"

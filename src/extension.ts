@@ -112,6 +112,9 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("raise", raise)
     registerCommandWithState("back-to-previous-selection", backToPreviousSelection)
     registerCommandWithState("undo-edit", undoEdit)
+    registerCommandWithState("toggle-selection-anchor", (state) => {
+        return { selectionAnchor: state.selectionAnchor ? null : state.currentNode }
+    })
 
     // direct tree movement commands
     registerCommandWithState("tree-move-previous-sibling", (state) => ({
@@ -175,6 +178,7 @@ export type EditorStateChange = {
     currentNode?: SyntaxNode
     insertMode?: boolean
     backToPreviousNode?: true
+    selectionAnchor?: SyntaxNode | null
 }
 
 export class Extension implements Disposable {
@@ -237,7 +241,7 @@ export class Extension implements Disposable {
             const promise = this.createNewEditorState(editor)
             promise.then((newState) => {
                 this.activeEditorState = newState
-                this.handleSelectedNodeChanged(newState)
+                this.handleStateChanged(newState)
                 this.handleModeChanged(newState)
             })
         }, 1)
@@ -265,7 +269,7 @@ export class Extension implements Disposable {
         }
         // TODO: should handle multiple selections
         const selection = event.selections[0]
-        if (selection.isEqual(toSelection(state.currentNode))) {
+        if (selection.isEqual(this.getTargetSelection(state))) {
             // Nothing to do, the current node already spans the selection.
             // Also happens if we are changing the selection manually after a movement command.
             return
@@ -283,25 +287,25 @@ export class Extension implements Disposable {
         })
     }
 
-    private handleSelectedNodeChanged(state: EditorState) {
-        logger.log("-> selectedNode changed")
-        // Ensure that the complete node is selected
-        const targetNodeSelection = toSelection(state.currentNode)
-        const currentSelection = state.editor.selection
-        if (!currentSelection.isEqual(targetNodeSelection)) {
-            logger.log("correcting editor selection")
-            // TODO: automatically changing the selection causes way too many problems:
-            // ctrl-leftButton : does not work. We could fix that one by delaying the selection update
+    private getTargetSelection(state: EditorState) {
+        const combinedRange = toRange(state.currentNode).union(
+            toRange(state.selectionAnchor ?? state.currentNode)
+        )
+        return new Selection(combinedRange.start, combinedRange.end)
+    }
 
-            state.editor.selection = targetNodeSelection
+    // deal with the consequences of changes in the state
+    private handleStateChanged(state: EditorState) {
+const targetSelection = this.getTargetSelection(state)
+        const currentSelection = state.editor.selection
+        if (!currentSelection.isEqual(targetSelection)) {
+            logger.log("correcting editor selection")
+            state.editor.selection = targetSelection
         }
-        // TODO: only reveal range when triggered change occurred via keyboard command?
-        //       Do not suddenly scroll the view, when accidentally selecting the whole program.
         state.editor.revealRange(
             toRange(state.currentNode),
             vscode.TextEditorRevealType.InCenterIfOutsideViewport
         )
-        // TODO: really always fire event here? Consider sending a second smaller "selected node change event"
         this.activeEditorStateChange.fire(state)
     }
 
@@ -334,6 +338,7 @@ export class Extension implements Disposable {
 
         if (change.insertMode !== undefined) {
             activeState.insertMode = change.insertMode
+            activeState.selectionAnchor = undefined
             this.handleModeChanged(activeState)
         }
         if (change.backToPreviousNode) {
@@ -346,10 +351,12 @@ export class Extension implements Disposable {
             activeState.previousNodes.push(currentNode)
             activeState.currentNode = change.currentNode
         }
+        if (change.selectionAnchor !== undefined) {
+            activeState.selectionAnchor = change.selectionAnchor ? change.selectionAnchor : undefined
+        }
 
-        const didChangeNode = activeState.currentNode !== currentNode
-        if (didChangeNode) {
-            this.handleSelectedNodeChanged(activeState) // will also fire the state change event
+        if (!activeState.insertMode) {
+            this.handleStateChanged(activeState) // will also fire the event
         } else {
             this.activeEditorStateChange.fire(activeState)
         }

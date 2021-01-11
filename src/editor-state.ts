@@ -7,5 +7,6 @@ export interface EditorState {
     insertMode: Boolean
     currentNode: SyntaxNode
     previousNodes: Array<SyntaxNode>
+    selectionAnchor?:  SyntaxNode
     parseTree: Parser.Tree
 }
