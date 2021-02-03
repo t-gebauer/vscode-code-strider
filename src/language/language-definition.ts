@@ -4,9 +4,9 @@ export type NodeAccessorFunction = (node: SyntaxNode) => SyntaxNode | null | und
 
 export type LanguageDefinition = {
     // vscode language id
-    id: string,
+    id: string
     // tree-sitter grammar id
-    grammarId: string,
+    grammarId: string
 }
 
 export function defineLanguage(languageId: string, grammarId?: string): LanguageDefinition {

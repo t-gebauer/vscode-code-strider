@@ -5,7 +5,6 @@ import { Logger } from "./logger"
 import { Languages } from "./language/language-support"
 
 export class TreeSitter {
-
     private parsers = new Map<string, Parser>()
 
     constructor(private readonly wasmDirPath: string, private readonly logger?: Logger) {
@@ -20,7 +19,7 @@ export class TreeSitter {
 
     async parseText(text: string, languageId: string, previousTree?: Tree): Promise<Tree> {
         this.logger?.log("1 initializing parser ...")
-        const parser = this.parsers.get(languageId) ?? await this.initializeNewParser(languageId)
+        const parser = this.parsers.get(languageId) ?? (await this.initializeNewParser(languageId))
         this.logger?.log("2 parsing text ...")
         const result = parser.parse(text, previousTree)
         this.logger?.log("3 done.")
@@ -29,7 +28,9 @@ export class TreeSitter {
 
     private async initializeNewParser(languageId: string): Promise<Parser> {
         const { grammarId } = Languages.get(languageId)
-        this.logger?.log(`-- initializing new parser instance for '${languageId}' with grammar '${grammarId}`)
+        this.logger?.log(
+            `-- initializing new parser instance for '${languageId}' with grammar '${grammarId}`
+        )
         const parser = new Parser()
         parser.setLanguage(await Parser.Language.load(this.wasmFilePath(grammarId)))
         this.parsers.set(languageId, parser)
@@ -41,7 +42,7 @@ export class TreeSitter {
     }
 
     private checkWasmFiles() {
-        Languages.list().forEach(language => {
+        Languages.list().forEach((language) => {
             const wasmFilePath = this.wasmFilePath(language.grammarId)
             if (!fs.existsSync(wasmFilePath)) {
                 throw new Error(`Missing parser: '${wasmFilePath}'`)

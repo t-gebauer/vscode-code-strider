@@ -52,9 +52,9 @@ export let logger: Logger
 
 // Main entry point. This method is called when the extension is activated. Configured in package.json.
 export async function activate(context: ExtensionContext) {
-    const outputChannelLogger = new OutputChannelLogger("code-strider debug")
+    const outputChannelLogger = new OutputChannelLogger("Code-strider [Debug]")
     logger = outputChannelLogger
-    logger.context("Activating extension ...")
+    logger.context("Activation ...")
 
     const treeSitter = new TreeSitter(context.asAbsolutePath("./wasm/"), logger)
     await treeSitter.initialize()
@@ -67,6 +67,7 @@ export async function activate(context: ExtensionContext) {
         outputChannelLogger,
         registerStatusBar(ext),
         registerDecorationHandler(ext),
+        // It is necessary to intercept the default type command to block all input unless in insert mode.
         commands.registerTextEditorCommand(
             "type",
             ext.withState(interceptTypeCommand, interceptTypeCommand)
@@ -75,10 +76,11 @@ export async function activate(context: ExtensionContext) {
             "code-strider:toggle-ast-viewer",
             ext.toggleAstViewer.bind(ext)
         ),
+        // Show the debug log output channel
         commands.registerTextEditorCommand("code-strider:show-log", () =>
             logger.show ? logger.show() : undefined
         ),
-        // Used during integration tests to wait until the extension is initialized
+        // Command used at the start of integration tests to wait until the extension is initialized
         commands.registerCommand(
             "code-strider:_ready",
             () =>
@@ -171,12 +173,17 @@ export enum InteractionMode {
     Insert,
 }
 
+/**
+ * All commands either modify the buffer directly via the TextEditor reference or use
+ * this interface to request changes to the currently active state.
+ */
 export type EditorStateChange = {
     currentNode?: SyntaxNode
     insertMode?: boolean
     backToPreviousNode?: true
 }
 
+// effectively a singleton, combining the whole state of the extension
 export class Extension implements Disposable {
     private activeEditorStateChange = new EventEmitter<EditorState | undefined>()
     readonly onActiveEditorStateChange: Event<EditorState | undefined> = this

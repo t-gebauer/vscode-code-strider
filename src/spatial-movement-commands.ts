@@ -2,7 +2,6 @@ import { EditorState } from "./editor-state"
 import { EditorStateChange } from "./extension"
 import { nodeAbove, nodeBelow, nodeLeftOf, nodeRightOf } from "./spatial-movement"
 
-
 export function moveUp(state: Readonly<EditorState>): EditorStateChange {
     return {
         currentNode: nodeAbove(state.currentNode),

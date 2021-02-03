@@ -142,6 +142,8 @@ export function renderTree(tree: Tree): string {
  *   1. the rendered string and
  *   2. a function to query the position of the string representation of
  *      a SyntaxNode in the rendered string.
+ *
+ * This implementation is kinda messy and not very fast, but it works.
  */
 function renderTreeWithRanges(
     tree: Tree

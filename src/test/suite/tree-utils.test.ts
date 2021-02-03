@@ -83,7 +83,6 @@ const x =          "weirdly formatted string"      ;
             softExpect(node.endPosition, "node end").to.deep.equal({ row: 3, column: 1 })
         })
 
-
         it("whitespace - same line, before", () => {
             const node = treeUtils.findNodeBeforeCursor(tree, position(2, 1))
             softExpect(node.type).to.equal("return_statement")

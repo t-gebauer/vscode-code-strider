@@ -4,16 +4,16 @@
 
 This extension provides a structured navigation and editing mode.
 
-This interface is modal. You can either navigate around the code or insert text but not both at the same time. The navigational mode is active by default.
+This editing interface is **modal**. You can either navigate around the code or insert text; but not both at the same time. The navigational mode is active by default.
 
-All keybindings are configurable. The defaults are heavily influenced by Vim.
+All keybindings are configurable. The defaults are influenced by Vim.
 
 ### Navigate complex code structures with ease
 
-Use the arrow keys or the HJKL keys (default) to easily move over source code fragments.
+Use the arrow keys or the [HJKL] keys (default) to easily move over source code fragments.
 These are bound to the smart movement commands `move-up`, `move-down`, `move-left`, `move-right`, which will try to move to code-structures in the desired direction.
 
-The commands `follow-structure` [f] and `follow-structure-last` [Shift+f] should be used to navigate further *inside* of a selected node.
+The commands `follow-structure` [f] and `follow-structure-last` [Shift+f] should preferably be used to navigate further *inside* a selected node.
 
 <!-- TODO: add animations -->
 
@@ -22,6 +22,7 @@ If any movement operation did not select your wished for node, you can return to
 #### Direct tree navigation
 
 It is also possible to move directly on the Tree-sitter AST with the `tree-move-...` commands.
+The commands `parent, next, previous, first child` are by default bound to `alt` + `h j k l` respectively.
 
 ### Perform syntax aware editing operations
 
@@ -44,21 +45,27 @@ To exit insert-mode, simply press [Escape] (`exit-insert-mode`).
 
 For convenience the default VS Code `undo` command is bound to [u].
 
+#### Slurping and barfing
+
+Currently, only really useful in HTML?
+
+<!-- TODO: animations -->
+
 ### Supported languages
 
-        c
-        clojure
-        css
-        fennel
-        html
-        java
-        javascript
-        json
-        markdown
-        nix
-        python
-        scss
-        typescript
+        C
+        Clojure
+        CSS
+        Fennel
+        HTML
+        Java
+        JavaScript
+        JSON
+        Markdown
+        Nix
+        Python
+        SCSS
+        TypeScript
 
 ### Inspect the abstract syntax tree (AST)
 
@@ -69,7 +76,7 @@ Activate it by opening the command palette [F1] and selecting the `Toggle AST vi
 
 ## Requirements
 
-No dependencies. This extension uses the *WASM* builds of [Tree-sitter](https://github.com/tree-sitter/tree-sitter), thus no native dependencies are required.
+No dependencies. This extension bundles the *WASM* builds of [Tree-sitter](https://github.com/tree-sitter/tree-sitter, thus, no native dependencies are required.
 
 In the future I might try to integrate native tree-sitter again, but that is currently quite complicated. The extension would need to be compiled with the exact same version of VS Code where it will be used.
 
@@ -79,14 +86,14 @@ Currently, there are no configurable settings.
 
 ## Contributions
 
-This extension contributes the languages `Fennel` and `Nix`. These are only partial definitions. Basically, only mapping their respective file suffixes to a language identifier. This allows consistent detection of all supported languages.
+This extension contributes the languages `Fennel` and `Nix`. These are only partial definitions. Basically only mapping their respective file suffixes to a language identifier. This allows consistent detection of all supported languages.
 
 ### Custom commands
 
-You can create custom key bindings which are only effective during Code-strider navigation or insert-mode. The following contexts can be used in a key bindings `when` expression:
+You can create custom key bindings which are only active during either Code-strider navigation or insert-mode. The following contexts can be used in a key binding's `when` expression:
 
-- `code-strider:is-editor-supported` indicates whether this extension is active in the currently active text editor (the language is supported).
-- `code-strider:is-insert-mode` indicates whether text insertion is active
+- `code-strider:is-editor-supported` indicates whether this extension is active in the currently active text editor (this is true if the language is supported).
+- `code-strider:is-insert-mode` indicates whether text insertion is active.
 
 For example, all default key bindings active during the structured-navigation mode use this expression:
 
@@ -96,7 +103,7 @@ For example, all default key bindings active during the structured-navigation mo
 
 ## Updating parsers
 
-With [nix](https://nixos.org/), the expression `build-wasm.nix` can be used to fetch and build all the latest parsers from their git repositories.
+With help of the package manager [Nix](https://nixos.org/), the expression `build-wasm.nix` can be used to fetch and build all the latest parsers from their git repositories.
 
 ```sh
 nix-build build-wasm.nix
@@ -110,3 +117,5 @@ cp ./result/*.wasm ./wasm/
 
 - Do not try to move the AST viewer manually. Change the editor layout instead. Otherwise the selections will not update.
   For example, use `View: Two rows editor layout` **after** opening the AST viewer to move it to the bottom row.
+
+- The extension will crash if a file is deleted during parsing. Simply reload VS Code (Action: `Developer: Reload Window`)

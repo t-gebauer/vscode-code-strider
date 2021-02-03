@@ -1,17 +1,20 @@
 import { Disposable, OutputChannel, window } from "vscode"
-import * as util from 'util'
+import * as util from "util"
 
 const contextDelimiter = `-`.repeat(80)
 
 export interface Logger {
+    /** Creates a regular log entry */
     log(message: unknown): void
+    /** Starts a new context; separating regular log messages visually */
     context(name: string): void
+    /** Bring the logger to the foreground if possible */
     show?: () => void
 }
 
 export class ConsoleOutLogger implements Logger {
     log(message: unknown) {
-        if (typeof message === 'object') {
+        if (typeof message === "object") {
             message = util.inspect(message)
         }
         console.log(formatMessage(message))
@@ -39,7 +42,7 @@ export class OutputChannelLogger implements Logger, Disposable {
     }
 
     log(message: unknown) {
-        if (typeof message === 'object') {
+        if (typeof message === "object") {
             message = util.inspect(message)
         }
         this.outputChannel.appendLine(formatMessage(message))

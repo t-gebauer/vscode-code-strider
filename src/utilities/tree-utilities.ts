@@ -28,12 +28,6 @@ export function findNodeAtSelection(tree: Tree, selection: Selection): SyntaxNod
     }
 }
 
-/** Directly move upwards to the outermost selection */
-export function findNodeAboveCursor(tree: Tree, position: Position): SyntaxNode {
-    // FIXME: implement
-    return tree.rootNode
-}
-
 /** Find a node on the same line as the given point, or earlier */
 // TODO simplify-> find node at cursor; use this as base for all other commands!
 // FIXME: should not select trailing `}` in TypeScript
@@ -90,6 +84,3 @@ export function findNodeBeforeCursor(tree: Tree, position: Position): SyntaxNode
         }
     }
 }
-
-/** Search on same line first and then move down */
-// TODO: implement
