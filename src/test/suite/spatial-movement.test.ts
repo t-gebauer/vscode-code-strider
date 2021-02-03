@@ -15,7 +15,7 @@ describe("Spatial movement", () => {
         const source = `
         export class Foo implements Bar {
 
-        private readonly config: Config = new Config();
+          private readonly config: Config = new Config();
           foo = "test";
 
           bar(arg1: number, arg2: string | null): void {
@@ -29,6 +29,7 @@ describe("Spatial movement", () => {
         let barFunction: SyntaxNode
         let returnStatement: SyntaxNode
         let bazAssignement: SyntaxNode
+        let lastInBlock: SyntaxNode
 
         before(async () => {
             const tree = await treeSitter.parseText(source, "typescript")
@@ -41,8 +42,10 @@ describe("Spatial movement", () => {
             expect(barFunction?.text).to.match(/^bar\(arg1: /)
             returnStatement = barFunction?.childForFieldName("body")?.firstNamedChild!
             expect(returnStatement?.text).to.equal("return undefined;")
-            bazAssignement = classBody?.namedChild(3)!
+            bazAssignement = classBody?.lastNamedChild!
             expect(bazAssignement?.text).to.equal("baz = false || true")
+            lastInBlock = bazAssignement.lastNamedChild!.lastNamedChild!
+            expect(lastInBlock?.text).to.equal("true")
         })
 
         describe("find node below", () => {
@@ -100,14 +103,14 @@ describe("Spatial movement", () => {
         })
 
         describe("find node right", () => {
-            it("should select parent when nothing else is there", () => {
+            it("should select element to the right", () => {
                 const result = nodeRightOf(className)
                 expect(result?.text).to.match(/^implements Bar$/)
             })
 
-            it("should stay inside parent block", () => {
+            it("should select a child if nothing is to the right", () => {
                 const result = nodeRightOf(barFunction)
-                expect(result).to.equal(undefined)
+                expect(result?.text).to.equal("bar")
             })
 
             it("should move inside parameter list", () => {
@@ -118,11 +121,16 @@ describe("Spatial movement", () => {
                 expect(result?.text).to.equal("arg2: string | null")
             })
 
-            it("should not move when already last parameter", () => {
+            it("should select a select a child if nothing is right while staying inside parent boundaries", () => {
                 const secondBarParameter = barFunction.childForFieldName("parameters")
                     ?.firstNamedChild?.nextNamedSibling!
                 expect(secondBarParameter?.text).to.equal("arg2: string | null")
                 const result = nodeRightOf(secondBarParameter)
+                expect(result?.text).to.equal("arg2")
+            })
+
+            it("should not move at all if already last in block and no children", () => {
+                const result = nodeRightOf(lastInBlock)
                 expect(result).to.equal(undefined)
             })
         })
@@ -148,7 +156,7 @@ describe("Spatial movement", () => {
             const tree = await treeSitter.parseText(source, "javascript")
             const callExpresssion = tree.rootNode.firstNamedChild?.firstNamedChild
             expect(callExpresssion?.text).to.match(/^server.start/)
-            const callExpressionArguments = callExpresssion?.childForFieldName('arguments')
+            const callExpressionArguments = callExpresssion?.childForFieldName("arguments")
             successFunction = callExpressionArguments?.namedChild(0)!
             expect(successFunction?.text).to.match(successFunctionRegex)
             errorFunction = callExpressionArguments?.namedChild(1)!
@@ -156,39 +164,42 @@ describe("Spatial movement", () => {
         })
 
         // FIXME
-        xit('should move down to error function', () => {
+        xit("should move down to error function", () => {
             expect(nodeBelow(successFunction)?.text).to.match(errorFunctionRegex)
         })
 
         // FIXME
-        xit('should move up to success function', () => {
+        xit("should move up to success function", () => {
             expect(nodeAbove(errorFunction)?.text).to.match(successFunctionRegex)
         })
 
-        it('should move right to error function', () => {
+        it("should move right to error function", () => {
             expect(nodeRightOf(successFunction)?.text).to.match(errorFunctionRegex)
         })
 
-        it('should move left to error function', () => {
+        it("should move left to error function", () => {
             expect(nodeLeftOf(errorFunction)?.text).to.match(successFunctionRegex)
         })
     })
 
     describe("Markdown", () => {
-        const source = trimMargin(`
+        const source = trimMargin(
+            `
         |# Title
         |
         |Some text with soft line breaks
         |more text in the same paragraph.
         |
-        |Another paragraph: (two spaces here)  
+        |Another paragraph: (two spaces here)  ` +
+                /* keep trailing spaces */ `
         |With a hard line break.
         |
         |- list item
         |- list
         |    - nested list item
         |    - second nested item
-        |`)
+        |`
+        )
         let titleNode: SyntaxNode
 
         before(async () => {

@@ -1,5 +1,4 @@
 import { expect } from "chai"
-import { assert } from "console"
 import * as vscode from "vscode"
 import { toSelection } from "../../utilities/conversion-utilities"
 import { executeCommand, waitUntilExtensionReady } from "../test-utils"
@@ -51,7 +50,7 @@ describe("Editing Commands", () => {
                 /.+html.+body.+\/body.+text inside.+div attr.+\/div.+Text behind.+\/html.+/s
             )
         })
-        
+
         it("barf right", async () => {
             await executeCommand("barf-right")
             expect(document.getText()).to.match(

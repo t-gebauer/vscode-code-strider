@@ -242,7 +242,7 @@
         ]
     },
     "scripts": {
-        "prepack": "cp node_modules/web-tree-sitter/tree-sitter.wasm dist/",
+        "prepack": "mkdir -p dist && cp node_modules/web-tree-sitter/tree-sitter.wasm dist/",
         "webpack": "npm run prepack && webpack --mode development",
         "webpack-prod": "npm run prepack && webpack --mode production",
         "package": "npm run webpack-prod && mkdir -p target && vsce ls | xargs cp --parents -t target",

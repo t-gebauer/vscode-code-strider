@@ -95,11 +95,8 @@ export function nodeLeftOf(node: SyntaxNode): SyntaxNode | undefined {
 
 export function nodeRightOf(node: SyntaxNode): SyntaxNode | undefined {
     const other = node.nextNamedSibling
-    if (!other) {
-        return undefined
-    }
-    if (other.startPosition.row === node.endPosition.row) {
+    if (other && other.startPosition.row === node.endPosition.row) {
         return other
     }
-    return nodeRightOf(other)
+    return node.firstNamedChild || undefined
 }
