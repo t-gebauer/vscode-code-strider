@@ -29,8 +29,7 @@ export function findNodeAtSelection(tree: Tree, selection: Selection): SyntaxNod
 }
 
 /** Find a node on the same line as the given point, or earlier */
-// TODO simplify-> find node at cursor; use this as base for all other commands!
-// FIXME: should not select trailing `}` in TypeScript
+// FIXME: should not select concrete syntax (e.g. `}` in TypeScript)
 export function findNodeBeforeCursor(tree: Tree, position: Position): SyntaxNode {
     const cursor = tree.walk()
 
@@ -59,7 +58,6 @@ export function findNodeBeforeCursor(tree: Tree, position: Position): SyntaxNode
                     position.character < cursor.startPosition.column)
             ) {
                 // needle is before current node
-                // TODO should we improve performance?
                 const node = cursor.currentNode()
                 const previousNode = node.previousSibling
                 if (!previousNode) {
