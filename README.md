@@ -85,7 +85,7 @@ Activate it by opening the command palette [F1] and selecting the `Toggle AST vi
 
 ## Requirements
 
-No dependencies. This extension bundles the *WASM* builds of [Tree-sitter](https://github.com/tree-sitter/tree-sitter, thus, no native dependencies are required.
+No dependencies. This extension bundles the *WASM* builds of [Tree-sitter](https://github.com/tree-sitter/tree-sitter), thus, no native dependencies are required.
 
 In the future I might try to integrate native tree-sitter again, but that is currently quite complicated. The extension would need to be compiled with the exact same version of VS Code where it will be used.
 
@@ -116,7 +116,7 @@ With help of the package manager [Nix](https://nixos.org/), the expression `buil
 
 ```sh
 nix-build build-wasm.nix
-cp ./result/*.wasm ./wasm/
+cp result/* wasm/
 ```
 
 ## Known Issues
