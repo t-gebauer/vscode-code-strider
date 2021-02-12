@@ -10,14 +10,14 @@ All keybindings are configurable. The defaults are influenced by Vim.
 
 ### Navigate complex code structures with ease
 
-Use the arrow keys or the [HJKL] keys (default) to easily move over source code fragments.
+Use the arrow keys to easily move over source code fragments.
 These are bound to the smart movement commands `move-up`, `move-down`, `move-left`, `move-right`, which will try to move to code-structures in the desired direction.
 
 The commands `follow-structure` [f] and `follow-structure-last` [Shift+f] should preferably be used to navigate further *inside* a selected node.
 
-<!-- TODO: add animations -->
+To select the parent of the currently selected node use `move-parent` [g]. 
 
-If any movement operation did not select your wished for node, you can return to previously selected nodes by using `back-to-previous-selection` [b]. (Note: this undo-stack is cleared on file-change or any file modifications)
+If any movement operation did not select your wished for node, you can return to previously selected nodes by using `back-to-previous-selection` [b]. (Note: this undo-stack is cleared when changing or modifying the file.)
 
 #### Direct tree navigation
 
@@ -36,6 +36,8 @@ The commands `parent, next, previous, first child` are by default bound to `alt`
 
 To exit insert-mode, simply press [Escape] (`exit-insert-mode`).
 
+For convenience the default VS Code `undo` command is bound to [u].
+
 #### Deleting nodes
 
 - `greedy-delete` (default binding: [Backspace])
@@ -43,13 +45,20 @@ To exit insert-mode, simply press [Escape] (`exit-insert-mode`).
 
 ![greedy-delete GIF](images/greedy-delete.gif)
 
-For convenience the default VS Code `undo` command is bound to [u].
-
 #### Slurping and barfing
 
-Currently, only really useful in HTML?
+- `slurp-left` [7] Include the next sibling as last child
+- `slurp-right` [8] Include the previous sibling as first child
+- `barf-left` [Shift-7] Extract the last child as next sibling
+- `barf-right` [Shift-8] Extract the first child as previous sibling
 
-<!-- TODO: animations -->
+Currently, only useful in HTML.
+While it is possible to use the commands in any language, the results are most definitely not what you would expect.
+The algorithms for slurping and barfing are currently tuned for use on HTML code.
+
+Theoretically, slurping and barfing are inverse operations, but in the current implementation line breaks are removed by the `slurping` and not restored by `barfing`.
+
+![slurping-and-barfing GIF](images/slurping-and-barfing.gif)
 
 ### Supported languages
 

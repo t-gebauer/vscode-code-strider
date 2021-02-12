@@ -63,6 +63,11 @@
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
+                "command": "code-strider:greedy-delete",
+                "key": "delete",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
                 "command": "code-strider:raise",
                 "key": "alt-s r",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
@@ -81,9 +86,6 @@
                 "command": "code-strider:exit-insert-mode",
                 "key": "Escape",
                 "when": "editorTextFocus && !suggestWidgetVisible && code-strider:is-editor-supported && code-strider:is-insert-mode"
-            },
-            {
-                "comment": "-----------------------------------------------------------------------"
             },
             {
                 "command": "code-strider:insert-before",
@@ -111,9 +113,6 @@
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
-                "comment": "-----------------------------------------------------------------------"
-            },
-            {
                 "command": "code-strider:tree-move-previous-sibling",
                 "key": "alt+k",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
@@ -139,9 +138,6 @@
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
-                "comment": "-----------------------------------------------------------------------"
-            },
-            {
                 "command": "code-strider:move-up",
                 "key": "k",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
@@ -160,9 +156,6 @@
                 "command": "code-strider:move-right",
                 "key": "l",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
-            },
-            {
-                "comment": "-----------------------------------------------------------------------"
             },
             {
                 "command": "code-strider:move-up",
@@ -196,9 +189,6 @@
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
-                "comment": "-----------------------------------------------------------------------"
-            },
-            {
                 "command": "code-strider:first-child",
                 "key": "alt+f",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
@@ -212,9 +202,6 @@
                 "command": "code-strider:move-parent",
                 "key": "g",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
-            },
-            {
-                "comment": "-----------------------------------------------------------------------"
             },
             {
                 "command": "code-strider:slurp-left",
