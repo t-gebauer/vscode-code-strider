@@ -49,11 +49,11 @@ in symlinkJoin {
     (officialGrammar "json")
     (officialGrammar "python")
     (grammar "clojure" "https://github.com/sogaiu/tree-sitter-clojure")
-    (grammar "fennel" "https://github.com/travonted/tree-sitter-fennel")
+    # (grammar "fennel" "https://github.com/travonted/tree-sitter-fennel") # no license
     (grammar "markdown" "https://github.com/ikatyang/tree-sitter-markdown")
     (grammar "nix" "https://github.com/cstrahan/tree-sitter-nix")
     (grammar "scss" "https://github.com/serenadeai/tree-sitter-scss")
-    # (grammar "yaml" "https://github.com/ikatyang/tree-sitter-yaml") TODO: build fails
+    # (grammar "yaml" "https://github.com/ikatyang/tree-sitter-yaml") FIXME: build fails
     (mkTreeSitterGrammar {
       id = "typescript";
       src = typescriptRepo;

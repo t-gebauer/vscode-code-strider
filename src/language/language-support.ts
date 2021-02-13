@@ -10,7 +10,6 @@ const languages: Map<string, LanguageDefinition> = new Map(
         defineLanguage("c"),
         defineLanguage("clojure"),
         defineLanguage("css"),
-        defineLanguage("fennel"),
         defineLanguage("html"),
         defineLanguage("java"),
         defineLanguage("javascript"),
