@@ -128,3 +128,25 @@ cp result/* wasm/
   For example, use `View: Two rows editor layout` **after** opening the AST viewer to move it to the bottom row.
 
 - The extension will crash if a file is deleted during parsing. Simply reload VS Code (Action: `Developer: Reload Window`)
+
+# Development
+
+Requirements: NodeJS (12)
+
+    npm install
+
+For testing and running, either use the npm commands from the `scripts` section in `package.json`
+or use the launch configs in VS Code (`.vscode`).
+
+Run tests: `npm test`  
+Compile (fast): `npm run webpack`  
+Compile (optimized): `npm run webpack-prod`  
+Automatically recompile on file changes: `npm run watch`  
+Start VS Code and load the extension: `npm start`  
+
+The `start` script has `codium` hard-coded. Replace it if you want to use VS Code:
+
+    code --extensionDevelopmentPath $(pwd)
+
+The path parameter has to be absolute, so use `$(pwd)` instead of `.`.
+
