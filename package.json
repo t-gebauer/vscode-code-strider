@@ -249,7 +249,7 @@
         "prepack": "mkdir -p dist && cp node_modules/web-tree-sitter/tree-sitter.wasm dist/",
         "webpack": "npm run prepack && webpack --mode development",
         "webpack-prod": "npm run prepack && webpack --mode production",
-        "package": "npm run webpack-prod && mkdir -p target && vsce ls | xargs cp --parents -t target",
+        "package": "npm run webpack-prod && rm -rdf target && mkdir -p target && vsce ls | xargs cp --parents -t target",
         "package-vsix": "npm run webpack-prod && vsce package",
         "watch": "npm run webpack -- --watch",
         "compile": "tsc -p ./",

@@ -12,6 +12,7 @@ vsc-extension-quickstart.md
 **/*.ts
 
 .envrc
+.direnv/
 .prettierignore
 .prettierrc.toml
 shell.nix

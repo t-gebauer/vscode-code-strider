@@ -1,4 +1,4 @@
-# A (complete?) list of all events
+# A (outdated?) list of all events
 
 ## External events
 triggered by the user directly (or indirectly by the editor (vs code))
