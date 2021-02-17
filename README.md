@@ -152,3 +152,10 @@ The `start` script has `codium` hard-coded. Replace it if you want to use VS Cod
 
 The path parameter has to be absolute, so use `$(pwd)` instead of `.`.
 
+# Credits
+
+This extension: The MIT License (MIT)  Copyright (c) 2021 Timo Gebauer  
+
+Tree-sitter: The MIT License (MIT)  Copyright (c) 2018 Max Brunsfeld  
+
+This extension bundles several Tree-sitter grammmars which can be found in the `wasm` directory with their respective licenses.  
