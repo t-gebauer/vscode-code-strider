@@ -82,6 +82,9 @@
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
+                "command": "••••••••••••••••••••••••••••••••••••••••••••••••••"
+            },
+            {
                 "command": "code-strider:exit-insert-mode",
                 "key": "Escape",
                 "when": "editorTextFocus && !suggestWidgetVisible && code-strider:is-editor-supported && code-strider:is-insert-mode"
@@ -112,6 +115,9 @@
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
+                "command": "••••••••••••••••••••••••••••••••••••••••••••••••••"
+            },
+            {
                 "command": "code-strider:tree-move-previous-sibling",
                 "key": "alt+k",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
@@ -135,6 +141,9 @@
                 "command": "code-strider:tree-move-last-child",
                 "key": "ctrl+alt+l",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "••••••••••••••••••••••••••••••••••••••••••••••••••"
             },
             {
                 "command": "code-strider:move-up",
@@ -203,6 +212,9 @@
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
+                "command": "••••••••••••••••••••••••••••••••••••••••••••••••••"
+            },
+            {
                 "command": "code-strider:slurp-left",
                 "key": "7",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
@@ -224,16 +236,6 @@
             }
         ],
         "languages": [
-            {
-                "id": "fennel",
-                "extensions": [
-                    ".fnl"
-                ],
-                "aliases": [
-                    "Fennel",
-                    "fnl"
-                ]
-            },
             {
                 "id": "nix",
                 "extensions": [

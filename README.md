@@ -127,7 +127,9 @@ cp result/* wasm/
 - Do not try to move the AST viewer manually. Change the editor layout instead. Otherwise the selections will not update.
   For example, use `View: Two rows editor layout` **after** opening the AST viewer to move it to the bottom row.
 
-- The extension will crash if a file is deleted during parsing. Simply reload VS Code (Action: `Developer: Reload Window`)
+- The extension will crash if a file is deleted during parsing.
+  Workaround: reload VS Code (Action: `Developer: Reload Window`)
+
 
 # Development
 
@@ -144,7 +146,7 @@ Compile (optimized): `npm run webpack-prod`
 Automatically recompile on file changes: `npm run watch`  
 Start VS Code and load the extension: `npm start`  
 
-The `start` script has `codium` hard-coded. Replace it if you want to use VS Code:
+The `start` script has `codium` hard-coded. Replace it if you want to use VS Code, or use it directly:
 
     code --extensionDevelopmentPath $(pwd)
 

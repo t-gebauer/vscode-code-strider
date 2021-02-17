@@ -1,5 +1,6 @@
 dist
 out
+target
 node_modules
 
 .vscode-test/

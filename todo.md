@@ -1,18 +1,17 @@
 # Prioritized for v1.0
-- // TODO: remove Fennel if unlicensed!
 - move node around (a minor mode?)
 
 # Bugs
-- parse tree gets out of sync after some edits? Might happen if the edits are happening quickly and the processing takes too long?
-- Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true)))
+- Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true))); delimiters should not be selected
+
 
 # More ideas
 - repository/code layout: differentiate between vscode-extension specific (commands, events) and tree-sitter specific code (algorithms for tree and node traversal, etc)
 - "greedy delete" needs to be more greedy when no named siblings are around
-- always highlight the whole lines of the selected node, to make it easier to see, where `move-up` and similar actions will do
 - prevent "reveal range" from reaching the top of the editor (add some extra lines?)
-- implement "ace jump" to nth-child
-- key:x "select node starting on line"?
+- implement "precise jump" to any descendant node
+    - to any thing inside the node? (e.g. words inside a paragraph)
+- key:x "select the first node starting on this line"?
 - select multiple nodes at once (maybe just two, and everything between?)
   - mark a node with [m] and then select everything the marked node and the current position?
 - formatting
@@ -27,17 +26,18 @@
 - Select node(s) in AST view
 - improve "raise" for complex languages (e.g. TypeScript)
 - add Kotlin (grammar exists, but wasm-build is slow)
+- re-add Fennel grammar once the author decides on a license
 - go to first/last sibling (in the current node) (note: this is already possible with one more key: "parent->first-child" or "parent->last-child")
 - surround object with ? (brackets, quote marks, etc.)
 - always show start and end of selection => fold center to fit the complete selection into view
-- fold everything :)
+- or just fold everything :)
 - remove not-really-needed testing library: soft-assert?
-- highlight errors
+- highlight errors reported by tree-sitter? (which would definitely need a configuration option to turn it off)
 - use the keys "pos1/home" and "end" to go to parents and children?
-- force the user to fix errors before leaving insert mode (how would that work if the file already has errors prior to opening?)
+- force the user to fix errors before leaving insert mode? (How would that work if the file already has errors prior to opening?)
 
 - (always) should node numbers in the gutter (like line numbers)
-  - jump to node by number
+  - jump to node by number (duplicated feature, conflict with "precise jump"?)
 
 - everything else that VIM can do:
   - marks
@@ -45,34 +45,16 @@
   - split / merge line
   - ...
 
-- ace jump everywhere
-  - direct child nodes
-  - any child nodes
-  - inside a node and insert
-
 - shortcuts during insert mode
   - jump to beginning/end of node next and previous nodes
 
-- hacky tree-sitter use: can we find nodes by editing the tree and then asking the tree, where the changes are?
+- investigate hacky tree-sitter use: can we find nodes by editing the tree and then asking the tree, where the changes are? (Searching is currently slower than incremantal parsing)
 
 # Rejected ideas (for now)
-- Toggle extension on/off: Why? VS Code can already enable and disable the extension (globally, per workspace).
+- Toggle extension on/off: Why? VS Code can already enable and disable the extension (globally, or per workspace).
   Use "insert mode" instead. It already disables all commands and enables normal selection.
   Better add an option to toggle specific languages.
 
-# Details
-
-directional movement
-key right-arrow -> select something which is right of the current selection
-
-navigation vs change vs insert mode
-navigation: move around
-change: edit the selected structure in a predefined way
-insert: normal text insertion
-
-### Do not do everything
-
-It's hard enough to build a solution that works for one language. Yes, sure, tree walking is possible in every language, but you knew that already. The navigation has to feel smooth and useful. This will only be possible with manual -- per language -- intervention.
 
 # Open questions
 

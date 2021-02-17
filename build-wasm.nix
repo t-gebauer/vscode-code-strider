@@ -23,7 +23,7 @@ let
   grammar = id: url:
     mkTreeSitterGrammar {
       inherit id;
-      # fetch latest commit from GitHub (impure!)
+      # fetch latest commit from git (impure!)
       src = builtins.fetchGit {
         inherit url;
         ref = "master";

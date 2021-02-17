@@ -107,9 +107,10 @@ export class AstViewer implements Disposable {
 
     async show(editorState: EditorState) {
         const document = await workspace.openTextDocument(createUri(editorState.editor.document))
-        // XXX: `ViewColumn.Beside` is currently the only non-fixed option here. We can not open it "below"
+
         this.editorWindow = await window.showTextDocument(document, {
             preserveFocus: true,
+            // `ViewColumn.Beside` is currently the only relative position to choose from.
             viewColumn: ViewColumn.Beside,
             preview: true,
         })
@@ -119,7 +120,7 @@ export class AstViewer implements Disposable {
     dispose() {
         // TODO: `TextEditor.hide()` is deprecated.
         // But there seems to be no direct replacement. Just keep it open then?
-        // Alternatively, we could close all editors which are showing this content by checking their document?
+        // Alternatively, we could close all editors which are showing this content by comparing `editor.document.uri`?
         if (this.editorWindow?.hide) {
             this.editorWindow?.hide()
         }
