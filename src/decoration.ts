@@ -4,6 +4,7 @@ import {
     TextEditorCursorStyle,
     TextEditorDecorationType,
     window,
+    workspace,
 } from "vscode"
 import { SyntaxNode } from "web-tree-sitter"
 import { Colors } from "./colors"
@@ -39,8 +40,9 @@ export function registerDecorationHandler(ext: Extension): Disposable {
     }
 
     function updateSelection(state?: EditorState): void {
-        if (!state) return
-        if (state.insertMode) {
+        if (!state) {
+            resetCursorStyle()
+        } else if (state.insertMode) {
             // Clear highlight when in insert mode
             setDecorationsForNode(state.editor, undefined)
             state.editor.options.cursorStyle = TextEditorCursorStyle.Line
@@ -54,4 +56,11 @@ export function registerDecorationHandler(ext: Extension): Disposable {
     ext.onActiveEditorStateChange(updateSelection)
 
     return Disposable.from(currentDecorationType, currentLineDecorationType)
+}
+
+function resetCursorStyle() {
+    const activeEditor = window.activeTextEditor
+    if (activeEditor) {
+        activeEditor.options.cursorStyle = workspace.getConfiguration("editor").get("cursorStyle")
+    }
 }
