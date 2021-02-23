@@ -1,8 +1,23 @@
 # Code-strider
 
-## Features
+Universal structural navigation and editing.
 
-This extension provides a structured navigation and editing mode.
+---
+
+The goal of this extension is to enable structural navigation and editing regardless of language.
+
+Inspired by the Lisp editing modes
+[Lispy](https://github.com/abo-abo/lispy),
+[Paredit](http://mumble.net/~campbell/emacs/paredit/paredit.html)
+and [Interlisp SEdit](https://interlisp.org/).
+
+Code-strider is powered by [Tree-sitter](https://github.com/tree-sitter/tree-sitter), a parser generator for fast, incremental, error-resistant parsers, and a community of Tree-sitter grammar authors and maintainers.
+
+## Status
+
+Prototype. Expect buggy behavior. However, all the features in this README should work as advertised.
+
+## Features
 
 This editing interface is **modal**. You can either navigate around the code or insert text; but not both at the same time. The navigational mode is active by default.
 
@@ -21,7 +36,7 @@ If any movement operation did not select your wished for node, you can return to
 
 #### Direct tree navigation
 
-It is also possible to move directly on the Tree-sitter AST with the `tree-move-...` commands.
+It is possible to move directly on the Tree-sitter AST with the `tree-move-...` commands.
 The commands `parent, next, previous, first child` are by default bound to `alt` + `h j k l` respectively.
 
 ### Perform syntax aware editing operations
@@ -65,7 +80,6 @@ Theoretically, slurping and barfing are inverse operations, but in the current i
         C
         Clojure
         CSS
-        Fennel
         HTML
         Java
         JavaScript
@@ -75,6 +89,8 @@ Theoretically, slurping and barfing are inverse operations, but in the current i
         Python
         SCSS
         TypeScript
+
+More to come. The goal is to support all languages supported by [Tree-sitter](https://github.com/tree-sitter/tree-sitter). So all of them :)
 
 ### Inspect the abstract syntax tree (AST)
 
@@ -95,7 +111,7 @@ Currently, there are no configurable settings.
 
 ## Contributions
 
-This extension contributes the languages `Fennel` and `Nix`. These are only partial definitions. Basically only mapping their respective file suffixes to a language identifier. This allows consistent detection of all supported languages.
+This extension contributes the language `Nix`. These are only partial definitions. Basically only mapping their respective file suffixes to a language identifier. This allows consistent detection of all supported languages independent of any other extensions.
 
 ### Custom commands
 
@@ -124,12 +140,15 @@ cp result/* wasm/
 - The extension does not (re-)initialize when changing the language mode of a file.
   It is necessary to switch to another editor and back to detect the language change.
 
-- Do not try to move the AST viewer manually. Change the editor layout instead. Otherwise the selections will not update.
+- If you move the AST viewer manually (e.g. by dragging it into another editor group), the selections will no longer update.
+  Workaround: Change the editor layout instead.
   For example, use `View: Two rows editor layout` **after** opening the AST viewer to move it to the bottom row.
 
 - The extension will crash if a file is deleted during parsing.
   Workaround: reload VS Code (Action: `Developer: Reload Window`)
 
+- This extension is not cat-proof, yet. For example: Holding the [delete] key in structural navigation mode might block the extension host process.
+  Workaround: reload VS Code (Action: `Developer: Reload Window`)
 
 # Development
 

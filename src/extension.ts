@@ -297,9 +297,7 @@ export class Extension implements Disposable {
         const currentSelection = state.editor.selection
         if (!currentSelection.isEqual(targetNodeSelection)) {
             logger.log("correcting editor selection")
-            // TODO: automatically changing the selection causes way too many problems:
-            // ctrl-leftButton : does not work. We could fix that one by delaying the selection update
-
+            // TODO: automatically changing the selection causes way too many problems?
             state.editor.selection = targetNodeSelection
         }
         // TODO: only reveal range when triggered change occurred via keyboard command?

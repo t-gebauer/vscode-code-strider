@@ -3,6 +3,7 @@
 
 # Bugs
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true))); delimiters should not be selected
+- Do not register edits which do not actually change anything. (e.g. the content is already deleted).
 
 
 # More ideas
@@ -36,7 +37,7 @@
 - use the keys "pos1/home" and "end" to go to parents and children?
 - force the user to fix errors before leaving insert mode? (How would that work if the file already has errors prior to opening?)
 
-- (always) should node numbers in the gutter (like line numbers)
+- (always) show node numbers in the gutter (like line numbers)
   - jump to node by number (duplicated feature, conflict with "precise jump"?)
 
 - everything else that VIM can do:
@@ -58,7 +59,7 @@
 
 # Open questions
 
-How to navigate efficiently over lots of one line statements? We do not want to navigate line-by-line. Ace jump?
+How to navigate efficiently over lots of one line statements? We do not want to navigate line-by-line. Precise jump?
 
 # Interesting VS Code changelogs
 ## v1.49
