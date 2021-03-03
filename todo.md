@@ -1,12 +1,21 @@
 # Prioritized for v1.0
-- move node around (a minor mode?)
+
+- (all?) language agnostic editing commands
 
 # Bugs
+
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true))); delimiters should not be selected
 - Do not register edits which do not actually change anything. (e.g. the content is already deleted).
 
-
 # More ideas
+
+- Instead of moving separators, could we replace the complete list node instead and insert new ones?
+  (would require language knowledge)
+- Why do we store the current node? Can we instead infer it from the current selection?
+  Cache selection-node mappings?
+- how to "insert inside"?
+- language specific shortcuts for blocks: Versor: head, body, tail
+- nested language snippets
 - repository/code layout: differentiate between vscode-extension specific (commands, events) and tree-sitter specific code (algorithms for tree and node traversal, etc)
 - "greedy delete" needs to be more greedy when no named siblings are around
 - prevent "reveal range" from reaching the top of the editor (add some extra lines?)
@@ -52,27 +61,14 @@
 - investigate hacky tree-sitter use: can we find nodes by editing the tree and then asking the tree, where the changes are? (Searching is currently slower than incremantal parsing)
 
 # Rejected ideas (for now)
+
 - Toggle extension on/off: Why? VS Code can already enable and disable the extension (globally, or per workspace).
   Use "insert mode" instead. It already disables all commands and enables normal selection.
   Better add an option to toggle specific languages.
 
-
 # Open questions
 
 How to navigate efficiently over lots of one line statements? We do not want to navigate line-by-line. Precise jump?
-
-# Interesting VS Code changelogs
-## v1.49
-
-- Only format modified text
-
-## v1.52
-
-- Open Keyboard Shortcuts editor with query filter
-vscode.commands.executeCommand('workbench.action.openGlobalKeybindings', 'query');
-
-- Status bar entry background color API (proposed?)
-
 
 # Alternative implementations
 
@@ -82,7 +78,7 @@ The AST view could also be rendered as `WebviewPanel` or `TreeView`. This could 
 
 # Limitations of VS Code
 
-- It is not possible to change the cursor color. For example to hide the cursor. The only thing we can do, is move the cursor out of sight (beginning or end of document). But that also moves the selection, which can create other problems.
+- It is not possible to change the cursor color. For example, to hide the cursor, the only thing we can do, is move the cursor out of sight (beginning or end of document). But that also moves the selection, which can create other problems.
 
 - It is currently not possible to intercept mouse events. We can only listen to selection change events.
 This makes it impossible to bind different actions to different mouse buttons.
@@ -91,4 +87,4 @@ As an alternative, we could create modal states for different selections, to dif
 
 https://github.com/microsoft/vscode/issues/3130
 
-Or we could do something really hacky, like registering a hover provider for the sole purpose of tracking the mouse position. Then we could bind the commands "select at cursor" "and select containing node" to hotkeys.
+Or, we could do something really hacky, like registering a hover provider for the sole purpose of tracking the mouse position. Then we could bind the commands "select at cursor" "and select containing node" to hotkeys.
