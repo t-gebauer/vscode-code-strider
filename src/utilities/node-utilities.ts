@@ -1,3 +1,7 @@
+// Copyright 2021 Timo Gebauer
+// GNU General Public License version 3.0 (or later)
+// See COPYING or https://www.gnu.org/licenses/gpl-3.0.txt
+
 import { SyntaxNode } from "web-tree-sitter"
 
 // Examples for nodes which are pure whitespace: `text` nodes in HTML and line breaks in Markdown.

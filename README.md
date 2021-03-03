@@ -173,8 +173,24 @@ The path parameter has to be absolute, so use `$(pwd)` instead of `.`.
 
 # Credits
 
-This extension: The MIT License (MIT)  Copyright (c) 2021 Timo Gebauer  
-
 Tree-sitter: The MIT License (MIT)  Copyright (c) 2018 Max Brunsfeld  
 
-This extension bundles several Tree-sitter grammmars which can be found in the `wasm` directory with their respective licenses.  
+This extension bundles several Tree-sitter grammmars, which can be found in the `wasm` directory with their respective licenses.
+Their sources are documented in the `build-wasm.nix` script.
+
+# License
+
+Copyright 2021 Timo Gebauer
+
+This program is free software: you can redistribute it and/or modify
+it under the terms of the GNU General Public License as published by
+the Free Software Foundation, either version 3 of the License, or
+(at your option) any later version.
+
+This program is distributed in the hope that it will be useful,
+but WITHOUT ANY WARRANTY; without even the implied warranty of
+MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+GNU General Public License for more details.
+
+See `COPYING` for a copy of the GNU General Public License.
+Or <https://www.gnu.org/licenses/>.
