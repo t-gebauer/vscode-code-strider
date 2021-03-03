@@ -13,7 +13,10 @@ export function toPosition(point: Parser.Point) {
     return new Position(point.row, point.column)
 }
 
-export function toSelection(node: Parser.Range): Selection {
+export function toSelection(node: {
+    startPosition: Parser.Point
+    endPosition: Parser.Point
+}): Selection {
     return new Selection(toPosition(node.startPosition), toPosition(node.endPosition))
 }
 

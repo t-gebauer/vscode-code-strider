@@ -30,7 +30,15 @@ export class TreeSitter {
         return result
     }
 
-    private async initializeNewParser(languageId: string): Promise<Parser> {
+    parseTextSync(text: string, languageId: string): Tree {
+        const parser = this.parsers.get(languageId)
+        if (!parser) {
+            throw Error(`Invalid state: language not yet initialized! (${languageId})`)
+        }
+        return parser.parse(text)
+    }
+
+    async initializeNewParser(languageId: string): Promise<Parser> {
         const { grammarId } = Languages.get(languageId)
         this.logger?.log(
             `-- initializing new parser instance for '${languageId}' with grammar '${grammarId}`

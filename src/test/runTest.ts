@@ -30,7 +30,12 @@ async function main() {
         // --extensionTestsPath=<TEST-RUNNER-SCRIPT-PATH>
 
         // Run the integration test
-        await runTests({ extensionDevelopmentPath, extensionTestsPath, vscodeExecutablePath })
+        await runTests({
+            extensionDevelopmentPath,
+            extensionTestsPath,
+            vscodeExecutablePath,
+            launchArgs: ["--disable-extensions"], // disable *other* extensions
+        })
     } catch (err) {
         console.error(err)
         console.error("Failed to run tests")

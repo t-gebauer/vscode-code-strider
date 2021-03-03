@@ -75,6 +75,8 @@ Theoretically, slurping and barfing are inverse operations, but in the current i
 
 ![slurping-and-barfing GIF](images/slurping-and-barfing.gif)
 
+(The formatting changes are not intentional and should be fixed.)
+
 ### Supported languages
 
         C
