@@ -2,12 +2,11 @@
 // GNU General Public License version 3.0 (or later)
 // See COPYING or https://www.gnu.org/licenses/gpl-3.0.txt
 
-import { Position, Selection } from "vscode"
-import { SyntaxNode, Tree } from "web-tree-sitter"
-import { toRange } from "./conversion-utilities"
+import { Point, SyntaxNode, Tree } from "web-tree-sitter"
+import { contains, SimpleRange } from "./node-utilities"
 
 /** Find the outmost node which is completely contained in the selection */
-export function findNodeAtSelection(tree: Tree, selection: Selection): SyntaxNode {
+export function findNodeAtSelection(tree: Tree, selection: SimpleRange): SyntaxNode {
     // Start at the top. Walk down until the we find the last node which completely contains the selection.
     const cursor = tree.walk()
 
@@ -20,7 +19,7 @@ export function findNodeAtSelection(tree: Tree, selection: Selection): SyntaxNod
         }
         // For all children
         while (true) {
-            if (cursor.nodeIsNamed && toRange(cursor).contains(selection)) {
+            if (cursor.nodeIsNamed && contains(cursor, selection)) {
                 break
             }
             if (!cursor.gotoNextSibling()) {
@@ -32,9 +31,9 @@ export function findNodeAtSelection(tree: Tree, selection: Selection): SyntaxNod
     }
 }
 
-/** Find a node on the same line as the given point, or earlier */
+/** Find a node on the same row as the given point, or earlier */
 // FIXME: should not select concrete syntax (e.g. `}` in TypeScript)
-export function findNodeBeforeCursor(tree: Tree, position: Position): SyntaxNode {
+export function findNodeBeforeCursor(tree: Tree, point: Point): SyntaxNode {
     const cursor = tree.walk()
 
     // move past the position, then step back
@@ -46,9 +45,9 @@ export function findNodeBeforeCursor(tree: Tree, position: Position): SyntaxNode
         // iterate through all siblings on this level
         while (true) {
             if (
-                position.line > cursor.endPosition.row ||
-                (position.line === cursor.endPosition.row &&
-                    position.character > cursor.endPosition.column)
+                point.row > cursor.endPosition.row ||
+                (point.row === cursor.endPosition.row &&
+                    point.column > cursor.endPosition.column)
             ) {
                 // needle is after current node
                 // -> go to next node
@@ -57,9 +56,9 @@ export function findNodeBeforeCursor(tree: Tree, position: Position): SyntaxNode
                     return cursor.currentNode()
                 }
             } else if (
-                position.line < cursor.startPosition.row ||
-                (position.line === cursor.startPosition.row &&
-                    position.character < cursor.startPosition.column)
+                point.row < cursor.startPosition.row ||
+                (point.row === cursor.startPosition.row &&
+                    point.column < cursor.startPosition.column)
             ) {
                 // needle is before current node
                 const node = cursor.currentNode()
@@ -69,10 +68,10 @@ export function findNodeBeforeCursor(tree: Tree, position: Position): SyntaxNode
                     cursor.gotoParent()
                     return cursor.currentNode()
                 }
-                if (position.line === cursor.startPosition.row) {
-                    // this node is on the same line
-                    if (previousNode.endPosition.row === position.line) {
-                        // the previous node is also on the same line
+                if (point.row === cursor.startPosition.row) {
+                    // this node is on the same row
+                    if (previousNode.endPosition.row === point.row) {
+                        // the previous node is also on the same row
                         return previousNode
                     }
                     return cursor.currentNode()

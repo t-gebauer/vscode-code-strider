@@ -2,7 +2,7 @@
 // GNU General Public License version 3.0 (or later)
 // See COPYING or https://www.gnu.org/licenses/gpl-3.0.txt
 
-import { SyntaxNode } from "web-tree-sitter"
+import { Point, SyntaxNode } from "web-tree-sitter"
 
 // Examples for nodes which are pure whitespace: `text` nodes in HTML and line breaks in Markdown.
 export function isPureWhitespace(node: SyntaxNode) {
@@ -27,4 +27,23 @@ export function nextChild(node: SyntaxNode, forward = true) {
 
 export function lastChild(node: SyntaxNode) {
     return nextChild(node, false)
+}
+
+/** A Tree-sitter `Range`, but without `startIndex` and `endIndex`. */
+export type SimpleRange = { startPosition: Point; endPosition: Point }
+
+/** Tests whether the `other` node is inside of this `node`. */
+export function contains(node: SimpleRange, other: SimpleRange): boolean {
+    return (
+        // beginning
+        (node.startPosition.row < other.startPosition.row ||
+            // on same row
+            (node.startPosition.row === other.startPosition.row &&
+                node.startPosition.column <= other.startPosition.column)) &&
+        // and end
+        (node.endPosition.row > other.endPosition.row ||
+            // on same row
+            (node.endPosition.row === other.endPosition.row &&
+                node.endPosition.column >= other.endPosition.column))
+    )
 }

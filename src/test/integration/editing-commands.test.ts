@@ -5,7 +5,7 @@
 import { expect } from "chai"
 import * as vscode from "vscode"
 import { toSelection } from "../../utilities/conversion-utilities"
-import { executeCommand, waitUntilExtensionReady } from "../test-utils"
+import { waitUntilExtensionReady, executeCommand } from "../integration-test-utils"
 
 describe("Editing Commands", () => {
     const source = `<html>

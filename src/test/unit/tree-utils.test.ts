@@ -3,8 +3,8 @@
 // See COPYING or https://www.gnu.org/licenses/gpl-3.0.txt
 
 import { expect } from "chai"
-import { Position, Selection } from "vscode"
-import { Tree } from "web-tree-sitter"
+import { Point, Tree } from "web-tree-sitter"
+import { SimpleRange } from "../../utilities/node-utilities"
 import * as treeUtils from "../../utilities/tree-utilities"
 import { TestTreeSitter } from "../test-utils"
 
@@ -87,7 +87,7 @@ const x =          "weirdly formatted string"      ;
         })
 
         it("whitespace - same line, after", () => {
-            const node = treeUtils.findNodeBeforeCursor(tree, position(3, 5))
+            const node = treeUtils.findNodeBeforeCursor(tree, point(3, 5))
             expect(node).to.deep.nested.include({
                 type: "if_statement",
                 startPosition: { row: 1, column: 0 },
@@ -96,7 +96,7 @@ const x =          "weirdly formatted string"      ;
         })
 
         it("whitespace - same line, before", () => {
-            const node = treeUtils.findNodeBeforeCursor(tree, position(2, 1))
+            const node = treeUtils.findNodeBeforeCursor(tree, point(2, 1))
             expect(node).to.deep.nested.include({
                 type: "return_statement",
                 startPosition: { row: 2, column: 2 },
@@ -106,8 +106,11 @@ const x =          "weirdly formatted string"      ;
     })
 })
 
-function position(line: number, char: number) {
-    return new Position(line, char)
+function point(line: number, char: number): Point {
+    return {
+        row: line,
+        column: char,
+    }
 }
 
 function selection(
@@ -115,9 +118,12 @@ function selection(
     startChar: number,
     endLine?: number,
     endChar?: number
-): Selection {
-    return new Selection(
-        new Position(startLine, startChar),
-        new Position(endLine ?? startLine, endChar ?? startChar)
-    )
+): SimpleRange {
+    return {
+        startPosition: { row: startLine, column: startChar },
+        endPosition: {
+            row: endLine ?? startLine,
+            column: endChar ?? startChar,
+        },
+    }
 }

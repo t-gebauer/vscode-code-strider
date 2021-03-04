@@ -7,6 +7,15 @@
 - Mouse selection will select the "lowest" node at the position. This is often undesired (clojure: (boolean (true))); delimiters should not be selected
 - Do not register edits which do not actually change anything. (e.g. the content is already deleted).
 
+# Next
+
+- Implement simple language agnostic editing commands
+    - transpose: reordering
+    - replace: overwrite node (paste)
+    - splice: remove delimiters around
+    - delete (cut): greedy delete already exists, but is not good enough yet; and `cut` should behave similarly
+- Fetch grammars more specifically (verify checksums) for reproducability
+
 # More ideas
 
 - Instead of moving separators, could we replace the complete list node instead and insert new ones?

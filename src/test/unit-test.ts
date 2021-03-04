@@ -7,7 +7,6 @@ import { SyntaxNode } from "web-tree-sitter"
 import { EditorState } from "../editor-state"
 import { EditorStateChange } from "../extension"
 import { TreeSitter } from "../tree-sitter"
-import { toSelection } from "../utilities/conversion-utilities"
 import { findNodeAtSelection } from "../utilities/tree-utilities"
 import { TestTreeSitter } from "./test-utils"
 
@@ -52,7 +51,7 @@ export namespace UnitTest {
     export function test(languageId: LanguageId, initialCode: string) {
         const initalState = extractSelection(initialCode)
         const parseTree = treeSitter.parseTextSync(initalState.text, languageId)
-        let currentNode: SyntaxNode = findNodeAtSelection(parseTree, toSelection(initalState))
+        let currentNode: SyntaxNode = findNodeAtSelection(parseTree, initalState)
         let expectCount = 1
 
         // Maybe chain this more elegantly?

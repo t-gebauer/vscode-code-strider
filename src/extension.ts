@@ -42,15 +42,16 @@ import { EditorState } from "./editor-state"
 import { interceptTypeCommand } from "./intercept-typing"
 import { Languages } from "./language/language-support"
 import { registerStatusBar } from "./status-bar"
-import { toPoint, toRange, toSelection } from "./utilities/conversion-utilities"
+import { toPoint, toRange, toSelection, toSimpleRange } from "./utilities/conversion-utilities"
 import { findNodeAtSelection, findNodeBeforeCursor } from "./utilities/tree-utilities"
 import Parser = require("web-tree-sitter")
 import { registerDecorationHandler } from "./decoration"
-import { Logger, OutputChannelLogger } from "./logger"
+import { Logger } from "./logger"
 import { SyntaxNode, Tree } from "web-tree-sitter"
 import { TreeSitter } from "./tree-sitter"
 import { moveDown, moveLeft, moveRight, moveUp } from "./spatial-movement-commands"
 import { Delayer } from "./utils"
+import { OutputChannelLogger } from "./output-channel-logger"
 
 export let logger: Logger
 
@@ -321,7 +322,7 @@ export class Extension implements Disposable {
         let state: EditorState = {
             editor,
             insertMode: false,
-            currentNode: findNodeAtSelection(parseTree, editor.selection),
+            currentNode: findNodeAtSelection(parseTree, toSimpleRange(editor.selection)),
             previousNodes: new Array(),
             parseTree,
         }
@@ -460,8 +461,8 @@ export class Extension implements Disposable {
         const timeBefore = Date.now()
         // Is the selection just a single character?
         const currentNode = selection.start.isEqual(selection.end)
-            ? findNodeBeforeCursor(parseTree, selection.start)
-            : findNodeAtSelection(parseTree, selection)
+            ? findNodeBeforeCursor(parseTree, toPoint(selection.start))
+            : findNodeAtSelection(parseTree, toSimpleRange(selection))
         logger.log(`finding matching node at selection (took ${Date.now() - timeBefore} ms)`)
         return currentNode
     }

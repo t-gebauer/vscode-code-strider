@@ -7,7 +7,7 @@ import { Selection, TextEditor, TextEditorEdit } from "vscode"
 import { SyntaxNode } from "web-tree-sitter"
 import { EditorState } from "./editor-state"
 import { EditorStateChange } from "./extension"
-import { toPosition, toRange } from "./utilities/conversion-utilities"
+import { toPosition, toRange, toSimpleRange } from "./utilities/conversion-utilities"
 import { nextChild, nextSibling } from "./utilities/node-utilities"
 import { findNodeAtSelection } from "./utilities/tree-utilities"
 
@@ -58,7 +58,7 @@ export function insertAfter(state: Readonly<EditorState>): EditorStateChange {
 export function exitInsertMode(state: Readonly<EditorState>): EditorStateChange {
     return {
         insertMode: false,
-        currentNode: findNodeAtSelection(state.parseTree, state.editor.selection),
+        currentNode: findNodeAtSelection(state.parseTree, toSimpleRange(state.editor.selection)),
     }
 }
 
