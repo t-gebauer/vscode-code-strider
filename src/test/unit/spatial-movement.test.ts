@@ -4,8 +4,8 @@
 
 import { expect } from "chai"
 import { SyntaxNode } from "web-tree-sitter"
-import { nodeAbove, nodeBelow, nodeLeftOf, nodeRightOf } from "../../spatial-movement"
-import { TreeSitter } from "../../tree-sitter"
+import { nodeAbove, nodeBelow, nodeLeftOf, nodeRightOf } from "../../lib/spatial-movement"
+import { TreeSitter } from "../../lib/tree-sitter"
 import { TestTreeSitter } from "../test-utils"
 
 describe("Spatial movement", () => {

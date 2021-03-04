@@ -7,9 +7,9 @@ import { Selection, TextEditor, TextEditorEdit } from "vscode"
 import { SyntaxNode } from "web-tree-sitter"
 import { EditorState } from "./editor-state"
 import { EditorStateChange } from "./extension"
-import { toPosition, toRange, toSimpleRange } from "./utilities/conversion-utilities"
-import { nextChild, nextSibling } from "./utilities/node-utilities"
-import { findNodeAtSelection } from "./utilities/tree-utilities"
+import { toPosition, toRange, toSimpleRange } from "./conversion-utilities"
+import { nextChild, nextSibling } from "./lib/node-utilities"
+import { findNodeAtSelection } from "./lib/tree-utilities"
 
 export function insertOnNewLineAbove(
     state: Readonly<EditorState>,

@@ -2,7 +2,7 @@
 // GNU General Public License version 3.0 (or later)
 // See COPYING or https://www.gnu.org/licenses/gpl-3.0.txt
 
-import { TreeSitter } from "../tree-sitter"
+import { TreeSitter } from "../lib/tree-sitter"
 
 export namespace TestTreeSitter {
     let treeSitter: TreeSitter | undefined

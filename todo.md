@@ -15,6 +15,7 @@
     - splice: remove delimiters around
     - delete (cut): greedy delete already exists, but is not good enough yet; and `cut` should behave similarly
 - Fetch grammars more specifically (verify checksums) for reproducability
+- GitHub pipeline to test and package the extension (`.vsix`)
 
 # More ideas
 

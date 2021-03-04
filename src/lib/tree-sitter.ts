@@ -6,7 +6,7 @@ import * as fs from "fs"
 import Parser = require("web-tree-sitter")
 import { Tree } from "web-tree-sitter"
 import { Logger } from "./logger"
-import { Languages } from "./language/language-support"
+import { Languages } from "./language-support"
 
 export class TreeSitter {
     private parsers = new Map<string, Parser>()

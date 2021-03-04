@@ -18,9 +18,9 @@ const languages: Map<string, LanguageDefinition> = new Map(
         defineLanguage("java"),
         defineLanguage("javascript"),
         defineLanguage("json"),
-        // TODO: VSCode maps some json files to "jsonc" - JSON with comments.
-        //       The normal "json" grammar should suffice. Even though the
-        //       comments are labeled as ERROR.
+        // VSCode maps some json files to "jsonc" - JSON with comments.
+        // The normal "json" grammar should suffice. Even though the
+        // comments are labeled as ERROR.
         defineLanguage("jsonc", "json"),
         defineLanguage("markdown"),
         defineLanguage("nix"),

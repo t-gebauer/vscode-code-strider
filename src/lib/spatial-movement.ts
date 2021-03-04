@@ -3,7 +3,7 @@
 // See COPYING or https://www.gnu.org/licenses/gpl-3.0.txt
 
 import { SyntaxNode } from "web-tree-sitter"
-import { nextSibling, nextChild } from "./utilities/node-utilities"
+import { nextSibling, nextChild } from "./node-utilities"
 
 // --- spatial movement functions (natural, planar)
 

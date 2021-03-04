@@ -4,7 +4,7 @@
 
 import { EditorState } from "./editor-state"
 import { EditorStateChange } from "./extension"
-import { nodeAbove, nodeBelow, nodeLeftOf, nodeRightOf } from "./spatial-movement"
+import { nodeAbove, nodeBelow, nodeLeftOf, nodeRightOf } from "./lib/spatial-movement"
 
 export function moveUp(state: Readonly<EditorState>): EditorStateChange {
     return {

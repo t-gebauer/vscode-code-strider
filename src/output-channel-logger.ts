@@ -4,7 +4,7 @@
 
 import { util } from "chai"
 import { Disposable, OutputChannel, window } from "vscode"
-import { Logger } from "./logger"
+import { Logger } from "./lib/logger"
 
 export class OutputChannelLogger implements Logger, Disposable {
     outputChannel: OutputChannel

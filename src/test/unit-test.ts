@@ -6,8 +6,8 @@ import { expect } from "chai"
 import { SyntaxNode } from "web-tree-sitter"
 import { EditorState } from "../editor-state"
 import { EditorStateChange } from "../extension"
-import { TreeSitter } from "../tree-sitter"
-import { findNodeAtSelection } from "../utilities/tree-utilities"
+import { TreeSitter } from "../lib/tree-sitter"
+import { findNodeAtSelection } from "../lib/tree-utilities"
 import { TestTreeSitter } from "./test-utils"
 
 export namespace UnitTest {

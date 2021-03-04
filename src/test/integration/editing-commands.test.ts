@@ -4,7 +4,7 @@
 
 import { expect } from "chai"
 import * as vscode from "vscode"
-import { toSelection } from "../../utilities/conversion-utilities"
+import { toSelection } from "../../conversion-utilities"
 import { waitUntilExtensionReady, executeCommand } from "../integration-test-utils"
 
 describe("Editing Commands", () => {

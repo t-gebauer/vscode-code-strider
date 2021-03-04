@@ -2,7 +2,7 @@
 // GNU General Public License version 3.0 (or later)
 // See COPYING or https://www.gnu.org/licenses/gpl-3.0.txt
 
-import { nodeLeftOf, nodeRightOf } from "../../spatial-movement"
+import { nodeLeftOf, nodeRightOf } from "../../lib/spatial-movement"
 import { UnitTest } from "../unit-test"
 
 // FIXME: these are not tests for "reordering..." (because those functions do not exist yet)

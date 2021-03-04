@@ -14,7 +14,7 @@ import { SyntaxNode } from "web-tree-sitter"
 import { Colors } from "./colors"
 import { EditorState } from "./editor-state"
 import { Extension } from "./extension"
-import { toRange } from "./utilities/conversion-utilities"
+import { toRange } from "./conversion-utilities"
 
 function setOrResetDecorations(
     editor: TextEditor,
