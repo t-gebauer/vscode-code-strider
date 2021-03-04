@@ -260,7 +260,7 @@
         "pretest": "npm run test-compile && npm run lint",
         "test:unit": "node ./out/test/runUnitTests.js",
         "test:integration": "node ./out/test/runIntegrationTest.js",
-        "test": "npm run test:unit && npm run test:integration",
+        "test": "npm run test:unit && npm run webpack && npm run test:integration",
         "start": "codium --extensionDevelopmentPath $(pwd)"
     },
     "devDependencies": {

@@ -132,8 +132,6 @@ function slurpNext(
     const sibling = nextSibling(currentNode, forward)
     const child = nextChild(currentNode, !forward)
     if (!(child && sibling)) return {}
-    console.log(sibling?.text)
-    console.log(child.text)
     edit.delete(toRange(sibling))
     edit.insert(toPosition(forward ? child.startPosition : child.endPosition), sibling.text)
     return {}
