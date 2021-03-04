@@ -19,7 +19,7 @@ async function main() {
 
         // The path to test runner
         // Passed to --extensionTestsPath
-        const extensionTestsPath = path.resolve(__dirname, "./suite/index")
+        const extensionTestsPath = path.resolve(__dirname, "./integration/index")
 
         // The executable to use. Would automatically download `version` when no path is provided
         const vscodeExecutablePath = `${process.env.CODIUM_PATH}/lib/vscode/codium`

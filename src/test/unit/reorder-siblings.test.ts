@@ -3,7 +3,7 @@
 // See COPYING or https://www.gnu.org/licenses/gpl-3.0.txt
 
 import { nodeLeftOf, nodeRightOf } from "../../spatial-movement"
-import { UnitTest } from "./unit-test"
+import { UnitTest } from "../unit-test"
 
 // FIXME: these are not tests for "reordering..." (because those functions do not exist yet)
 describe("Reordering of siblings", () => {

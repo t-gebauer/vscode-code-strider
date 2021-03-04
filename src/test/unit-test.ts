@@ -4,12 +4,12 @@
 
 import { expect } from "chai"
 import { SyntaxNode } from "web-tree-sitter"
-import { EditorState } from "../../editor-state"
-import { EditorStateChange } from "../../extension"
-import { TreeSitter } from "../../tree-sitter"
-import { toSelection } from "../../utilities/conversion-utilities"
-import { findNodeAtSelection } from "../../utilities/tree-utilities"
-import { TestTreeSitter } from "../test-utils"
+import { EditorState } from "../editor-state"
+import { EditorStateChange } from "../extension"
+import { TreeSitter } from "../tree-sitter"
+import { toSelection } from "../utilities/conversion-utilities"
+import { findNodeAtSelection } from "../utilities/tree-utilities"
+import { TestTreeSitter } from "./test-utils"
 
 export namespace UnitTest {
     type LanguageId = "javascript"
