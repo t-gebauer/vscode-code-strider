@@ -2,10 +2,10 @@
 // GNU General Public License version 3.0 (or later)
 // See COPYING or https://www.gnu.org/licenses/gpl-3.0.txt
 
+import { expect } from "chai"
 import { Position, Selection } from "vscode"
 import { Tree } from "web-tree-sitter"
 import * as treeUtils from "../../utilities/tree-utilities"
-import { softExpect } from "../soft-expect"
 import { TestTreeSitter } from "../test-utils"
 
 describe("Tree Utils", () => {
@@ -37,10 +37,12 @@ function bar(arg = false) {
 
         it("node at start", () => {
             const node = treeUtils.findNodeAtSelection(tree, selection(1, 0))
-            softExpect(node.type).to.equal("lexical_declaration")
-            softExpect(node.parent?.type).to.equal("program")
-            softExpect(node.startPosition).to.deep.equal({ row: 1, column: 0 })
-            softExpect(node.endPosition).to.deep.equal({ row: 1, column: sourceLines[1].length })
+            expect(node).to.deep.nested.include({
+                type: "lexical_declaration",
+                "parent.type": "program",
+                startPosition: { row: 1, column: 0 },
+                endPosition: { row: 1, column: sourceLines[1].length },
+            })
         })
 
         it("node at end", () => {
@@ -48,21 +50,25 @@ function bar(arg = false) {
                 tree,
                 selection(sourceLines.length - 2, sourceLines[sourceLines.length - 2].length)
             )
-            softExpect(node.type).to.equal("statement_block")
-            softExpect(node.parent?.type).to.equal("function_declaration")
-            softExpect(node.startPosition).to.deep.equal({ row: 8, column: 26 })
-            softExpect(node.endPosition).to.deep.equal({
-                row: sourceLines.length - 2,
-                column: sourceLines[sourceLines.length - 2].length,
+            expect(node).to.deep.nested.include({
+                type: "statement_block",
+                "parent.type": "function_declaration",
+                startPosition: { row: 8, column: 26 },
+                endPosition: {
+                    row: sourceLines.length - 2,
+                    column: sourceLines[sourceLines.length - 2].length,
+                },
             })
         })
 
         it("boolean in inside", () => {
             const node = treeUtils.findNodeAtSelection(tree, selection(4, 12))
-            softExpect(node.type).to.equal("true")
-            softExpect(node.parent?.type).to.equal("arguments")
-            softExpect(node.startPosition).to.deep.equal({ row: 4, column: 10 })
-            softExpect(node.endPosition).to.deep.equal({ row: 4, column: 14 })
+            expect(node).to.deep.nested.include({
+                type: "true",
+                "parent.type": "arguments",
+                startPosition: { row: 4, column: 10 },
+                endPosition: { row: 4, column: 14 },
+            })
         })
     })
 
@@ -82,16 +88,20 @@ const x =          "weirdly formatted string"      ;
 
         it("whitespace - same line, after", () => {
             const node = treeUtils.findNodeBeforeCursor(tree, position(3, 5))
-            softExpect(node.type).to.equal("if_statement")
-            softExpect(node.startPosition, "node start").to.deep.equal({ row: 1, column: 0 })
-            softExpect(node.endPosition, "node end").to.deep.equal({ row: 3, column: 1 })
+            expect(node).to.deep.nested.include({
+                type: "if_statement",
+                startPosition: { row: 1, column: 0 },
+                endPosition: { row: 3, column: 1 },
+            })
         })
 
         it("whitespace - same line, before", () => {
             const node = treeUtils.findNodeBeforeCursor(tree, position(2, 1))
-            softExpect(node.type).to.equal("return_statement")
-            softExpect(node.startPosition, "node start").to.deep.equal({ row: 2, column: 2 })
-            softExpect(node.endPosition, "node end").to.deep.equal({ row: 2, column: 19 })
+            expect(node).to.deep.nested.include({
+                type: "return_statement",
+                startPosition: { row: 2, column: 2 },
+                endPosition: { row: 2, column: 19 },
+            })
         })
     })
 })

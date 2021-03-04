@@ -41,7 +41,6 @@
 - surround object with ? (brackets, quote marks, etc.)
 - always show start and end of selection => fold center to fit the complete selection into view
 - or just fold everything :)
-- remove not-really-needed testing library: soft-assert?
 - highlight errors reported by tree-sitter? (which would definitely need a configuration option to turn it off)
 - use the keys "pos1/home" and "end" to go to parents and children?
 - force the user to fix errors before leaving insert mode? (How would that work if the file already has errors prior to opening?)
