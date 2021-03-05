@@ -87,7 +87,7 @@
             {
                 "command": "code-strider:exit-insert-mode",
                 "key": "Escape",
-                "when": "editorTextFocus && !suggestWidgetVisible && code-strider:is-editor-supported && code-strider:is-insert-mode"
+                "when": "editorTextFocus && !suggestWidgetVisible && !editorHasMultipleSelections && !breakpointWidgetVisible && !findWidgetVisible && !inSnippetMode && !parameterHintsVisible && !LinkedEditingInputVisible && code-strider:is-editor-supported && code-strider:is-insert-mode"
             },
             {
                 "command": "code-strider:insert-before",
