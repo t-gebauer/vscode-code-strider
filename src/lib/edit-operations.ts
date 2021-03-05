@@ -1,42 +1,57 @@
-import { SyntaxNode } from "web-tree-sitter"
-import { EditActions } from "./interop"
+import { Point, SyntaxNode } from "web-tree-sitter"
+import { EditActions, SimpleRange } from "./interop"
+
+/** Technically the same as a Point, but conceptually different? */
+type RelPoint = Point
+
+function _add(point: Point, other: RelPoint): Point {
+    return {
+        row: point.row + other.row,
+        column: other.row === 0 ? point.column + other.column : other.column,
+    }
+}
+
+function add(point: Point, ...others: RelPoint[]): Point {
+    return others.reduce(_add, point)
+}
+
+function subtract(point: Point, other: Point): RelPoint {
+    return {
+        row: point.row - other.row,
+        column: point.row === other.row ? point.column - other.column : point.column,
+    }
+}
+
+function relativeOffset(range: SimpleRange): RelPoint {
+    return subtract(range.endPosition, range.startPosition)
+}
+
+/** This only works if both nodes have the same parent and the firstNode is before the secondNode. */
+function editBetweenSiblings(firstNode: SyntaxNode, secondNode: SyntaxNode) {
+    const parent = firstNode.parent!! // A node which has a sibling also has a parent.
+    const textInBetween = parent.text.substring(
+        firstNode.endIndex - parent.startIndex,
+        secondNode.startIndex - parent.startIndex
+    )
+    const combinedText = secondNode.text + textInBetween + firstNode.text
+    return {
+        range: { startPosition: firstNode.startPosition, endPosition: secondNode.endPosition },
+        text: combinedText,
+    }
+}
 
 export function transposeNext(node: SyntaxNode): EditActions {
     const next = node.nextNamedSibling
     if (!next) {
         return {}
     }
-    const startNode = node
-    const endNode = next
-    // Assumption: A node which has a sibling also has a parent.
-    const parent = startNode.parent!!
-    const textInBetween = parent.text.substring(
-        startNode.endIndex - parent.startIndex,
-        endNode.startIndex - parent.startIndex
-    )
-    const combinedText = endNode.text + textInBetween + startNode.text
-    const edit = {
-        range: { startPosition: startNode.startPosition, endPosition: endNode.endPosition },
-        text: combinedText,
-    }
-    const textBefore = endNode.text + textInBetween
-    const textBeforeLines = textBefore.split("\n")
-    const combinedTextLines = combinedText.split("\n")
+    const edit = editBetweenSiblings(node, next)
+
+    const separatorRelative = subtract(next.startPosition, node.endPosition)
+    const newStart = add(node.startPosition, relativeOffset(next), separatorRelative)
     const select = {
-        startPosition: {
-            row: startNode.startPosition.row + textBeforeLines.length - 1,
-            column:
-                textBeforeLines.length === 1
-                    ? startNode.startPosition.column + textBefore.length
-                    : textBeforeLines[textBeforeLines.length - 1].length,
-        },
-        endPosition: {
-            row: endNode.endPosition.row,
-            column:
-                combinedTextLines.length === 1
-                    ? endNode.endPosition.column
-                    : combinedTextLines[combinedTextLines.length - 1].length,
-        },
+        startPosition: newStart,
+        endPosition: add(newStart, relativeOffset(node)),
     }
     return { edit, select }
 }
@@ -46,17 +61,10 @@ export function transposePrevious(node: SyntaxNode): EditActions {
     if (!previous) {
         return {}
     }
-    const { edit } = transposeNext(previous)
-    const nodeLines = node.text.split("\n")
+    const edit = editBetweenSiblings(previous, node)
     const select = {
         startPosition: previous.startPosition,
-        endPosition: {
-            row: previous.startPosition.row + nodeLines.length - 1,
-            column:
-                nodeLines.length === 1
-                    ? previous.startPosition.column + node.text.length
-                    : nodeLines[nodeLines.length - 1].length,
-        },
+        endPosition: add(previous.startPosition, relativeOffset(node)),
     }
     return { edit, select }
 }
