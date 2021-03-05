@@ -10,7 +10,7 @@ import { EditorStateChange } from "./extension"
 import { toPosition, toRange, toSelection, toSimpleRange } from "./conversion-utilities"
 import { nextChild, nextSibling } from "./lib/node-utilities"
 import { findNodeAtSelection } from "./lib/tree-utilities"
-import { transposeNext, transposePrevious } from "./lib/edit-operations"
+import { splice, transposeNext, transposePrevious } from "./lib/edit-operations"
 import { EditFunction } from "./lib/interop"
 
 export function insertOnNewLineAbove(
@@ -212,4 +212,5 @@ function executeEditAction(editFunction: EditFunction) {
 export const editCommands = {
     transposeNext: executeEditAction(transposeNext),
     transposePrevious: executeEditAction(transposePrevious),
+    splice: executeEditAction(splice),
 }

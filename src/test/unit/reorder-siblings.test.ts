@@ -2,7 +2,7 @@
 // GNU General Public License version 3.0 (or later)
 // See COPYING or https://www.gnu.org/licenses/gpl-3.0.txt
 
-import { transposeNext, transposePrevious } from "../../lib/edit-operations"
+import { splice, transposeNext, transposePrevious } from "../../lib/edit-operations"
 import { nodeLeftOf, nodeRightOf } from "../../lib/spatial-movement"
 import { UnitTest } from "../unit-test"
 
@@ -69,5 +69,23 @@ describe("Reordering of siblings", () => {
         UnitTest.test("javascript", before)
             .edit(transposeNext) //
             .andExpect(after)
+    })
+})
+
+describe("Splice", () => {
+    before(async () => {
+        await UnitTest.setup("javascript")
+    })
+
+    it("should do nothing without children", () => {
+        UnitTest.test("javascript", `const x = |42|;`)
+            .edit(splice) //
+            .andExpect(`const x = |42|;`)
+    })
+
+    it("should lift all children", () => {
+        UnitTest.test("javascript", `['abc', |[1, 42.0, '333']|, (a * b), [3, 4]];`)
+            .edit(splice)
+            .andExpect(`['abc', |1|, 42.0, '333', (a * b), [3, 4]];`)
     })
 })

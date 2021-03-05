@@ -246,6 +246,11 @@
                 "command": "code-strider:transpose-previous",
                 "key": "shift+p",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:splice",
+                "key": "shift+s",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             }
         ],
         "languages": [

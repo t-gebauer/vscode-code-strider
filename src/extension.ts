@@ -167,6 +167,7 @@ export async function activate(context: ExtensionContext) {
     // language agnostic editing commands
     registerCommandWithState("transpose-next", editCommands.transposeNext)
     registerCommandWithState("transpose-previous", editCommands.transposePrevious)
+    registerCommandWithState("splice", editCommands.splice)
 
     logger.log("... registration complete.")
 

@@ -68,3 +68,27 @@ export function transposePrevious(node: SyntaxNode): EditActions {
     }
     return { edit, select }
 }
+
+/**
+ * Raises all *named* children; will not work for XML-like languages.
+ */
+export function splice(node: SyntaxNode): EditActions {
+    const firstChild = node.firstNamedChild
+    const lastChild = node.lastNamedChild
+    if (!firstChild || !lastChild) {
+        return {}
+    }
+    return {
+        edit: {
+            range: node,
+            text: node.text.substring(
+                firstChild.startIndex - node.startIndex,
+                lastChild.endIndex - node.startIndex
+            ),
+        },
+        select: {
+            startPosition: node.startPosition,
+            endPosition: add(node.startPosition, relativeOffset(firstChild)),
+        },
+    }
+}
