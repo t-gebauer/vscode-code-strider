@@ -215,22 +215,22 @@
                 "command": "••••••••••••••••••••••••••••••••••••••••••••••••••"
             },
             {
-                "command": "code-strider:slurp-left",
+                "command": "code-strider:slurp-backward",
                 "key": "7",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
-                "command": "code-strider:slurp-right",
+                "command": "code-strider:slurp-forward",
                 "key": "8",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
-                "command": "code-strider:barf-left",
+                "command": "code-strider:barf-backward",
                 "key": "shift+7",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },
             {
-                "command": "code-strider:barf-right",
+                "command": "code-strider:barf-forward",
                 "key": "shift+8",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             },

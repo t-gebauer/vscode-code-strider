@@ -11,7 +11,7 @@ import { TestTreeSitter } from "./test-utils"
 
 /** Simulates the behavior of a real text editor, so that we can test selection and editing commands in isolation. */
 export namespace UnitTest {
-    type LanguageId = "javascript"
+    type LanguageId = "javascript" | "html"
 
     let treeSitter: TreeSitter
 

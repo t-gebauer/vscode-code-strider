@@ -35,28 +35,28 @@ describe("Editing Commands", () => {
         })
 
         it("slurp left", async () => {
-            await executeCommand("slurp-left")
+            await executeCommand("slurp-backward")
             expect(document.getText()).to.match(
                 /.+html.+div.+body.+\/body.+text inside.+\/div.+Text behind.+\/html.+/s
             )
         })
 
         it("slurp right", async () => {
-            await executeCommand("slurp-right")
+            await executeCommand("slurp-forward")
             expect(document.getText()).to.match(
                 /.+html.+body.+\/body.+div.+text inside.+Text behind.+\/div.+\/html.+/s
             )
         })
 
         it("barf left", async () => {
-            await executeCommand("barf-left")
+            await executeCommand("barf-backward")
             expect(document.getText()).to.match(
                 /.+html.+body.+\/body.+text inside.+div attr.+\/div.+Text behind.+\/html.+/s
             )
         })
 
         it("barf right", async () => {
-            await executeCommand("barf-right")
+            await executeCommand("barf-forward")
             expect(document.getText()).to.match(
                 /.+html.+body.+\/body.+div.+\/div.+text inside.+Text behind.+\/html.+/s
             )

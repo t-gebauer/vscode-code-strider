@@ -21,7 +21,6 @@ import {
 import { AstViewer } from "./ast-view"
 import {
     backToPreviousSelection,
-    slurpLeft,
     deleteAndInsert,
     exitInsertMode,
     goToFirstChild,
@@ -34,9 +33,6 @@ import {
     insertOnNewLineBelow,
     raise,
     undoEdit,
-    slurpRight,
-    barfLeft,
-    barfRight,
     editCommands,
 } from "./commands"
 import { EditorState } from "./editor-state"
@@ -44,11 +40,7 @@ import { interceptTypeCommand } from "./intercept-typing"
 import { Languages } from "./lib/language-support"
 import { registerStatusBar } from "./status-bar"
 import { toPoint, toRange, toSelection, toSimpleRange } from "./conversion-utilities"
-import {
-    composeTreeEdit,
-    findNodeAtSelection,
-    findNodeBeforeCursor,
-} from "./lib/tree-utilities"
+import { composeTreeEdit, findNodeAtSelection, findNodeBeforeCursor } from "./lib/tree-utilities"
 import Parser = require("web-tree-sitter")
 import { registerDecorationHandler } from "./decoration"
 import { Logger } from "./lib/logger"
@@ -156,13 +148,11 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("follow-structure-last", goToLastChild)
 
     // editing commands
-    // TODO: afaik, slurping and barfing only works for HTML.
-    //       Configure per language "how much" of the selected node is its border?
-    //       In HTML: the first named child node
-    registerCommandWithState("slurp-left", slurpLeft)
-    registerCommandWithState("slurp-right", slurpRight)
-    registerCommandWithState("barf-left", barfLeft)
-    registerCommandWithState("barf-right", barfRight)
+    // TODO: slurping and barfing only works for HTML (or similar languages).
+    registerCommandWithState("slurp-backward", editCommands.slurpBackwardHtml)
+    registerCommandWithState("slurp-forward", editCommands.slurpForwardHtml)
+    registerCommandWithState("barf-backward", editCommands.barfBackwardHtml)
+    registerCommandWithState("barf-forward", editCommands.barfForwardHtml)
 
     // language agnostic editing commands
     registerCommandWithState("transpose-next", editCommands.transposeNext)

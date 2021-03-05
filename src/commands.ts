@@ -8,9 +8,8 @@ import { SyntaxNode } from "web-tree-sitter"
 import { EditorState } from "./editor-state"
 import { EditorStateChange } from "./extension"
 import { toPosition, toRange, toSelection, toSimpleRange } from "./conversion-utilities"
-import { nextChild, nextSibling } from "./lib/node-utilities"
 import { findNodeAtSelection } from "./lib/tree-utilities"
-import { splice, transposeNext, transposePrevious } from "./lib/edit-operations"
+import { barfBackwardHtml, barfForwardHtml, slurpBackwardHtml, slurpForwardHtml, splice, transposeNext, transposePrevious } from "./lib/edit-operations"
 import { EditFunction } from "./lib/interop"
 
 export function insertOnNewLineAbove(
@@ -125,72 +124,6 @@ export function raise(
     }
 }
 
-function slurpNext(
-    state: Readonly<EditorState>,
-    edit: TextEditorEdit,
-    forward = true
-): EditorStateChange {
-    const { currentNode } = state
-    const sibling = nextSibling(currentNode, forward)
-    const child = nextChild(currentNode, !forward)
-    if (!(child && sibling)) return {}
-    edit.delete(toRange(sibling))
-    edit.insert(toPosition(forward ? child.startPosition : child.endPosition), sibling.text)
-    return {}
-}
-
-export function slurpLeft(
-    state: Readonly<EditorState>,
-    editor: TextEditor,
-    edit: TextEditorEdit
-): EditorStateChange {
-    return slurpNext(state, edit, false)
-}
-
-export function slurpRight(
-    state: Readonly<EditorState>,
-    editor: TextEditor,
-    edit: TextEditorEdit
-): EditorStateChange {
-    return slurpNext(state, edit, true)
-}
-
-function barfNext(
-    state: Readonly<EditorState>,
-    editor: TextEditor,
-    edit: TextEditorEdit,
-    forward = true
-): EditorStateChange {
-    const { currentNode: current } = state
-    const child = nextChild(current, !forward)
-    if (!child) return {}
-    const sibling = nextSibling(child, !forward)
-    if (!sibling) return {}
-    edit.delete(toRange(sibling))
-    edit.replace(toPosition(forward ? current.endPosition : current.startPosition), sibling.text)
-    // TODO: selections should always be around the original node on its new position
-    editor.selection = new Selection(
-        toPosition(forward ? current.startPosition : current.endPosition),
-        toPosition(forward ? sibling.endPosition : sibling.startPosition)
-    )
-    return {}
-}
-
-export function barfLeft(
-    state: Readonly<EditorState>,
-    editor: TextEditor,
-    edit: TextEditorEdit
-): EditorStateChange {
-    return barfNext(state, editor, edit, false)
-}
-
-export function barfRight(
-    state: Readonly<EditorState>,
-    editor: TextEditor,
-    edit: TextEditorEdit
-): EditorStateChange {
-    return barfNext(state, editor, edit, true)
-}
 
 function executeEditAction(editFunction: EditFunction) {
     return (state: Readonly<EditorState>, editor: TextEditor, textEdit: TextEditorEdit) => {
@@ -213,4 +146,8 @@ export const editCommands = {
     transposeNext: executeEditAction(transposeNext),
     transposePrevious: executeEditAction(transposePrevious),
     splice: executeEditAction(splice),
+    slurpForwardHtml: executeEditAction(slurpForwardHtml),
+    slurpBackwardHtml: executeEditAction(slurpBackwardHtml),
+    barfForwardHtml: executeEditAction(barfForwardHtml),
+    barfBackwardHtml: executeEditAction(barfBackwardHtml),
 }

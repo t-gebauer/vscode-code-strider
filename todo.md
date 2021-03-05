@@ -11,6 +11,7 @@
 
 - Documentation: language agnostic edit ommands:
     - transpose: reordering
+    - splice
 
 - Implement simple language agnostic editing commands
     - delete (cut): greedy delete already exists, but is not good enough yet; and `cut` should behave similarly

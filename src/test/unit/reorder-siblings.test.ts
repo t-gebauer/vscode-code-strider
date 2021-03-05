@@ -2,7 +2,15 @@
 // GNU General Public License version 3.0 (or later)
 // See COPYING or https://www.gnu.org/licenses/gpl-3.0.txt
 
-import { splice, transposeNext, transposePrevious } from "../../lib/edit-operations"
+import {
+    slurpForwardHtml,
+    slurpBackwardHtml,
+    splice,
+    transposeNext,
+    transposePrevious,
+    barfForwardHtml,
+    barfBackwardHtml,
+} from "../../lib/edit-operations"
 import { nodeLeftOf, nodeRightOf } from "../../lib/spatial-movement"
 import { UnitTest } from "../unit-test"
 
@@ -87,5 +95,53 @@ describe("Splice", () => {
         UnitTest.test("javascript", `['abc', |[1, 42.0, '333']|, (a * b), [3, 4]];`)
             .edit(splice)
             .andExpect(`['abc', |1|, 42.0, '333', (a * b), [3, 4]];`)
+    })
+})
+
+describe("Slurp and barf", () => {
+    before(async () => {
+        await UnitTest.setup("html")
+    })
+
+    it("should do nothing without next sibling", () => {
+        UnitTest.test("html", `<p>This</p> |<div><a>test</a></div>|`)
+            .edit(slurpForwardHtml)
+            .andExpect(`<p>This</p> |<div><a>test</a></div>|`)
+    })
+
+    it("should slurp the next paragraph and reverse barf", () => {
+        const before = `
+        |<div context="true"> <p1> </p1>
+        </div>|
+        <p2> </p2>
+        `
+        const after = `
+        |<div context="true"> <p1> </p1>
+        <p2> </p2>
+        </div>|
+        `
+        UnitTest.test("html", before)
+            .edit(slurpForwardHtml)
+            .andExpect(after)
+            .edit(barfForwardHtml)
+            .andExpect(before)
+    })
+
+    it("should slurp the previous paragraph and reverse barf", () => {
+        const before = `
+        <p2> </p2>
+        |<div context="true"> <p1> </p1>
+        </div>|
+        `
+        const after = `
+        |<div context="true">
+        <p2> </p2> <p1> </p1>
+        </div>|
+        `
+        UnitTest.test("html", before)
+            .edit(slurpBackwardHtml)
+            .andExpect(after)
+            .edit(barfBackwardHtml)
+            .andExpect(before)
     })
 })

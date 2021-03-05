@@ -62,10 +62,10 @@ For convenience the default VS Code `undo` command is bound to [u].
 
 #### Slurping and barfing
 
-- `slurp-left` [7] Include the next sibling as last child
-- `slurp-right` [8] Include the previous sibling as first child
-- `barf-left` [Shift-7] Extract the last child as next sibling
-- `barf-right` [Shift-8] Extract the first child as previous sibling
+- `slurp-backward` [7] Include the previous sibling as first child
+- `slurp-forward` [8] Include the next sibling as last child
+- `barf-backward` [Shift-7] Extract the first child as previous sibling
+- `barf-forward` [Shift-8] Extract the last child as next sibling
 
 Currently, only useful in HTML.
 While it is possible to use the commands in any language, the results are most definitely not what you would expect.
