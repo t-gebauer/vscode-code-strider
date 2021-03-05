@@ -4,7 +4,7 @@
 
 import { expect } from "chai"
 import { Point, Tree } from "web-tree-sitter"
-import { SimpleRange } from "../../lib/node-utilities"
+import { SimpleRange } from "../../lib/interop"
 import * as treeUtils from "../../lib/tree-utilities"
 import { TestTreeSitter } from "../test-utils"
 

@@ -233,6 +233,19 @@
                 "command": "code-strider:barf-right",
                 "key": "shift+8",
                 "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "•••language•agnostic•editing••••••••••••••••••••••••"
+            },
+            {
+                "command": "code-strider:transpose-next",
+                "key": "shift+n",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
+            },
+            {
+                "command": "code-strider:transpose-previous",
+                "key": "shift+p",
+                "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
             }
         ],
         "languages": [

@@ -21,21 +21,21 @@ export class TreeSitter {
         await Parser.init()
     }
 
-    async parseText(text: string, languageId: string, previousTree?: Tree): Promise<Tree> {
+    async parseText(text: string, languageId: string, editedTree?: Tree): Promise<Tree> {
         this.logger?.log("1 initializing parser ...")
         const parser = this.parsers.get(languageId) ?? (await this.initializeNewParser(languageId))
         this.logger?.log("2 parsing text ...")
-        const result = parser.parse(text, previousTree)
+        const result = parser.parse(text, editedTree)
         this.logger?.log("3 done.")
         return result
     }
 
-    parseTextSync(text: string, languageId: string): Tree {
+    parseTextSync(text: string, languageId: string, editedTree?: Tree): Tree {
         const parser = this.parsers.get(languageId)
         if (!parser) {
             throw Error(`Invalid state: language not yet initialized! (${languageId})`)
         }
-        return parser.parse(text)
+        return parser.parse(text, editedTree)
     }
 
     async initializeNewParser(languageId: string): Promise<Parser> {

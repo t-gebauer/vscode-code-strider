@@ -7,9 +7,11 @@ import { Selection, TextEditor, TextEditorEdit } from "vscode"
 import { SyntaxNode } from "web-tree-sitter"
 import { EditorState } from "./editor-state"
 import { EditorStateChange } from "./extension"
-import { toPosition, toRange, toSimpleRange } from "./conversion-utilities"
+import { toPosition, toRange, toSelection, toSimpleRange } from "./conversion-utilities"
 import { nextChild, nextSibling } from "./lib/node-utilities"
 import { findNodeAtSelection } from "./lib/tree-utilities"
+import { transposeNext, transposePrevious } from "./lib/edit-operations"
+import { EditFunction } from "./lib/interop"
 
 export function insertOnNewLineAbove(
     state: Readonly<EditorState>,
@@ -188,4 +190,26 @@ export function barfRight(
     edit: TextEditorEdit
 ): EditorStateChange {
     return barfNext(state, editor, edit, true)
+}
+
+function executeEditAction(editFunction: EditFunction) {
+    return (state: Readonly<EditorState>, editor: TextEditor, textEdit: TextEditorEdit) => {
+        const { edit, select } = editFunction(state.currentNode)
+        if (edit) {
+            textEdit.replace(toSelection(edit.range), edit.text)
+        }
+        if (select) {
+            // The `edit` action will trigger a selection update. So, we can not set the
+            // selection here, as it would be directly overidden.
+            //editor.selection = toSelection(select)
+            // TODO: make this more reliable. Chain directly after next content change event?
+            setTimeout(() => (editor.selection = toSelection(select)), 50)
+        }
+        return undefined
+    }
+}
+
+export const editCommands = {
+    transposeNext: executeEditAction(transposeNext),
+    transposePrevious: executeEditAction(transposePrevious),
 }

@@ -9,8 +9,10 @@
 
 # Next
 
-- Implement simple language agnostic editing commands
+- Documentation: language agnostic edit ommands:
     - transpose: reordering
+
+- Implement simple language agnostic editing commands
     - replace: overwrite node (paste)
     - splice: remove delimiters around
     - delete (cut): greedy delete already exists, but is not good enough yet; and `cut` should behave similarly

@@ -4,7 +4,7 @@
 
 import { Position, Range, Selection } from "vscode"
 import Parser = require("web-tree-sitter")
-import { SimpleRange } from "./lib/node-utilities"
+import { SimpleRange } from "./lib/interop"
 
 export function toPoint(position: Position): Parser.Point {
     return { row: position.line, column: position.character }

@@ -2,8 +2,9 @@
 // GNU General Public License version 3.0 (or later)
 // See COPYING or https://www.gnu.org/licenses/gpl-3.0.txt
 
-import { Point, SyntaxNode, Tree } from "web-tree-sitter"
-import { contains, SimpleRange } from "./node-utilities"
+import { Edit, Point, SyntaxNode, Tree } from "web-tree-sitter"
+import { SimpleRange } from "./interop"
+import { contains } from "./node-utilities"
 
 /** Find the outmost node which is completely contained in the selection */
 export function findNodeAtSelection(tree: Tree, selection: SimpleRange): SyntaxNode {
@@ -46,8 +47,7 @@ export function findNodeBeforeCursor(tree: Tree, point: Point): SyntaxNode {
         while (true) {
             if (
                 point.row > cursor.endPosition.row ||
-                (point.row === cursor.endPosition.row &&
-                    point.column > cursor.endPosition.column)
+                (point.row === cursor.endPosition.row && point.column > cursor.endPosition.column)
             ) {
                 // needle is after current node
                 // -> go to next node
@@ -83,5 +83,29 @@ export function findNodeBeforeCursor(tree: Tree, point: Point): SyntaxNode {
                 break
             }
         }
+    }
+}
+
+export function composeTreeEdit(
+    range: SimpleRange,
+    rangeOffset: number,
+    rangeLength: number,
+    text: string
+): Edit {
+    // Let's just assume that end-of-line sequences are normalized
+    const newLines = text.split("\n")
+    return {
+        startIndex: rangeOffset,
+        oldEndIndex: rangeOffset + rangeLength,
+        newEndIndex: rangeOffset + text.length,
+        startPosition: range.startPosition,
+        oldEndPosition: range.endPosition,
+        newEndPosition: {
+            row: range.startPosition.row + newLines.length - 1,
+            column:
+                newLines.length > 1
+                    ? newLines[newLines.length - 1].length
+                    : range.startPosition.column + text.length,
+        },
     }
 }

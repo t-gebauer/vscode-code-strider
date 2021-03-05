@@ -37,13 +37,18 @@ import {
     slurpRight,
     barfLeft,
     barfRight,
+    editCommands,
 } from "./commands"
 import { EditorState } from "./editor-state"
 import { interceptTypeCommand } from "./intercept-typing"
 import { Languages } from "./lib/language-support"
 import { registerStatusBar } from "./status-bar"
 import { toPoint, toRange, toSelection, toSimpleRange } from "./conversion-utilities"
-import { findNodeAtSelection, findNodeBeforeCursor } from "./lib/tree-utilities"
+import {
+    composeTreeEdit,
+    findNodeAtSelection,
+    findNodeBeforeCursor,
+} from "./lib/tree-utilities"
 import Parser = require("web-tree-sitter")
 import { registerDecorationHandler } from "./decoration"
 import { Logger } from "./lib/logger"
@@ -158,6 +163,10 @@ export async function activate(context: ExtensionContext) {
     registerCommandWithState("slurp-right", slurpRight)
     registerCommandWithState("barf-left", barfLeft)
     registerCommandWithState("barf-right", barfRight)
+
+    // language agnostic editing commands
+    registerCommandWithState("transpose-next", editCommands.transposeNext)
+    registerCommandWithState("transpose-previous", editCommands.transposePrevious)
 
     logger.log("... registration complete.")
 
@@ -404,7 +413,7 @@ export class Extension implements Disposable {
         return newTree
     }
 
-    // TODO: ensure that multiple edits are correctly processed in order
+    // TODO: ensure that multiple edits are correctly processed in order?
     handleTextDocumentChange(event: TextDocumentChangeEvent) {
         const { document, contentChanges } = event
         // Did the content change? The event is also fired when other properties of the document change.
@@ -414,23 +423,14 @@ export class Extension implements Disposable {
 
         logger.context("Event: TextDocument content changed")
         contentChanges.forEach((change) => {
-            const newLines = change.text.split("\n") // TODO: different end-of-line sequences?
-            // TODO: write a test for this?
-            const edit = {
-                startIndex: change.rangeOffset,
-                oldEndIndex: change.rangeOffset + change.rangeLength,
-                newEndIndex: change.rangeOffset + change.text.length,
-                startPosition: toPoint(change.range.start),
-                oldEndPosition: toPoint(change.range.end),
-                newEndPosition: {
-                    row: change.range.start.line + newLines.length - 1,
-                    column:
-                        newLines.length > 1
-                            ? newLines[newLines.length - 1].length
-                            : change.range.start.character + change.text.length,
-                },
-            }
-            tree.edit(edit)
+            tree.edit(
+                composeTreeEdit(
+                    toSimpleRange(change.range),
+                    change.rangeOffset,
+                    change.rangeLength,
+                    change.text
+                )
+            )
         })
         // This is async!
         this.parseTextDocument(document, tree)
