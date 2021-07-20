@@ -1,22 +1,23 @@
-.vscode/**
-.vscode-test/**
-out/**
-target/**
-src/**
-.gitignore
-.yarnrc
-vsc-extension-quickstart.md
-**/tsconfig.json
-**/.eslintrc.json
-**/*.map
-**/*.ts
+# Controls which files are packaged by `vsce`.
 
-.envrc
-.direnv/
-.prettierignore
-.prettierrc.toml
-shell.nix
-todo.md
-webpack.config.js
+# Same syntax as gitignore (since version 1.92.0, but not longer in 1.95.0 ...).
+# https://github.com/microsoft/vscode-vsce/issues/576
+# https://github.com/microsoft/vscode-vsce/issues/588
+# Pray that this feature will be readded soon.
 
-node_modules/**
+# Ignore everything
+/*
+
+# These files are always included (so these lines don't matter at all)
+!package.json
+!README.md
+
+# Except for these files
+!COPYING
+!Licenses.md
+!CHANGELOG.md
+!images/
+
+# And the actual extension
+!dist/
+!wasm/

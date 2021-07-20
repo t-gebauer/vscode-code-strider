@@ -8,7 +8,7 @@
         "type": "git",
         "url": "https://github.com/t-gebauer/vscode-code-strider"
     },
-    "version": "0.2.1",
+    "version": "0.2.1-dev",
     "engines": {
         "vscode": "^1.50.0"
     },
@@ -266,10 +266,10 @@
         ]
     },
     "scripts": {
-        "prepack": "mkdir -p dist && cp node_modules/web-tree-sitter/tree-sitter.wasm dist/",
+        "prepack": "rm -rd dist && mkdir dist && cp node_modules/web-tree-sitter/tree-sitter.wasm dist/",
         "webpack": "npm run prepack && webpack --mode development",
         "webpack-prod": "npm run prepack && webpack --mode production",
-        "package": "npm run webpack-prod && rm -rdf target && mkdir -p target && vsce ls | xargs cp --parents -t target",
+        "package": "npm run webpack-prod && rm -rdf target && mkdir target && vsce ls | xargs cp --parents -t target",
         "package-vsix": "npm run webpack-prod && vsce package",
         "watch": "npm run webpack -- --watch",
         "compile": "tsc -p ./",
@@ -296,7 +296,7 @@
         "prettier": "^2.2.1",
         "ts-loader": "^8.0.13",
         "typescript": "^4.0.2",
-        "vsce": "^1.85.0",
+        "vsce": "1.94.0",
         "vscode-test": "^1.4.0",
         "webpack": "^5.11.1",
         "webpack-cli": "^4.3.1"
