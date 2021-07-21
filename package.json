@@ -8,7 +8,7 @@
         "type": "git",
         "url": "https://github.com/t-gebauer/vscode-code-strider"
     },
-    "version": "0.3.0",
+    "version": "0.3.0-dev",
     "engines": {
         "vscode": "^1.50.0"
     },

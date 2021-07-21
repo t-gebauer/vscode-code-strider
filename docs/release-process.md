@@ -8,7 +8,7 @@ Step-by-step checklist to create a release
 5. Install and test it (manually): `codium --install-extension code-strider-0.0.0.vsix`
 6. Commit the changes with message `release 0.0.0` and push them to GitHub
 7. Create a release on GitHub: https://github.com/t-gebauer/vscode-code-strider/releases/new
-   Tag and title: v0.0.0
+   Tag: v0.0.0
    Copy the relevant lines from the `CHANGELOG.md` into the body
    Attach the packaged vsix
 8. Bump the version, e.g. `0.1.0-dev`, commit, push...
