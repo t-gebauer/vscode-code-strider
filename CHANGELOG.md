@@ -6,6 +6,8 @@ The format is roughly based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+## [0.3.0]
+
 - Improved slurping and barfing (still only HTML)
 - New edit command: transpose siblings
 - New edit command: splice
