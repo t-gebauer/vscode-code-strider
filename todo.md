@@ -78,7 +78,7 @@
 
 # Open questions
 
-How to navigate efficiently over lots of one line statements? We do not want to navigate line-by-line. Precise jump?
+How to navigate efficiently over lots of one-line statements? We do not want to navigate line-by-line. Precise jump?
 
 # Alternative implementations
 

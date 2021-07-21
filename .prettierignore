@@ -1,4 +1,3 @@
-# Keep language definitions compact
-/src/language/languages/
-
-/out
+out/
+dist/
+target/

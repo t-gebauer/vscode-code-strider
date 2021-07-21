@@ -49,7 +49,7 @@ in symlinkJoin {
     (officialGrammar "json")
     (officialGrammar "python")
     (grammar "clojure" "https://github.com/sogaiu/tree-sitter-clojure")
-    # (grammar "fennel" "https://github.com/travonted/tree-sitter-fennel") # no license
+    # (grammar "fennel" "https://github.com/travonted/tree-sitter-fennel") # TODO: include again
     (grammar "markdown" "https://github.com/ikatyang/tree-sitter-markdown")
     (grammar "nix" "https://github.com/cstrahan/tree-sitter-nix")
     (grammar "scss" "https://github.com/serenadeai/tree-sitter-scss")
@@ -57,7 +57,7 @@ in symlinkJoin {
     (mkTreeSitterGrammar {
       id = "typescript";
       src = typescriptRepo;
-      # there are multiple grammars this repository: TypeScript and JSX
+      # there are multiple grammars the typescript repository: TypeScript and JSX
       preBuild = "cd typescript";
     })
   ];
