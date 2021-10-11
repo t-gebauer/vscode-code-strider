@@ -90,6 +90,7 @@ Theoretically, slurping and barfing are inverse operations, but in the current i
         Java
         JavaScript
         JSON
+        Kotlin
         Lua
         Markdown
         Nix
@@ -136,16 +137,6 @@ For example, all default key bindings active during the structured-navigation mo
   "when": "editorTextFocus && code-strider:is-editor-supported && !code-strider:is-insert-mode"
 ```
 
-## Updating parsers
-
-With help of the package manager [Nix](https://nixos.org/), the expression `build-wasm.nix` can be used to fetch and build all the latest parsers from their git repositories.
-
-```sh
-nix-build build-wasm.nix
-cp result/* wasm/
-chmod 644 wasm/*
-```
-
 ## Known Issues
 
 - The extension does not (re-)initialize when changing the language mode of a file.
@@ -180,7 +171,8 @@ The `start` script has `codium` hard-coded. Replace it if you want to use VS Cod
 
     code --extensionDevelopmentPath $(pwd)
 
-The path parameter has to be absolute, so use `$(pwd)` instead of `.`.
+The path parameter has to be absolute, so use `$(pwd)` instead of `.`.  
+Make sure to compile first (`npm run webpack`) before starting with `npm start`.
 
 # Credits
 

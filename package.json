@@ -27,6 +27,7 @@
         "onLanguage:java",
         "onLanguage:javascript",
         "onLanguage:json",
+        "onLanguage:kotlin",
         "onLanguage:lua",
         "onLanguage:markdown",
         "onLanguage:nix",
@@ -279,6 +280,15 @@
                 ],
                 "aliases": [
                     "Fennel"
+                ]
+            },
+            {
+                "id": "kotlin",
+                "extensions": [
+                    ".kt"
+                ],
+                "aliases": [
+                    "Kotlin"
                 ]
             }
         ]

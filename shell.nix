@@ -18,6 +18,10 @@ let
     cp result/* wasm/
     chmod 644 wasm/*
   '';
+  manual-test = pkgs.writeShellScriptBin "manual-test" ''
+    npm run webpack \
+    && npm start . -- --user-data-dir data --disable-extension
+  '';
 in
 pkgs.mkShell {
   buildInputs = with pkgs; [
@@ -29,6 +33,7 @@ pkgs.mkShell {
     nodePackages.prettier
 
     update-wasm
+    manual-test
     #print-versions
   ];
 

@@ -50,6 +50,7 @@ pkgs.symlinkJoin {
     (grammar "java" tree-sitter-java)
     (grammar "javascript" tree-sitter-javascript)
     (grammar "json" tree-sitter-json)
+    (grammar "kotlin" tree-sitter-kotlin)
     (grammar "lua" tree-sitter-lua)
     (grammar "markdown" tree-sitter-markdown)
     (grammar "nix" tree-sitter-nix)

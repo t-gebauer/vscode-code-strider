@@ -167,6 +167,18 @@
         "url": "https://github.com/tree-sitter/tree-sitter-json/archive/203e239408d642be83edde8988d6e7b20a19f0e8.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "tree-sitter-kotlin": {
+        "branch": "main",
+        "description": "Kotlin grammar for Tree-Sitter",
+        "homepage": "",
+        "owner": "fwcd",
+        "repo": "tree-sitter-kotlin",
+        "rev": "7b55a836e658f4025809fc76d3cd9f2188b277c7",
+        "sha256": "1mrv0gg0v43x0dvaq7z6islp7j8c7mq946sidwavpxi4nrp4a1bx",
+        "type": "tarball",
+        "url": "https://github.com/fwcd/tree-sitter-kotlin/archive/7b55a836e658f4025809fc76d3cd9f2188b277c7.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "tree-sitter-lua": {
         "branch": "master",
         "description": "Lua grammar for tree-sitter.",

@@ -26,6 +26,7 @@ const languages: Map<string, LanguageDefinition> = new Map(
         // The normal "json" grammar should suffice. Even though the
         // comments are labeled as ERROR.
         defineLanguage("jsonc", "json"),
+        defineLanguage("kotlin"),
         defineLanguage("lua"),
         defineLanguage("markdown"),
         defineLanguage("nix"),
