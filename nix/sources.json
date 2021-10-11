@@ -35,6 +35,18 @@
         "url": "https://github.com/nixos/nixpkgs/archive/9bf75dd50b7b6d3ce6aaf6563db95f41438b9bdb.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "tree-sitter-bash": {
+        "branch": "master",
+        "description": "Bash grammar for tree-sitter",
+        "homepage": null,
+        "owner": "tree-sitter",
+        "repo": "tree-sitter-bash",
+        "rev": "30d369ba45971a40160de34631ceea05358c9a48",
+        "sha256": "06ibspp39ar4gi4g6xs4bdnbfm8h5cmmb5gh2fnp60hx2in3izm2",
+        "type": "tarball",
+        "url": "https://github.com/tree-sitter/tree-sitter-bash/archive/30d369ba45971a40160de34631ceea05358c9a48.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "tree-sitter-c": {
         "branch": "master",
         "description": "C grammar for tree-sitter",
@@ -81,6 +93,30 @@
         "sha256": "1k8acyav26248liz0psk2r9dl7472mqgdyrjwg3pfxx94jgqjcik",
         "type": "tarball",
         "url": "https://github.com/travonted/tree-sitter-fennel/archive/fce4331731a960077ff5f98939bc675179f1908a.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "tree-sitter-go": {
+        "branch": "master",
+        "description": "Go grammar for tree-sitter",
+        "homepage": null,
+        "owner": "tree-sitter",
+        "repo": "tree-sitter-go",
+        "rev": "7f6bfd0161b2fe97f03564edad3287ebea0494a3",
+        "sha256": "12naks95vzb0sf219i39myvfpkycr2dh3lv7i7i6kwddmlhqsjnl",
+        "type": "tarball",
+        "url": "https://github.com/tree-sitter/tree-sitter-go/archive/7f6bfd0161b2fe97f03564edad3287ebea0494a3.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "tree-sitter-haskell": {
+        "branch": "master",
+        "description": "Haskell grammar for tree-sitter.",
+        "homepage": null,
+        "owner": "tree-sitter",
+        "repo": "tree-sitter-haskell",
+        "rev": "bf7d643b494b7c7eed909ed7fbd8447231152cb0",
+        "sha256": "1wlp6kncjadhfz8y2wn90gkbqf35iidrn0y1ga360l5wyzx1mpid",
+        "type": "tarball",
+        "url": "https://github.com/tree-sitter/tree-sitter-haskell/archive/bf7d643b494b7c7eed909ed7fbd8447231152cb0.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "tree-sitter-html": {
@@ -131,6 +167,18 @@
         "url": "https://github.com/tree-sitter/tree-sitter-json/archive/203e239408d642be83edde8988d6e7b20a19f0e8.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "tree-sitter-lua": {
+        "branch": "master",
+        "description": "Lua grammar for tree-sitter.",
+        "homepage": null,
+        "owner": "Azganoth",
+        "repo": "tree-sitter-lua",
+        "rev": "a943944ec09c5e96f455bb166079de4ef3534457",
+        "sha256": "0pm6wwb3kv73bfvvshdmvazcb1is5x1z6jwr31gz0niln18nqvpb",
+        "type": "tarball",
+        "url": "https://github.com/Azganoth/tree-sitter-lua/archive/a943944ec09c5e96f455bb166079de4ef3534457.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "tree-sitter-markdown": {
         "branch": "master",
         "description": "Markdown grammar for tree-sitter",
@@ -153,6 +201,30 @@
         "sha256": "03jhvyrsxq49smk9p2apjj839wmzjmrzy045wcxawz1g7xssp9pr",
         "type": "tarball",
         "url": "https://github.com/cstrahan/tree-sitter-nix/archive/83ee5993560bf15854c69b77d92e34456f8fb655.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "tree-sitter-ocaml": {
+        "branch": "master",
+        "description": "OCaml grammar for tree-sitter",
+        "homepage": "",
+        "owner": "tree-sitter",
+        "repo": "tree-sitter-ocaml",
+        "rev": "23d419ba45789c5a47d31448061557716b02750a",
+        "sha256": "1bh3afd3iix0gf6ldjngf2c65nyfdwvbmsq25gcxm04jwbg9c6k8",
+        "type": "tarball",
+        "url": "https://github.com/tree-sitter/tree-sitter-ocaml/archive/23d419ba45789c5a47d31448061557716b02750a.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "tree-sitter-php": {
+        "branch": "master",
+        "description": "PHP grammar for tree-sitter",
+        "homepage": null,
+        "owner": "tree-sitter",
+        "repo": "tree-sitter-php",
+        "rev": "31550c1506b2033c5631cd18886edd600b67861e",
+        "sha256": "1qykyziapwmw5qhd5svawzksp4w9hjdql84d7lqs3w0dfa60bjax",
+        "type": "tarball",
+        "url": "https://github.com/tree-sitter/tree-sitter-php/archive/31550c1506b2033c5631cd18886edd600b67861e.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "tree-sitter-python": {
@@ -179,6 +251,18 @@
         "url": "https://github.com/serenadeai/tree-sitter-scss/archive/9da7c979c010c350c28ad2235893103db4622c10.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "tree-sitter-toml": {
+        "branch": "master",
+        "description": "TOML grammar for tree-sitter",
+        "homepage": "https://ikatyang.github.io/tree-sitter-toml/",
+        "owner": "ikatyang",
+        "repo": "tree-sitter-toml",
+        "rev": "8bd2056818b21860e3d756b5a58c4f6e05fb744e",
+        "sha256": "0yasw5fp4mq6vzrdwlc3dxlss8a94bsffv4mzrfp0b3iw0s1dlyg",
+        "type": "tarball",
+        "url": "https://github.com/ikatyang/tree-sitter-toml/archive/8bd2056818b21860e3d756b5a58c4f6e05fb744e.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "tree-sitter-typescript": {
         "branch": "master",
         "description": "TypeScript grammar for tree-sitter",
@@ -189,6 +273,18 @@
         "sha256": "1jh4z86wfsry9a2mkqlvjjg3lypj249r5yq7z175h0bch018y7jv",
         "type": "tarball",
         "url": "https://github.com/tree-sitter/tree-sitter-typescript/archive/5f90415434414122111ea124d456ea1cc0770d16.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "tree-sitter-yaml": {
+        "branch": "master",
+        "description": "YAML grammar for tree-sitter",
+        "homepage": "https://ikatyang.github.io/tree-sitter-yaml/",
+        "owner": "ikatyang",
+        "repo": "tree-sitter-yaml",
+        "rev": "0e36bed171768908f331ff7dff9d956bae016efb",
+        "sha256": "0wyvjh62zdp5bhd2y8k7k7x4wz952l55i1c8d94rhffsbbf9763f",
+        "type": "tarball",
+        "url": "https://github.com/ikatyang/tree-sitter-yaml/archive/0e36bed171768908f331ff7dff9d956bae016efb.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     }
 }

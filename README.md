@@ -79,18 +79,26 @@ Theoretically, slurping and barfing are inverse operations, but in the current i
 
 ### Supported languages
 
+        Bash
         C
         Clojure
         CSS
+        Fennel
+        Go
+        Haskell
         HTML
         Java
         JavaScript
         JSON
+        Lua
         Markdown
         Nix
+        OCaml
+        PHP
         Python
         SCSS
         TypeScript
+        YAML
 
 More to come. The goal is to support all languages supported by [Tree-sitter](https://github.com/tree-sitter/tree-sitter). So all of them :)
 

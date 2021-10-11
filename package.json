@@ -16,19 +16,27 @@
         "Other"
     ],
     "activationEvents": [
+        "onLanguage:bash",
         "onLanguage:c",
         "onLanguage:clojure",
         "onLanguage:css",
         "onLanguage:fennel",
+        "onLanguage:go",
+        "onLanguage:haskell",
         "onLanguage:html",
         "onLanguage:java",
         "onLanguage:javascript",
         "onLanguage:json",
+        "onLanguage:lua",
         "onLanguage:markdown",
         "onLanguage:nix",
+        "onLanguage:ocaml",
+        "onLanguage:php",
         "onLanguage:python",
         "onLanguage:scss",
-        "onLanguage:typescript"
+        "onLanguage:toml",
+        "onLanguage:typescript",
+        "onLanguage:yaml"
     ],
     "main": "./dist/extension.js",
     "contributes": {

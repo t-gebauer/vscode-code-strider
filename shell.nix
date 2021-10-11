@@ -12,6 +12,12 @@ let
     ${niv-unstable.tree-sitter}/bin/tree-sitter --version
     ${niv-unstable.emscripten}/bin/emcc --version
   '';
+  update-wasm = pkgs.writeShellScriptBin "update-wasm" ''
+    nix-build build-wasm.nix
+    rm wasm/*
+    cp result/* wasm/
+    chmod 644 wasm/*
+  '';
 in
 pkgs.mkShell {
   buildInputs = with pkgs; [
@@ -22,6 +28,7 @@ pkgs.mkShell {
     # Code formatting
     nodePackages.prettier
 
+    update-wasm
     #print-versions
   ];
 
