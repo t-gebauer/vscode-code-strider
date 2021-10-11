@@ -19,6 +19,7 @@
         "onLanguage:c",
         "onLanguage:clojure",
         "onLanguage:css",
+        "onLanguage:fennel",
         "onLanguage:html",
         "onLanguage:java",
         "onLanguage:javascript",
@@ -262,6 +263,15 @@
                 "aliases": [
                     "Nix"
                 ]
+            },
+            {
+                "id": "fennel",
+                "extensions": [
+                    ".fnl"
+                ],
+                "aliases": [
+                    "Fennel"
+                ]
             }
         ]
     },
@@ -302,6 +312,6 @@
         "webpack-cli": "^4.3.1"
     },
     "dependencies": {
-        "web-tree-sitter": "^0.17.1"
+        "web-tree-sitter": "^0.19.4"
     }
 }

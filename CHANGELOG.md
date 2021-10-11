@@ -6,6 +6,9 @@ The format is roughly based on [Keep a Changelog](https://keepachangelog.com/).
 
 ## [Unreleased]
 
+- pin grammar dependencies with, managed with niv
+- update web-tree-sitter to 0.19.4, tree-sitter-cli to 0.19.3, emscripten to 2.0.27
+
 ## [0.3.0]
 
 - Improved slurping and barfing (still only HTML)

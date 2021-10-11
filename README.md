@@ -135,6 +135,7 @@ With help of the package manager [Nix](https://nixos.org/), the expression `buil
 ```sh
 nix-build build-wasm.nix
 cp result/* wasm/
+chmod 644 wasm/*
 ```
 
 ## Known Issues

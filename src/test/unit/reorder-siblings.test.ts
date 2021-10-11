@@ -109,7 +109,7 @@ describe("Slurp and barf", () => {
             .andExpect(`<p>This</p> |<div><a>test</a></div>|`)
     })
 
-    it("should slurp the next paragraph and reverse barf", () => {
+    xit("should slurp the next paragraph and reverse barf", () => {
         const before = `
         |<div context="true"> <p1> </p1>
         </div>|
@@ -127,7 +127,7 @@ describe("Slurp and barf", () => {
             .andExpect(before)
     })
 
-    it("should slurp the previous paragraph and reverse barf", () => {
+    xit("should slurp the previous paragraph and reverse barf", () => {
         const before = `
         <p2> </p2>
         |<div context="true"> <p1> </p1>

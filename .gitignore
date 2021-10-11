@@ -7,5 +7,6 @@ node_modules
 *.vsix
 
 .envrc
+result
 
 data

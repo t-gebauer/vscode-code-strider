@@ -1,7 +1,18 @@
-with import <nixpkgs> { };
+#! /usr/bin/env nix-build
+
+# Uses [niv](https://github.com/nmattia/niv) to manage sources.
+# Add a new grammar from GitHub:
+#    niv add tree-sitter/tree-sitter-c
+# Update a grammar:
+#    niv update tree-sitter-c
+
 let
-  mkTreeSitterGrammar = { id, src, preBuild ? "" }:
-    runCommand "tree-sitter-${id}-latest" { inherit src; } ''
+  sources = import nix/sources.nix;
+  pkgs = import sources.nixpkgs { };
+  unstable = import sources.nixpkgs-unstable { };
+
+  mkTreeSitterGrammar = id: src: { preBuild ? "" }:
+    pkgs.runCommand "tree-sitter-${id}-wasm" { inherit src; } ''
       mkdir $out
       mkdir home
       export HOME=$PWD/home
@@ -14,51 +25,34 @@ let
 
       ${preBuild}
 
-      PATH=$PATH:${pkgs.emscripten}/bin
+      PATH=$PATH:${unstable.emscripten}/bin
       ${pkgs.tree-sitter}/bin/tree-sitter build-wasm
 
       cp *.wasm $out/
     '';
 
-  grammar = id: url:
-    mkTreeSitterGrammar {
-      inherit id;
-      # fetch latest commit from git (impure!)
-      src = builtins.fetchGit {
-        inherit url;
-        ref = "master";
-      };
-    };
+  grammar = id: src:
+    mkTreeSitterGrammar id src { };
 
-  officialGrammar = id:
-    grammar id "https://github.com/tree-sitter/tree-sitter-${id}";
-
-  typescriptRepo = builtins.fetchGit {
-    url = "https://github.com/tree-sitter/tree-sitter-typescript";
-    ref = "master";
-  };
-
-in symlinkJoin {
+in
+pkgs.symlinkJoin {
   name = "tree-sitter-wasm-builds-combined";
-  paths = [
-    (officialGrammar "c")
-    (officialGrammar "css")
-    (officialGrammar "html")
-    (officialGrammar "java")
-    (officialGrammar "javascript")
-    (officialGrammar "json")
-    (officialGrammar "python")
-    (grammar "clojure" "https://github.com/sogaiu/tree-sitter-clojure")
-    # (grammar "fennel" "https://github.com/travonted/tree-sitter-fennel") # TODO: include again
-    (grammar "markdown" "https://github.com/ikatyang/tree-sitter-markdown")
-    (grammar "nix" "https://github.com/cstrahan/tree-sitter-nix")
-    (grammar "scss" "https://github.com/serenadeai/tree-sitter-scss")
+  paths = with sources; [
+    (grammar "c" tree-sitter-c)
+    (grammar "css" tree-sitter-css)
+    (grammar "html" tree-sitter-html)
+    (grammar "java" tree-sitter-java)
+    (grammar "javascript" tree-sitter-javascript)
+    (grammar "json" tree-sitter-json)
+    (grammar "python" tree-sitter-python)
+    (grammar "clojure" tree-sitter-clojure)
+    (grammar "fennel" tree-sitter-fennel)
+    (grammar "markdown" tree-sitter-markdown)
+    (grammar "nix" tree-sitter-nix)
+    (grammar "scss" tree-sitter-scss)
     # (grammar "yaml" "https://github.com/ikatyang/tree-sitter-yaml") FIXME: build fails
-    (mkTreeSitterGrammar {
-      id = "typescript";
-      src = typescriptRepo;
-      # there are multiple grammars the typescript repository: TypeScript and JSX
-      preBuild = "cd typescript";
-    })
+    (mkTreeSitterGrammar "typescript" tree-sitter-typescript
+      # repository contains multiple grammars in sub-directories: TypeScript and JSX
+      { preBuild = "cd typescript"; })
   ];
 }
