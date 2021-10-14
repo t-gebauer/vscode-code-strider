@@ -294,20 +294,24 @@
         ]
     },
     "scripts": {
-        "prepack": "rm -rd dist && mkdir dist && cp node_modules/web-tree-sitter/tree-sitter.wasm dist/",
-        "webpack": "npm run prepack && webpack --mode development",
-        "webpack-prod": "npm run prepack && webpack --mode production",
-        "package": "npm run webpack-prod && rm -rdf target && mkdir target && vsce ls | xargs cp --parents -t target",
-        "package-vsix": "npm run webpack-prod && vsce package",
-        "watch": "npm run webpack -- --watch",
+        "prebuild": "rm -rd dist && mkdir dist && cp node_modules/web-tree-sitter/tree-sitter.wasm dist/",
+        "build-base": "npm run prebuild && esbuild ./src/extension.ts --bundle --outfile=dist/extension.js --external:vscode --format=cjs --platform=node",
+        "build": "npm run build-base -- --sourcemap",
+        "watch": "npm run build-base -- --sourcemap --watch",
+        "build-prod": "npm run build-base -- --minify",
+        "///////////////": "---",
         "compile": "tsc -p ./",
         "test-compile": "tsc -p ./",
         "lint": "eslint src --ext ts",
+        "////////////////": "---",
         "pretest": "npm run test-compile && npm run lint",
         "test:unit": "node ./out/test/runUnitTests.js",
         "test:integration": "node ./out/test/runIntegrationTest.js",
-        "test": "npm run test:unit && npm run webpack && npm run test:integration",
-        "start": "codium --extensionDevelopmentPath $(pwd)"
+        "test": "npm run test:unit && npm run build && npm run test:integration",
+        "/////////////////": "---",
+        "start": "codium --extensionDevelopmentPath $(pwd)",
+        "package": "npm run build-prod && rm -rdf target && mkdir target && vsce ls | xargs cp --parents -t target",
+        "package-vsix": "npm run build-prod && vsce package"
     },
     "devDependencies": {
         "@types/chai": "^4.2.14",
@@ -318,6 +322,7 @@
         "@typescript-eslint/eslint-plugin": "^4.1.1",
         "@typescript-eslint/parser": "^4.1.1",
         "chai": "^4.2.0",
+        "esbuild": "^0.13.6",
         "eslint": "^7.9.0",
         "glob": "^7.1.6",
         "mocha": "^8.1.3",
@@ -325,9 +330,7 @@
         "ts-loader": "^8.0.13",
         "typescript": "^4.0.2",
         "vsce": "1.94.0",
-        "vscode-test": "^1.4.0",
-        "webpack": "^5.11.1",
-        "webpack-cli": "^4.3.1"
+        "vscode-test": "^1.4.0"
     },
     "dependencies": {
         "web-tree-sitter": "^0.19.4"

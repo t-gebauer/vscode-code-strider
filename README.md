@@ -162,8 +162,8 @@ For testing and running, either use the npm commands from the `scripts` section 
 or use the launch configs in VS Code (`.vscode`).
 
 Run tests: `npm test`  
-Compile (fast): `npm run webpack`  
-Compile (optimized): `npm run webpack-prod`  
+Compile (fast): `npm run build`  
+Compile (optimized): `npm run build-prod`  
 Automatically recompile on file changes: `npm run watch`  
 Start VS Code and load the extension: `npm start`  
 
@@ -172,7 +172,7 @@ The `start` script has `codium` hard-coded. Replace it if you want to use VS Cod
     code --extensionDevelopmentPath $(pwd)
 
 The path parameter has to be absolute, so use `$(pwd)` instead of `.`.  
-Make sure to compile first (`npm run webpack`) before starting with `npm start`.
+Make sure to build first (`npm run build`) before starting with `npm start`.
 
 # Credits
 

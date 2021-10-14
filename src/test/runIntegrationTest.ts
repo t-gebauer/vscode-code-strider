@@ -2,10 +2,6 @@
 // Copyright (c) Microsoft Corporation
 // https://github.com/Microsoft/vscode-generator-code
 
-// Copyright 2021 Timo Gebauer
-// GNU General Public License version 3.0 (or later)
-// See COPYING or https://www.gnu.org/licenses/gpl-3.0.txt
-
 import * as path from "path"
 import * as process from "process"
 
@@ -34,7 +30,9 @@ async function main() {
             extensionDevelopmentPath,
             extensionTestsPath,
             vscodeExecutablePath,
-            launchArgs: ["--disable-extensions"], // disable *other* extensions
+            launchArgs: [
+                "--disable-extensions", // disable *other* extensions
+            ],
         })
     } catch (err) {
         console.error(err)

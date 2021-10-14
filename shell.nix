@@ -19,8 +19,8 @@ let
     chmod 644 wasm/*
   '';
   manual-test = pkgs.writeShellScriptBin "manual-test" ''
-    npm run webpack \
-    && npm start . -- --user-data-dir data --disable-extension
+    npm run build \
+    && npm start . -- --user-data-dir data/ --disable-extensions
   '';
 in
 pkgs.mkShell {
