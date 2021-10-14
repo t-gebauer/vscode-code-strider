@@ -1,0 +1,13 @@
+printWidth: 100
+tabWidth: 4
+semi: false
+trailingComma: "es5"
+bracketSpacing: true
+arrowParens: "always"
+overrides:
+  - files:
+      - "*.md"
+      - "*.yml"
+      - "*.yaml"
+    options:
+      tabWidth: 2
