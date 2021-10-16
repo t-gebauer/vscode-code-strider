@@ -41,7 +41,7 @@ export class TreeSitter {
     async initializeNewParser(languageId: string): Promise<Parser> {
         const { grammarId } = Languages.get(languageId)
         this.logger?.log(
-            `-- initializing new parser instance for '${languageId}' with grammar '${grammarId}`
+            `-- initializing new parser instance for '${languageId}' with grammar '${grammarId}'`
         )
         const parser = new Parser()
         parser.setLanguage(await Parser.Language.load(this.wasmFilePath(grammarId)))

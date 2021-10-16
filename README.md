@@ -116,9 +116,15 @@ No dependencies. This extension bundles the *WASM* builds of [Tree-sitter](https
 
 In the future I might try to integrate native tree-sitter again, but that is currently quite complicated. The extension would need to be compiled with the exact same version of VS Code where it will be used.
 
-## Extension Settings
+## Extension Settings / Configuration
 
-Currently, there are no configurable settings.
+**Default mode** (`"code-strider.defaultMode"`)  
+Specify the mode in which the extension starts when opening (or switching to) a file.
+When starting in `insert` mode the extension is essentially deactivated until the `toggle-structural-navigation` command is executed.
+
+Options:
+  - `structural`: Start with structural navigation on.
+  - `insert`: Start with structural navigation off. (default)
 
 ## Contributions
 

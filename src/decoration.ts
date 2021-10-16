@@ -43,10 +43,8 @@ export function registerDecorationHandler(ext: Extension): Disposable {
         setOrResetDecorations(editor, currentLineDecorationType, node)
     }
 
-    function updateSelection(state?: EditorState): void {
-        if (!state) {
-            resetCursorStyle()
-        } else if (state.insertMode) {
+    function updateSelection(state: EditorState): void {
+        if (state.insertMode) {
             // Clear highlight when in insert mode
             setDecorationsForNode(state.editor, undefined)
             state.editor.options.cursorStyle = TextEditorCursorStyle.Line
@@ -56,15 +54,23 @@ export function registerDecorationHandler(ext: Extension): Disposable {
         }
     }
 
-    // TODO: Ideally, we would also change the decorations for inactive editors
-    ext.onActiveEditorStateChange(updateSelection)
+    function resetSelection() {
+        const activeEditor = window.activeTextEditor
+        if (activeEditor) {
+            setDecorationsForNode(activeEditor, undefined)
+            activeEditor.options.cursorStyle = workspace
+                .getConfiguration("editor")
+                .get("cursorStyle")
+        }
+    }
+
+    ext.onActiveEditorStateChange((state?: EditorState) => {
+        if (state) {
+            updateSelection(state)
+        } else {
+            resetSelection()
+        }
+    })
 
     return Disposable.from(currentDecorationType, currentLineDecorationType)
-}
-
-function resetCursorStyle() {
-    const activeEditor = window.activeTextEditor
-    if (activeEditor) {
-        activeEditor.options.cursorStyle = workspace.getConfiguration("editor").get("cursorStyle")
-    }
 }

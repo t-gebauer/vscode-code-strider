@@ -9,6 +9,9 @@ The format is roughly based on [Keep a Changelog](https://keepachangelog.com/).
 ### Features
 
 - Support more languages: Bash, Go, Haskell, Kotlin, Lua, OCaml, PHP, TOML, YAML
+- Start in insert mode by default  
+  New configuration (`code-strider.defaultMode`)  
+  New command (`code-strider:toggle-structural-navigation`)  
 
 ### Maintenance / Build tools
 
@@ -16,7 +19,7 @@ The format is roughly based on [Keep a Changelog](https://keepachangelog.com/).
 - Update `web-tree-sitter` to 0.19.4, `tree-sitter-cli` to 0.19.3, `emscripten` to 2.0.27
 - Replace `webpack` with `esbuild`
 
-## [0.3.0]
+## [0.3.0] - 2021-07-21
 
 - Improved slurping and barfing (still only HTML)
 - New edit command: transpose siblings

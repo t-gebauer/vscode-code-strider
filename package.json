@@ -41,7 +41,29 @@
     ],
     "main": "./dist/extension.js",
     "contributes": {
+        "configuration": {
+            "title": "Code Strider",
+            "properties": {
+                "code-strider.defaultMode": {
+                    "description": "The mode in which to start the extension when opening (or switching to) a new file.",
+                    "type": "string",
+                    "default": "insert",
+                    "enum": [
+                        "insert",
+                        "structural"
+                    ],
+                    "markdownEnumDescriptions": [
+                        "Start with structural navigation *off*. Activate structural navigition with the `toggle-structural-navigation` command",
+                        "Start with structural navigation *on*."
+                    ]
+                }
+            }
+        },
         "commands": [
+            {
+                "command": "code-strider:toggle-structural-navigation",
+                "title": "Code-strider: Toggle structural navigation"
+            },
             {
                 "command": "code-strider:toggle-ast-viewer",
                 "title": "Code-strider: Toggle AST viewer"
@@ -50,12 +72,21 @@
         "menus": {
             "commandPalette": [
                 {
+                    "command": "code-strider:toggle-structural-navigation",
+                    "when": "code-strider:is-editor-supported"
+                },
+                {
                     "command": "code-strider:toggle-ast-viewer",
                     "when": "code-strider:is-editor-supported"
                 }
             ]
         },
         "keybindings": [
+            {
+                "command": "code-strider:toggle-structural-navigation",
+                "key": "alt-s alt-s",
+                "when": "code-strider:is-editor-supported"
+            },
             {
                 "command": "code-strider:toggle-ast-viewer",
                 "key": "alt-s alt-t",

@@ -67,12 +67,6 @@
 
 - investigate hacky tree-sitter use: can we find nodes by editing the tree and then asking the tree, where the changes are? (Searching is currently slower than incremantal parsing)
 
-# Rejected ideas (for now)
-
-- Toggle extension on/off: Why? VS Code can already enable and disable the extension (globally, or per workspace).
-  Use "insert mode" instead. It already disables all commands and enables normal selection.
-  Better add an option to toggle specific languages.
-
 # Open questions
 
 How to navigate efficiently over lots of one-line statements? We do not want to navigate line-by-line. Precise jump?

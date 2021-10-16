@@ -75,8 +75,12 @@ export async function activate(context: ExtensionContext) {
             ext.withState(interceptTypeCommand, interceptTypeCommand)
         ),
         commands.registerTextEditorCommand(
+            "code-strider:toggle-structural-navigation",
+            ext.toggleStructuralNavigationCommand.bind(ext)
+        ),
+        commands.registerTextEditorCommand(
             "code-strider:toggle-ast-viewer",
-            ext.toggleAstViewer.bind(ext)
+            ext.toggleAstViewerCommand.bind(ext)
         ),
         // Show the debug log output channel
         commands.registerTextEditorCommand("code-strider:show-log", () =>
@@ -199,17 +203,33 @@ export class Extension implements Disposable {
 
     private readonly subscriptions: { dispose(): unknown }[] = []
 
-    constructor(private readonly treeSitter: TreeSitter) {}
+    // config `defaultMode`
+    private startInInsertMode = true
+
+    constructor(private readonly treeSitter: TreeSitter) {
+        this.readConfiguration()
+    }
 
     registerEventHandlers() {
         this.subscriptions.push(
             window.onDidChangeActiveTextEditor(this.onDidChangeActiveTextEditor.bind(this)),
             window.onDidChangeTextEditorSelection(this.onDidChangeTextEditorSelection.bind(this)),
-            workspace.onDidChangeTextDocument(this.handleTextDocumentChange.bind(this))
+            workspace.onDidChangeTextDocument(this.handleTextDocumentChange.bind(this)),
+            workspace.onDidChangeConfiguration(this.handleConfigurationChange.bind(this))
         )
     }
 
-    toggleAstViewer() {
+    toggleStructuralNavigationCommand() {
+        if (this.activeEditorState) {
+            logger.context("Stopping structural navigation")
+            this.stopStructuralNavigation()
+        } else if (window.activeTextEditor) {
+            logger.context("Activating structural navigation")
+            this.startStructuralNavigation(window.activeTextEditor)
+        }
+    }
+
+    toggleAstViewerCommand() {
         if (this.astViewer) {
             this.astViewer.dispose()
             this.astViewer = undefined
@@ -230,9 +250,10 @@ export class Extension implements Disposable {
         logger.context("Event: changed activeTextEditor")
         const isEditorSupported = editor && Languages.isSupported(editor.document.languageId)
         commands.executeCommand("setContext", "code-strider:is-editor-supported", isEditorSupported)
+
         this.activeEditorState = undefined
-        if (!editor || !isEditorSupported) {
-            this.activeEditorStateChange.fire(undefined)
+        if (!editor || !isEditorSupported || this.startInInsertMode) {
+            this.stopStructuralNavigation()
             return
         }
         // XXX: Initially the `editor.selection` will be " 0,0,0,0 " if switching to another tab
@@ -245,14 +266,7 @@ export class Extension implements Disposable {
         // the selection is correctly positioned at the start of the file.
         // Also, switching between two editor groups (split windows) will only fire the
         // `onDidChangeActiveTextEditor`, but this time with the correct expected selection.
-        setTimeout(() => {
-            const promise = this.createNewEditorState(editor)
-            promise.then((newState) => {
-                this.activeEditorState = newState
-                this.handleSelectedNodeChanged(newState)
-                this.handleModeChanged(newState)
-            })
-        }, 1)
+        setTimeout(() => this.startStructuralNavigation(editor), 1)
     }
 
     // XXX: This delay just needs to be high enough for [Ctrl-LeftButton] "Go to definition" to
@@ -315,6 +329,21 @@ export class Extension implements Disposable {
         this.activeEditorStateChange.fire(state)
     }
 
+    private startStructuralNavigation(editor: TextEditor) {
+        const promise = this.createNewEditorState(editor)
+        promise.then((newState) => {
+            this.activeEditorState = newState
+            this.handleSelectedNodeChanged(newState)
+            this.handleModeChanged(newState)
+        })
+    }
+
+    private stopStructuralNavigation() {
+        this.activeEditorState = undefined
+        commands.executeCommand("setContext", "code-strider:is-insert-mode", true)
+        this.activeEditorStateChange.fire(undefined)
+    }
+
     private async createNewEditorState(editor: TextEditor): Promise<EditorState> {
         logger.log("Starting to create new editor state ...")
         const { document } = editor
@@ -375,17 +404,17 @@ export class Extension implements Disposable {
         fundefined?: (state: undefined, ...args: T) => Promise<void> | unknown | undefined
     ): (...args: T) => Promise<void> {
         return async (...rest) => {
-            logger.context("State changing event: " + fdefined.name)
             if (this.activeEditorState) {
+                logger.context("State changing event: " + fdefined.name)
                 const readonlyState = Object.freeze({ ...this.activeEditorState })
                 const change = await fdefined(readonlyState, ...rest)
                 if (change !== undefined) {
                     this.changeActiveEditorState(change)
                 }
+                logger.log("State change event done: " + fdefined.name)
             } else if (fundefined) {
                 await fundefined(undefined, ...rest)
             }
-            logger.log("State change event done: " + fdefined.name)
         }
     }
 
@@ -448,7 +477,6 @@ export class Extension implements Disposable {
     // We should also consider whether this is an automatic reaction or a
     //   user generated (mouse selection) event.
     private findBestNodeForSelection(parseTree: Tree, selection: Selection): SyntaxNode {
-        // TODO: remove this benchmarking here?
         const timeBefore = Date.now()
         // Is the selection just a single character?
         const currentNode = selection.start.isEqual(selection.end)
@@ -456,5 +484,24 @@ export class Extension implements Disposable {
             : findNodeAtSelection(parseTree, toSimpleRange(selection))
         logger.log(`finding matching node at selection (took ${Date.now() - timeBefore} ms)`)
         return currentNode
+    }
+
+    private handleConfigurationChange(event: vscode.ConfigurationChangeEvent) {
+        logger.context("Event: configuration change detected")
+        if (event.affectsConfiguration("code-strider")) {
+            this.readConfiguration()
+        } else {
+            logger.log("does not effect code-strider")
+        }
+    }
+
+    private readConfiguration() {
+        logger.log("checking configuration")
+        const config = workspace.getConfiguration("code-strider")
+        const defaultMode = config.get("defaultMode")
+        if (defaultMode !== undefined) {
+            logger.log(`defaultMode: ${defaultMode}`)
+            this.startInInsertMode = defaultMode === "insert"
+        }
     }
 }
