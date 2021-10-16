@@ -15,7 +15,6 @@
 
 - Implement simple language agnostic editing commands
     - delete (cut): greedy delete already exists, but is not good enough yet; and `cut` should behave similarly
-- Fetch grammars more specifically (verify checksums) for reproducability
 - GitHub pipeline to test and package the extension (`.vsix`)
 
 # More ideas
@@ -46,8 +45,6 @@
   - add an option to disable specific languages
 - Select node(s) in AST view
 - improve "raise" for complex languages (e.g. TypeScript)
-- add Kotlin (grammar exists, but wasm-build is slow)
-- re-add Fennel grammar once the author decides on a license
 - go to first/last sibling (in the current node) (note: this is already possible with one more key: "parent->first-child" or "parent->last-child")
 - surround object with ? (brackets, quote marks, etc.)
 - always show start and end of selection => fold center to fit the complete selection into view
@@ -59,7 +56,7 @@
 - (always) show node numbers in the gutter (like line numbers)
   - jump to node by number (duplicated feature, conflict with "precise jump"?)
 
-- everything else that VIM can do:
+- everything else that VIM can do (integrate with the vim extensions?):
   - marks
   - go to line / beginning / end of file
   - split / merge line
